@@ -1,0 +1,3 @@
+[submodule "code/code_snippets"]
+	path = code/code_snippets
+	url = git@github.com:TheRedElement/code_snippets.git
