@@ -11,9 +11,9 @@ Each dataset is a `.csv` file with the following columns:
 
 | Column | Description |
 | :- | :- |
+$\theta$-values | values to be plotted as azimuthal offset of the panel
 $x$-values      | values to be plotted radially
 $y$-values      | values to be plotted as an azimuthal offset constraint to a circle-sector
-$\theta$-values | values to be plotted as azimuthal offset of the panel
 $y$-errors      | errors assigned to $y$-values
 processing context  | which processing was used
 
