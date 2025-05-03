@@ -13,8 +13,8 @@ using .LVisP
 """
     - function defining a gauss distribution
 """
-function gaussian_pdf(x, μ, σ)
-    f = 1 / (σ * sqrt(2π)) * exp(-(x - μ)^2 / (2σ^2))
+function gaussian_pdf(x, mu, sigma)
+    f = 1 / (sigma * sqrt(2π)) * exp(-(x - mu)^2 / (2sigma^2))
     return f
 end
 """
