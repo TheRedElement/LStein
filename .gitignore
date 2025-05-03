@@ -3,8 +3,7 @@
 #my files
 ~/
 .vscode
-data/gp
-data/raw
+gfx/*.png
 
 ##ignore
 .temp/

@@ -378,7 +378,7 @@ end
 struct LVisPCanvas
     
     thetalims::Tuple{Real,Real}
-    xticks::Tuple{Vector{Real},Vector{Any}}
+    xticks::Tuple{Vector{Real},Vector{<: Any}}
     
     thetaguidelims::Tuple{Real,Real}
     thetaplotlims::Tuple{Real,Real}
@@ -415,7 +415,7 @@ struct LVisPCanvas
     xlimrange::Union{Real,Nothing}
 
     function LVisPCanvas(;
-        thetalims::Tuple{Real,Real}, xticks::Union{Vector{T},Tuple{Vector{T},Vector{U}}}, yticks::Union{Vector{T},Tuple{Vector{T},Vector{U}},Nothing}=nothing,
+        thetalims::Tuple{Real,Real}, xticks::Union{Vector{T},Tuple{Vector{T},Vector{U}}},
         thetaguidelims::Tuple{Real,Real}=(0,2pi), thetaplotlims::Union{Tuple{Real,Real},Nothing}=nothing, xlimdeadzone::Real=0.3, panelsize::Real=pi/8,
         thetalabel::String="", xlabel::String="", ylabel::String="",
         th_arrowlength::Real=pi/4,
@@ -1140,6 +1140,10 @@ function plot_LVisPPanel!(plt::Plots.Plot,
         return
     else    #add guides
         ##get some corrections
+        thetaticklabelkwargs = LVPP.thetaticklabelkwargs
+        if ~in(:rotation, keys(thetaticklabelkwargs))
+            thetaticklabelkwargs = merge(thetaticklabelkwargs, (rotation=correct_labelrotation(theta_offset * 180/pi) - 90,))
+        end
         ylabelkwargs = LVPP.ylabelkwargs
         if ~in(:rotation, keys(ylabelkwargs))
             ylabelkwargs = merge(ylabelkwargs, (rotation=correct_labelrotation(theta_offset * 180/pi) - 90,))
@@ -1161,7 +1165,7 @@ function plot_LVisPPanel!(plt::Plots.Plot,
         end 
     
         ##labels
-        annotate!(plt, 1.35*thslicemiddle_x[2], 1.25*thslicemiddle_y[2], text(LVPP.thetaticklabel, LVPP.fontsizes[:thetaticklabel]; LVPP.thetaticklabelkwargs...); label="")                                             #theta sector
+        annotate!(plt, 1.35*thslicemiddle_x[2], 1.25*thslicemiddle_y[2], text(LVPP.thetaticklabel, LVPP.fontsizes[:thetaticklabel]; thetaticklabelkwargs...); label="")                                             #theta sector
         annotate!(plt, 1.2*thslicemiddle_x[2], 1.18*thslicemiddle_y[2], text(LVPP.ylabel, LVPP.fontsizes[:ylabel]; ylabelkwargs...); label="")  #y-label
     end
 
@@ -1258,9 +1262,9 @@ end
 """
 function Plots.plot!(plt::Plots.Plot,
     LVPC::LVisPCanvas,
-    theta::Vector{T}, x::Vector{Vector{T}}, y::Vector{Vector{T}};
+    theta::Vector{<: Real}, x::Vector{Vector{T}}, y::Vector{Vector{T}};
     thetaticklabels::Union{Vector{String},Nothing}=nothing,
-    yticks::Union{Tuple{Vector{U},Vector{V}},Vector{U},Nothing}=nothing,
+    yticks::Union{Tuple{Vector{<: Real},Vector{V}},Vector{<: Real},Nothing}=nothing,
     data_only::Bool=false,
     plot_kwargs::Union{Vector{Dict{Symbol,Any}},Nothing}=nothing,
     ) where {T <: Real, U <: Real, V <: Any}
@@ -1292,9 +1296,9 @@ function Plots.plot!(plt::Plots.Plot,
 end
 function Plots.plot(
     LVPC::LVisPCanvas,
-    theta::Vector{T}, x::Vector{Vector{T}}, y::Vector{Vector{T}};
+    theta::Vector{<: Real}, x::Vector{Vector{T}}, y::Vector{Vector{T}};
     thetaticklabels::Union{Vector{String},Nothing}=nothing,
-    yticks::Union{Tuple{Vector{U},Vector{V}},Vector{U},Nothing}=nothing,
+    yticks::Union{Tuple{Vector{<: Real},Vector{V}},Vector{<: Real},Nothing}=nothing,
     data_only::Bool=false,
     plot_kwargs::Union{Vector{Dict{Symbol,Any}},Nothing}=nothing,
     ) where {T <: Real, U <: Real, V <: Any}
