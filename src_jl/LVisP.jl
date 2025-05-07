@@ -898,7 +898,7 @@ end
     Comments
     --------
 """
-function get_xy2plot(
+function get_xy2plot_(
     LVPP::LVisPPanel, LVPC::LVisPCanvas;
     yref::Real,
     )::Tuple{Vector,Vector}
@@ -913,6 +913,28 @@ function get_xy2plot(
     y2plot = y2plot .* range(LVPC.xlimdeadzone,1,length(LVPP.y))    #rescale `y` with distance from origin
 
     y2plot = minmaxscale(y2plot, 0, nanmaximum(yslice);) .- yslice/2   #rescale `y` w.r.t. size of the sector
+
+    return x2plot, y2plot
+end
+function get_xy2plot(
+    LVPP::LVisPPanel, LVPC::LVisPCanvas;
+    yref::Real,
+    )::Tuple{Vector,Vector}
+    
+    #adapting `x` to fit into plot (`xmin_ref` and `xmax_ref` to ensure correct scaling when series does not reach xlims)
+    x2plot = minmaxscale(LVPP.x, LVPC.xlimdeadzone .* LVPC.xlimrange, LVPC.xlimrange; xmin_ref=LVPC.xlims[1], xmax_ref=LVPC.xlims[2])
+
+    #adapting `y` to fit into plot
+    yslice = x2plot .* tan(LVPP.panelsize)  #convert sector of angle `panelsize` to carthesian equivalent
+    
+    scaler = minmaxscale(x2plot, LVPC.xlimdeadzone, 1; xmin_ref=LVPC.xlimdeadzone .* LVPC.xlimrange, xmax_ref=LVPC.xlimrange)                                 #map to range(xlimdeadzone,1) to ensure dependence on x-values
+    y2plot = minmaxscale(LVPP.y, 0, 1;)  #map to range(0,1) for easy manipulation
+    y2plot = y2plot .* scaler                                                           #rescale `y` with distance from origin
+    
+    ##map into panel of angular width yslice
+    # y2plot = yslice .* y2plot .- yslice/2                                   #preserves relative dataseries-positions (i.e. for binning) #more projection effects
+    y2plot = nanmaximum(yslice) .* y2plot .- yslice/2                       #less projection effects (preserves series-signatures) #leads to discrepancies between dataseries-positions     
+    # y2plot = minmaxscale(y2plot, 0, nanmaximum(yslice)) .- yslice/2
 
     return x2plot, y2plot
 end
