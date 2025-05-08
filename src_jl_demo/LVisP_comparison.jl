@@ -10,11 +10,112 @@ using Revise
 include(joinpath(@__DIR__, "../src/LVisP.jl"))
 using .LVisP
 
+#%%definitions
+"""
+    - function defining a gaussian normaldistribution
+"""
+function gaussian_pdf(x, mu, sigma)
+    f = 1 / (sigma * sqrt(2π)) * exp(-(x - mu)^2 / (2sigma^2))
+    return f
+end
+"""
+    - function to define a very simplistic phenomenological LC simulation
+"""
+function lc_sim(
+    t::Vector;
+    t_peak::Number, f_peak::Number,
+    lambda::Number=1.0,
+    stretch0::Number, stretch1::Number, stretch2::Number,
+    noiselevel::Number=0.0,
+    )::Vector
+
+    f = (gaussian_pdf.(t, t_peak - stretch0/2, stretch1) .+ gaussian_pdf.(t, t_peak + stretch0/2, stretch2))
+    f = f_peak .* f ./ maximum(f) .+ noiselevel .* randn(length(t))
+    f .*= lambda #wavelength dependent scaling
+    return f
+end
+"""
+    - function to evaluate a sin with period `p` and `offset`
+"""
+function sin_sim(
+    t::Real;
+    f_peak::Real,
+    p::Real, offset::Real=0.,
+    noiselevel::Number=0.0
+    )::Real
+    f = f_peak * sin(t * 2pi/p + offset) .+ noiselevel .* randn()
+    return f
+end
+"""
+    - function to generate `nobjects` different dataseries according to `opt` (one of `"lc"`, `"sin"`)
+"""
+function simulate(
+    nobjects::Int=12;
+    opt::String="lc"
+    )
+    x = Array.(eachcol(collect(-20:0.2:100) .* ones(nobjects)'))
+    theta_options = 0.4:0.3:4
+    ridxs = randperm(length(theta_options))  #for random sampling without replacement
+    theta = theta_options[ridxs][1:nobjects]
+    
+    if opt == "lc"
+        t_peak = collect(range(0,40, nobjects)) .* 1
+        y = map(i -> lc_sim(x[i]; t_peak=t_peak[i], f_peak=20, lambda=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=1.0), 1:nobjects)
+        y_nonoise = map(i -> lc_sim(x[i]; t_peak=t_peak[i], f_peak=20, lambda=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=0.0), 1:nobjects)
+    else
+        theta .*= 10
+        y = map(i -> sin_sim.(x[i]; f_peak=1, p=theta[i], offset=0.0, noiselevel=0.15), 1:nobjects)
+        y_nonoise = map(i -> sin_sim.(x[i]; f_peak=1, p=theta[i], offset=0.0, noiselevel=0.0), 1:nobjects)
+    end
+
+    df_raw = DataFrame(
+        :period=>vcat(repeat(theta, 1, length(x[1]))'...),
+        :time=>vcat(x...),
+        :amplitude=>vcat(y...),
+        :amplitude_e=>NaN,
+        :processing=>"raw",
+    )
+    df_pro = DataFrame(
+        :period=>vcat(repeat(theta, 1, length(x[1]))'...),
+        :time=>vcat(x...),
+        :amplitude=>vcat(y_nonoise...),
+        :amplitude_e=>NaN,
+        :processing=>"nonoise",
+
+    )
+    df = vcat(df_raw, df_pro)
+
+    # p = scatter(
+    #     df_raw[!,:time], df_raw[!,:amplitude],
+    #     group=df_raw[!,:period],
+    #     )
+    # plot!(p,
+    #     df_pro[!,:time], df_pro[!,:amplitude],
+    #     group=df_pro[!,:period],
+
+    # )
+    # display(p)
+
+    return df
+end
+
+
+#%%demos
+
 #%%data loading
 fnames = Glob.glob("*.csv", joinpath(@__DIR__,"../data/"))
+append!(fnames, [joinpath(@__DIR__, "../data/lc_simulated.jl"), joinpath(@__DIR__, "../data/sin_simulated.jl")])    #append pseudo filenames for data generated in this script
 println(fnames)
-fname = fnames[4]
-df = DataFrame(CSV.File(fname))
+fname = fnames[31]
+
+#deal with on-the-fly data generation (pseudo filenames)
+if fname == joinpath(@__DIR__, "../data/lc_simulated.jl")
+    df = simulate(10; opt="lc")
+elseif fname == joinpath(@__DIR__, "../data/sin_simulated.jl")
+    df = simulate(10; opt="sin")
+else
+    df = DataFrame(CSV.File(fname))
+end
 
 parts = split(fname, r"[\_\.]")
 survey = parts[end-1]
@@ -79,7 +180,7 @@ yticks = collect(range(floor(minimum(minimum.(y_pro))), ceil(maximum(maximum.(y_
 
 #%%plotting
 #LVisP
-panelsize = pi/8
+panelsize = pi/(2*nthetas)
 LVPC = LVisP.LVisPCanvas(
     thetalims=thetalims, xticks=xticks,
     thetaguidelims=(-pi/2,pi/2), thetaplotlims=(-pi/2+panelsize/2,pi/2-panelsize/2), xlimdeadzone=0.3, panelsize=panelsize,
@@ -161,4 +262,4 @@ p_comp = plot(p, p_trad1, p_trad2;
 )
 
 display(p_comp)
-savefig(p_comp, replace(fname, "./data/"=>"./gfx/", ".csv"=>".png"))
+savefig(p_comp, replace(fname, "./data/"=>"./gfx/", ".csv"=>".png", ".jl"=>".png"))
