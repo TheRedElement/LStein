@@ -49,7 +49,7 @@ class LVisPCanvas:
 
         self.thetatickkwargs       = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if thetatickkwargs is None else thetatickkwargs
         self.thetaticklabelkwargs   = dict(ha="center", va="center", pad=0.2) if thetaticklabelkwargs is None else thetaticklabelkwargs
-        self.thetalabelkwargs       = dict(textcoords="offset fontsize", xytext=(-2,-2), rotation="auto") if thetalabelkwargs is None else thetalabelkwargs
+        self.thetalabelkwargs       = dict(ha="center", va="center") if thetalabelkwargs is None else thetalabelkwargs
         
         self.xtickkwargs            = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if xtickkwargs is None else xtickkwargs
         self.xticklabelkwargs       = dict(textcoords="offset fontsize", xytext=(-1,-1)) if xticklabelkwargs is None else xticklabelkwargs
@@ -110,15 +110,16 @@ class LVisPCanvas:
 
         #indicator
         th_arrow    = np.linspace(self.thetaguidelims[0], self.thetaguidelims[0]+self.thetaarrowlength, 101)
-        x_arrow, y_arrow = lvisu.polar2carth(1.4*self.xlimrange, th_arrow)
+        x_arrow, y_arrow = lvisu.polar2carth(1.0*thetatickpos_ro, th_arrow)
 
         #label
-        th_label_x, th_label_y = lvisu.polar2carth(1.45 * self.xlimrange, np.mean(th_arrow))
+        # th_label_x, th_label_y = lvisu.polar2carth(1.45 * self.xlimrange, np.mean(th_arrow))
+        th_label_x, th_label_y = (0,0)
 
         ##get correct rotation
-        th_rot = lvisu.correct_labelrotation(np.mean(th_arrow)/np.pi*180)-90 if self.thetalabelkwargs["rotation"] == "auto" else self.thetalabelkwargs["rotation"]
-        thetalabelkwargs = self.thetalabelkwargs.copy()
-        thetalabelkwargs["rotation"] = th_rot
+        # th_rot = lvisu.correct_labelrotation(np.mean(th_arrow)/np.pi*180)-90 if self.thetalabelkwargs["rotation"] == "auto" else self.thetalabelkwargs["rotation"]
+        # thetalabelkwargs = self.thetalabelkwargs.copy()
+        # thetalabelkwargs["rotation"] = th_rot
 
         #plotting
         ax.plot(np.array([thetatickpos_xi, thetatickpos_xo]), np.array([thetatickpos_yi, thetatickpos_yo]), **self.thetatickkwargs)
@@ -135,7 +136,7 @@ class LVisPCanvas:
                 fill=True,
             )
         )        
-        ax.annotate(self.thetalabel, xy=(th_label_x,th_label_y), **thetalabelkwargs)
+        ax.annotate(self.thetalabel, xy=(th_label_x,th_label_y), **self.thetalabelkwargs)
         return
 
     def plot_LVisPCanvas(self,
