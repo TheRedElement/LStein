@@ -11,6 +11,7 @@ import utils as lvisu
 class LVisPCanvas:
 
     def __init__(self,
+        ax:plt.Axes,
         thetaticks:Tuple[List[float],List[Any]], xticks:Tuple[List[float],List[Any]], yticks:Tuple[List[float],List[Any]],
         thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, 
         thetalabel:str=None, xlabel:str=None, ylabel:str=None,
@@ -24,6 +25,8 @@ class LVisPCanvas:
         ylabelkwargs:dict=None,
         ):
         
+        self.ax             = ax
+
         self.thetaticks     = (thetaticks, thetaticks) if isinstance(thetaticks, (list, np.ndarray)) else thetaticks
         self.xticks         = (xticks, xticks) if isinstance(xticks, (list, np.ndarray)) else xticks
         self.yticks         = (yticks, yticks) if isinstance(yticks, (list, np.ndarray)) else yticks
@@ -53,6 +56,7 @@ class LVisPCanvas:
         #infered attributes
         self.xlimrange = np.max(self.xticks[0]) - np.min(self.xticks[0])
         self.Panels = []
+        self.canvas_drawn = False
 
         return
 
@@ -61,8 +65,11 @@ class LVisPCanvas:
 
     #canvas methods
     def add_xaxis(self,
-        ax:plt.Axes
+        ax:plt.Axes=None,                 
         ):
+
+        #default parameters
+        if ax is None: ax = self.ax
 
         #xticks
         th_circ = np.linspace(self.thetaguidelims[0], self.thetaguidelims[1], 100)
@@ -93,8 +100,11 @@ class LVisPCanvas:
         return
     
     def add_thetaaxis(self,
-        ax:plt.Axes,               
+        ax:plt.Axes=None,                 
         ):
+
+        #default parameters
+        if ax is None: ax = self.ax
 
         #ticks
         th_pad = 1-self.thetaticklabelkwargs.pop("pad")     #get padding (scales position)
@@ -137,9 +147,12 @@ class LVisPCanvas:
         ax.annotate(self.thetalabel, xy=(th_label_x,th_label_y), annotation_clip=False, **self.thetalabelkwargs)
         return
 
-    def plot_LVisPCanvas(self,
-        ax:plt.Axes,                 
+    def draw_LVisPCanvas(self,
+        ax:plt.Axes=None,                 
         ):
+
+        #default parameters
+        if ax is None: ax = self.ax
 
         #disable some default settings
         ax.set_aspect("equal")
@@ -147,6 +160,9 @@ class LVisPCanvas:
 
         self.add_xaxis(ax)
         self.add_thetaaxis(ax)
+
+        #update switch denoting that panel has been drawn
+        self.canvas_drawn = True
 
         return
 
@@ -215,11 +231,15 @@ class LVisPPanel:
         
         self.panelboundskwargs      = dict(c=plt.rcParams["axes.edgecolor"]) if panelboundskwargs is None else panelboundskwargs
 
+        #infered attributes
+        self.panel_drawn = False
+
         return
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
 
+    #panel methods
     def get_thetabounds(self) -> Tuple[float,float,float]:
         thetaoffset = lvisu.minmaxscale(self.theta, #panel position
             self.LVPC.thetaplotlims[0], self.LVPC.thetaplotlims[1],
@@ -242,9 +262,16 @@ class LVisPPanel:
 
         return ytickpos_th, yticklabs
 
-    def plot_LVisPPanel(self,
-        ax:plt.Axes,
+    def draw_LVisPPanel(self,
+        ax:plt.Axes=None,
         ):
+        """
+            - method to draw the panel
+                - just outlines, no data-series
+        """
+
+        #default parameters
+        if ax is None: ax = self.LVPC.ax
 
         #get panel boundaries
         thetaoffset, theta_lb, theta_ub = self.get_thetabounds()
@@ -271,15 +298,39 @@ class LVisPPanel:
                 ax.annotate(yticklabs[i], xy=(yticklabelpos_x[i],yticklabelpos_y[i]), annotation_clip=False, **self.yticklabelkwargs)
         if self.show_panelbounds: ax.plot(x_bounds.T, y_bounds.T, **self.panelboundskwargs)
 
+        #update switch denoting that panel has been drawn
+        self.panel_drawn = True
+
         return
     
+    #plotting methods
+    def plot(self,
+        x:np.ndarray, y:np.ndarray,
+        ax:plt.Axes=None,
+        ):
+
+        #default parameters
+        if ax is None: ax = self.LVPC.ax
+
+        #draw canvas, panel if not done already
+        if not self.LVPC.canvas_drawn: self.LVPC.draw_LVisPCanvas()
+        if not self.panel_drawn: self.draw_LVisPPanel()
+
+        return
+
+#%%pseudo data
+x = np.linspace(-20,100,100)
+y1 = 1*np.sin(x*2*np.pi/50)
+y2 = 2*np.sin(x*2*np.pi/20)
+
 
 #%%
+
 panelsize = np.pi/8
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-LVPC = LVisPCanvas(
+LVPC = LVisPCanvas(ax,
     [-3,0,1,7], [-20,0,100], [0, 1, 6, 10],
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     xlimdeadzone=0.3,
@@ -288,7 +339,7 @@ LVPC = LVisPCanvas(
     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 )
-LVPP = LVPC.add_panel(
+LVPP1 = LVPC.add_panel(
     theta=1,
     # yticks=None, 
     yticks=([0,10,50], ["A", "B", "C"]), 
@@ -307,12 +358,12 @@ LVPP2 = LVPC.add_panel(
     panelboundskwargs=None,
 )
 
-LVPC.plot_LVisPCanvas(ax)
-# # LVPC.add_xaxis(ax)
-# # LVPC.add_thetaaxis(ax)
+# LVPC.draw_LVisPCanvas()
+# # LVPC.add_xaxis()
+# # LVPC.add_thetaaxis()
 
-LVPP.plot_LVisPPanel(ax)
-LVPP2.plot_LVisPPanel(ax)
+LVPP1.plot(x, y1)
+LVPP2.plot(x, y2)
 
 # fig.tight_layout()
 plt.show()
