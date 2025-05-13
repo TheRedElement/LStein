@@ -320,7 +320,7 @@ class LVisPPanel:
     def apply_axis_limits(self,
         x:np.ndarray, y:np.ndarray,
         **kwargs,
-        ) -> Tuple[np.ndarray,np.ndarray]:
+        ) -> Tuple[np.ndarray,np.ndarray, Dict]:
 
         x_bool = (self.LVPC.xlims[0]<=x)&(x<=self.LVPC.xlims[1])
         y_bool = (self.ylims[0]<=y)&(y<=self.ylims[1])
@@ -343,7 +343,38 @@ class LVisPPanel:
 
     def project_xy_theta(self,
         x:np.ndarray, y:np.ndarray,
-        ) -> Tuple[np.ndarray,np.ndarray, Dict]:
+        ) -> Tuple[np.ndarray,np.ndarray]:
+        """
+            - method implementing a way to project `x` and `y` into the panel
+            - operates in `theta`-space when projecting the series
+
+            Parameters
+            ----------
+                - `x`
+                    - `np.ndarray`
+                    - x-values of the series to be projected into the panel
+                - `y`
+                    - `np.ndarray`
+                    - y-values of the series to be projected into the panel
+
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `x_proj`
+                    - `np.ndarray`
+                    - `x` after projection
+                - `y_proj`
+                    - `np.ndarray`
+                    - `y` after projection
+
+            Comments
+            --------
+                - more distorsion in x-direction
+                - more accurate representation of y-direction
+        """
 
         #global variables
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
@@ -383,6 +414,37 @@ class LVisPPanel:
     def project_xy_y(self,
         x:np.ndarray, y:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray, Dict]:
+        """
+            - method implementing a way to project `x` and `y` into the panel
+            - operates in `y`-space when projecting the series
+
+            Parameters
+            ----------
+                - `x`
+                    - `np.ndarray`
+                    - x-values of the series to be projected into the panel
+                - `y`
+                    - `np.ndarray`
+                    - y-values of the series to be projected into the panel
+
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `x_proj`
+                    - `np.ndarray`
+                    - `x` after projection
+                - `y_proj`
+                    - `np.ndarray`
+                    - `y` after projection
+
+            Comments
+            --------
+                - less distorsion in x-direction
+                - less accurate values in y-direction
+        """
 
         #global variables
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
@@ -416,8 +478,42 @@ class LVisPPanel:
     
     def project_xy(self,
         x:np.ndarray, y:np.ndarray,
-        y_projection_mode:Literal["theta", "y"]="theta"
+        y_projection_mode:Literal["theta", "y"]="y"
         ) -> Tuple[np.ndarray,np.ndarray]:
+        """
+            - method to project `x` and `y` into the panel using `y_projection_method`
+
+            Parameters
+            ----------
+                - `x`
+                    - `np.ndarray`
+                    - x-values of the series to be projected into the panel
+                - `y`
+                    - `np.ndarray`
+                    - y-values of the series to be projected into the panel
+                - `y_projection_mode`
+                    - `Literal["theta","y"]`, optioal
+                    - method to use for the projection
+                    - the default is `y`
+                        - uses `self.project_xy_y()`
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `x_proj`
+                    - `np.ndarray`
+                    - `x` after projection
+                - `y_proj`
+                    - `np.ndarray`
+                    - `y` after projection
+
+            Comments
+            --------
+                - more distorsion in x-direction
+                - more accurate representation of y-direction
+        """
 
         if y_projection_mode == "theta":
             x_proj, y_proj = self.project_xy_theta(x, y)
@@ -566,8 +662,8 @@ for i in range(len(X)):
         # yticks=(yticks, ["A", "B", "C", "D"]), 
         panelsize=panelsize,
         show_panelbounds=True, show_yticks=True,
-        # y_projection_method="y",
-        y_projection_method="theta",
+        y_projection_method="y",
+        # y_projection_method="theta",
         ytickkwargs=None, yticklabelkwargs=None,
         panelboundskwargs=None,
     )
