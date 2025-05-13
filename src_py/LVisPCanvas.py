@@ -54,6 +54,7 @@ class LVisPCanvas:
         self.ylabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"]) if ylabelkwargs is None else ylabelkwargs
 
         #infered attributes
+        self.xlims = (np.min(self.xticks[0]), np.max(self.xticks[1]))
         self.xlimrange = np.max(self.xticks[0]) - np.min(self.xticks[0])
         self.Panels = []
         self.canvas_drawn = False
@@ -240,14 +241,18 @@ class LVisPPanel:
         return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
 
     #panel methods
-    def get_thetabounds(self) -> Tuple[float,float,float]:
+    def get_thetaoffset(self) -> float:
         thetaoffset = lvisu.minmaxscale(self.theta, #panel position
             self.LVPC.thetaplotlims[0], self.LVPC.thetaplotlims[1],
             xmin_ref=self.LVPC.thetaticks[0][0], xmax_ref=self.LVPC.thetaticks[0][-1]
         )
+        return thetaoffset
+    
+    def get_thetabounds(self) -> Tuple[float,float]:
+        thetaoffset = self.get_thetaoffset()
         theta_lb = thetaoffset - self.panelsize/2   #lower bound of panel
         theta_ub = thetaoffset + self.panelsize/2   #upper bound of panel
-        return thetaoffset, theta_lb, theta_ub
+        return theta_lb, theta_ub
 
     def get_rbounds(self) -> Tuple[float,float]:
         r_lb = self.LVPC.xlimdeadzone*self.LVPC.xlimrange
@@ -274,7 +279,7 @@ class LVisPPanel:
         if ax is None: ax = self.LVPC.ax
 
         #get panel boundaries
-        thetaoffset, theta_lb, theta_ub = self.get_thetabounds()
+        theta_lb, theta_ub = self.get_thetabounds()
         r_lb, r_ub = self.get_rbounds()
         r_bounds = np.array([r_lb, r_ub])
 
@@ -302,7 +307,7 @@ class LVisPPanel:
         self.panel_drawn = True
 
         return
-    
+
     #plotting methods
     def plot(self,
         x:np.ndarray, y:np.ndarray,
@@ -316,22 +321,39 @@ class LVisPPanel:
         if not self.LVPC.canvas_drawn: self.LVPC.draw_LVisPCanvas()
         if not self.panel_drawn: self.draw_LVisPPanel()
 
+
+        #project x and y
+        x2plot = lvisu.minmaxscale(x,
+            self.LVPC.xlimdeadzone*self.LVPC.xlimrange, self.LVPC.xlimrange,
+            xmin_ref=self.LVPC.xlims[0], xmax_ref=self.LVPC.xlims[1],
+        )
+        y2plot = y
+        r, theta = lvisu.carth2polar(x2plot, y2plot)
+        theta += self.get_thetaoffset() + np.pi
+
+        x2plot, y2plot = lvisu.polar2carth(r, theta)
+
+        #plotting
+        ax.plot(x2plot, y2plot)
+
         return
 
 #%%pseudo data
-x = np.linspace(-20,100,100)
-y1 = 1*np.sin(x*2*np.pi/50)
-y2 = 2*np.sin(x*2*np.pi/20)
+x1 = np.linspace(-30,100,100)
+x2 = np.linspace(-5,100,50)
+y1 = 1*np.sin(x1*2*np.pi/50)
+y2 = 2*np.sin(x2*2*np.pi/20)
 
 
 #%%
 
+yticks = np.round(np.linspace(np.min(np.append(y1,y2)), np.max(np.append(y1,y2)), 4), decimals=0)
 panelsize = np.pi/8
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
 LVPC = LVisPCanvas(ax,
-    [-3,0,1,7], [-20,0,100], [0, 1, 6, 10],
+    [-3,0,1,7], [-20,0,100], yticks,
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     xlimdeadzone=0.3,
     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
@@ -342,7 +364,7 @@ LVPC = LVisPCanvas(ax,
 LVPP1 = LVPC.add_panel(
     theta=1,
     # yticks=None, 
-    yticks=([0,10,50], ["A", "B", "C"]), 
+    # yticks=([0,10,50], ["A", "B", "C"]), 
     panelsize=panelsize,
     show_panelbounds=True, show_yticks=True,
     ytickkwargs=None, yticklabelkwargs=None,
@@ -362,8 +384,8 @@ LVPP2 = LVPC.add_panel(
 # # LVPC.add_xaxis()
 # # LVPC.add_thetaaxis()
 
-LVPP1.plot(x, y1)
-LVPP2.plot(x, y2)
+LVPP1.plot(x1, y1)
+LVPP2.plot(x2, y2)
 
 # fig.tight_layout()
 plt.show()
