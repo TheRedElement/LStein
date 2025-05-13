@@ -129,7 +129,7 @@ class LVisPPanel:
 
         #modifications of array kwargs
         if "c" in kwargs.keys():
-            if isinstance(kwargs["c"], (np.ndarray, list)) : kwargs["c"] = kwargs["c"][limitbool]
+            if isinstance(kwargs["c"], (np.ndarray, list)): kwargs["c"] = kwargs["c"][limitbool]
         if "s" in kwargs.keys(): 
             if isinstance(kwargs["s"], (np.ndarray, list)) : kwargs["s"] = kwargs["s"][limitbool]
         if "alpha" in kwargs.keys(): 

@@ -1,7 +1,9 @@
 
 #%%imports
+import matplotlib.pyplot as plt
+from matplotlib import colors as mcolors
 import numpy as np
-from typing import Tuple
+from typing import Callable, Tuple, Union
 
 #%%definitions
 def carth2polar(
@@ -18,6 +20,7 @@ def polar2carth(
     x = r * np.cos(theta)
     y = r * np.sin(theta)
     return x, y
+
 def minmaxscale(
     x:np.ndarray,
     xmin:float, xmax:float,
@@ -37,6 +40,64 @@ def correct_labelrotation(theta:float) -> float:
         return theta + 180
     else:
         return theta
+    
+def get_colors(
+    x:np.ndarray,
+    cmap:Union[str,mcolors.Colormap]=None, norm=mcolors.Normalize,
+    **kwargs
+    ) -> np.ndarray:
+    """
+        - function to generate an array of colors mapping `x` onto `cmap`
+
+        Parameters
+        ----------
+            - `x`
+                - `np.ndarray`
+                - data-series to be mapped onto `cmap`
+            - `cmap`
+                - `str`, `mcolors.Colormap`, optional
+                - colormap to use
+                - the default is `None`
+                    - will use `plt.rcParams["image.cmap"]`
+            - `norm`
+                - `mcolors Norm`, optional
+                - some instance of a `matplotlib.colors` Norm
+                - normalization to use when mapping `x` to `cmap`
+                - the default is `mcolors.Normalize`
+            - `**kwargs`
+                - kwargs to to pass to `norm()`
+
+
+        Raies
+        -----
+
+        Returns
+        -------
+            - `colors`
+                - `np.ndarray`
+                - has shape `(x.shape[0],3)`
+                    - one rgb-tuple for each value in `x`
+
+        Dependencies
+        ------------
+            - `matplotlib`
+            - `numpy`
+            - `typing`
+        
+        Comments
+        --------
+    """
+    
+    #default parameters
+    cmap = plt.rcParams["image.cmap"] if cmap is None else cmap
+    cmap = plt.get_cmap(cmap) if isinstance(cmap, str) else cmap
+    
+    #get norm
+    norm = norm(**kwargs)
+    
+    colors = cmap(norm(x))
+
+    return colors
 # %%
 
 # theta = np.linspace(0,2*np.pi,10)

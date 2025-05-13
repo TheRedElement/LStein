@@ -1,8 +1,9 @@
 
 #%%imports
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import numpy as np
-from typing import Any, List, Literal, Tuple
+from typing import Any, Dict, List, Literal, Tuple, Union
 
 import utils as lvisu
 from LVisPPanel import LVisPPanel
@@ -203,8 +204,86 @@ class LVisPCanvas:
 
         return LVPP
     
+    #get methods
+    def get_thetas(self) -> List[float]:
+        thetas = [P.theta for P in self.Panels]
 
-#%%
+        return thetas
+    
+    def get_panel(self,
+        theta:float,
+        ) -> LVisPPanel:
+
+        panel = [P for P in self.Panels if P.theta == theta][0]
+
+        return panel
+
+    #convenience methods
+    def plot(self,
+        theta:np.ndarray, X:List[np.ndarray], Y:List[np.ndarray],
+        panel_kwargs:List[Dict]=None,
+        plot_kwargs:List[Dict]=None,
+        ):
+
+        #default parameters
+        panel_kwargs = [dict() for _ in theta.__iter__()] if panel_kwargs is None else panel_kwargs
+        plot_kwargs  = [dict() for _ in theta.__iter__()] if plot_kwargs is None else plot_kwargs
+
+        #get existing panels
+        thetas = self.get_thetas()
+
+        #generate colors
+        colors = lvisu.get_colors(theta)
+        for i in range(len(plot_kwargs)):
+            if "c" not in plot_kwargs[i].keys(): plot_kwargs[i]["c"] = mcolors.to_hex(colors[i])
+        
+        for i in range(len(theta)):
+            #avoid drawing the panel twice
+            if theta[i] not in thetas:
+                LVPP = self.add_panel(
+                    theta=theta[i],
+                    **panel_kwargs[i]
+                )
+            else:
+                LVPP = self.get_panel(theta[i])
+            
+            #draw the series
+            LVPP.plot(X[i], Y[i], **plot_kwargs[i])
+            
+        return
+    
+    def scatter(self,
+        theta:np.ndarray, X:List[np.ndarray], Y:List[np.ndarray],
+        panel_kwargs:List[Dict]=None,
+        scatter_kwargs:List[Dict]=None,
+        ):
+    
+        #default parameters
+        panel_kwargs    = [dict() for _ in theta.__iter__()] if panel_kwargs is None else panel_kwargs
+        scatter_kwargs  = [dict() for _ in theta.__iter__()] if scatter_kwargs is None else scatter_kwargs
+
+        #get existing panels
+        thetas = self.get_thetas()
+
+        #generate colors
+        colors = lvisu.get_colors(theta)
+        for i in range(len(scatter_kwargs)):
+            if "c" not in scatter_kwargs[i].keys(): scatter_kwargs[i]["c"] = mcolors.to_hex(colors[i])
+        
+        for i in range(len(theta)):
+            #avoid drawing the panel twice
+            if theta[i] not in thetas:
+                LVPP = self.add_panel(
+                    theta=theta[i],
+                    **panel_kwargs[i]
+                )
+            else:
+                LVPP = self.get_panel(theta[i])
+            
+            #draw the series
+            LVPP.scatter(X[i], Y[i], **scatter_kwargs[i])
+
+        return    
 
 #%%pseudo data
 def gaussian_pdf(x, mu, sigma):
@@ -259,7 +338,7 @@ def simulate(
     return theta, x, y, y_nonoise
 
 theta, X, Y, Y_nonoise = simulate(4, opt="lc")
-theta, X, Y, Y_nonoise = simulate(4, opt="sin")
+theta, X, Y, Y_nonoise = simulate(5, opt="sin")
 
 fig = plt.figure()
 for i in range(len(theta)):
@@ -267,14 +346,14 @@ for i in range(len(theta)):
     plt.plot(X[i], Y_nonoise[i])
 
 #%%
-
 thetaticks = np.linspace(np.floor(np.min(theta)), np.ceil(np.max(theta)), 4)
 yticks = np.round(np.linspace(np.floor(np.min(np.concat(Y))), np.ceil(np.max(np.concat(Y))), 4), decimals=0)
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
+
+#%%standard usage
 fig = plt.figure(figsize=(5,9))
 ax = fig.add_subplot(111)
-
 LVPC = LVisPCanvas(ax,
     thetaticks, [-20,0,100,120], yticks,
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
@@ -284,6 +363,8 @@ LVPC = LVisPCanvas(ax,
     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 )
+colors = lvisu.get_colors(theta)
+
 for i in range(len(X)):
     LVPP = LVPC.add_panel(
         theta=theta[i],
@@ -300,8 +381,25 @@ for i in range(len(X)):
 
     LVPP.scatter(X[i], Y[i], c=Y[i], s=5,  alpha=np.linspace(0, 1, Y[i].shape[0]))
     LVPP.plot(X[i], Y_nonoise[i], c="w", lw=3)
-    LVPP.plot(X[i], Y_nonoise[i])
+    LVPP.plot(X[i], Y_nonoise[i], color=colors[i])
 
+plt.show()
+
+#%%convenience usage
+fig = plt.figure(figsize=(5,9))
+ax = fig.add_subplot(111)
+LVPC = LVisPCanvas(ax,
+    thetaticks, [-20,0,100,120], yticks,
+    thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
+    xlimdeadzone=0.3,
+    thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
+    thetaarrowlength=np.pi/2,
+    thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
+    xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
+)
+LVPC.scatter(theta, X, Y)
+LVPC.plot(theta, X, Y_nonoise, plot_kwargs=[dict(lw=3, c="w") for _ in theta])
+LVPC.plot(theta, X, Y_nonoise)
 
 # fig.tight_layout()
 plt.show()
