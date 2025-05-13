@@ -12,21 +12,16 @@ class LVisPCanvas:
 
     def __init__(self,
         thetaticks:Tuple[List[float],List[Any]], xticks:Tuple[List[float],List[Any]], yticks:Tuple[List[float],List[Any]],
-        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, panelsize:float=np.pi/8,
+        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, 
         thetalabel:str=None, xlabel:str=None, ylabel:str=None,
         thetaarrowlength:float=np.pi/4,
-        panelbounds:bool=False, ygrid:bool=True,
-        # fontsizes::Union{NamedTuple,Nothing}=nothing,
         thetatickkwargs:dict=None,
         thetaticklabelkwargs:dict=None,
         thetalabelkwargs:dict=None,
         xtickkwargs:dict=None,
         xticklabelkwargs:dict=None,
         xlabelkwargs:dict=None,
-        # ygridkwargs::NamedTuple=(linecolor=:black, linealpha=0.3, linestyle=:solid,),
-        # yticklabelkwargs::NamedTuple=NamedTuple(),
-        # ylabelkwargs::NamedTuple=NamedTuple(),
-        # panelboundskwargs::NamedTuple=(linecolor=:black, linealpha=0.4, linestyle=:solid,),
+        ylabelkwargs:dict=None,
         ):
         
         self.thetaticks     = (thetaticks, thetaticks) if isinstance(thetaticks, (list, np.ndarray)) else thetaticks
@@ -44,25 +39,27 @@ class LVisPCanvas:
 
         self.thetaarrowlength = thetaarrowlength
 
-        self.panelbounds    = panelbounds
-        self.ygrid          = ygrid
 
-        self.thetatickkwargs       = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if thetatickkwargs is None else thetatickkwargs
-        self.thetaticklabelkwargs   = dict(ha="center", va="center", pad=0.2) if thetaticklabelkwargs is None else thetaticklabelkwargs
-        self.thetalabelkwargs       = dict(ha="center", va="center") if thetalabelkwargs is None else thetalabelkwargs
+        self.thetatickkwargs        = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if thetatickkwargs is None else thetatickkwargs
+        self.thetaticklabelkwargs   = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.2) if thetaticklabelkwargs is None else thetaticklabelkwargs
+        self.thetalabelkwargs       = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center") if thetalabelkwargs is None else thetalabelkwargs
         
         self.xtickkwargs            = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if xtickkwargs is None else xtickkwargs
-        self.xticklabelkwargs       = dict(textcoords="offset fontsize", xytext=(-1,-1)) if xticklabelkwargs is None else xticklabelkwargs
-        self.xlabelkwargs           = dict(textcoords="offset fontsize", xytext=(-2,-2)) if xlabelkwargs is None else xlabelkwargs
+        self.xticklabelkwargs       = dict(c=plt.rcParams["axes.labelcolor"], textcoords="offset fontsize", xytext=(-1,-1)) if xticklabelkwargs is None else xticklabelkwargs
+        self.xlabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"], textcoords="offset fontsize", xytext=(-2,-2)) if xlabelkwargs is None else xlabelkwargs
+        
+        self.ylabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"]) if ylabelkwargs is None else ylabelkwargs
 
         #infered attributes
         self.xlimrange = np.max(self.xticks[0]) - np.min(self.xticks[0])
+        self.Panels = []
 
         return
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
 
+    #canvas methods
     def add_xaxis(self,
         ax:plt.Axes
         ):
@@ -90,8 +87,8 @@ class LVisPCanvas:
 
         ax.plot(circles_x.T, circles_y.T, **self.xtickkwargs)
         for i in range(len(xticklabs)):
-            ax.annotate(xticklabs[i], xy=(xtickpos_x[i], xtickpos_y[i]), **self.xticklabelkwargs)
-        ax.annotate(self.xlabel, xy=(xlabpos_x, xlabpos_y), **self.xlabelkwargs)
+            ax.annotate(xticklabs[i], xy=(xtickpos_x[i], xtickpos_y[i]), annotation_clip=False, **self.xticklabelkwargs)
+        ax.annotate(self.xlabel, xy=(xlabpos_x, xlabpos_y), annotation_clip=False, **self.xlabelkwargs)
 
         return
     
@@ -124,7 +121,7 @@ class LVisPCanvas:
         #plotting
         ax.plot(np.array([thetatickpos_xi, thetatickpos_xo]), np.array([thetatickpos_yi, thetatickpos_yo]), **self.thetatickkwargs)
         for i in range(len(self.thetaticks[0])):    #ticklabels
-            ax.annotate(f"{self.thetaticks[1][i]}", xy=(thetaticklabelpos_x[i], thetaticklabelpos_y[i]), **self.thetaticklabelkwargs)
+            ax.annotate(f"{self.thetaticks[1][i]}", xy=(thetaticklabelpos_x[i], thetaticklabelpos_y[i]), annotation_clip=False, **self.thetaticklabelkwargs)
         line, = ax.plot(x_arrow[:-1], y_arrow[:-1], **self.thetatickkwargs)
         ax.annotate("",
             xy=(x_arrow[-1],y_arrow[-1]),
@@ -134,9 +131,10 @@ class LVisPCanvas:
                 lw=line.get_linewidth(),
                 color=line.get_color(),
                 fill=True,
-            )
+            ),
+            annotation_clip=False, 
         )        
-        ax.annotate(self.thetalabel, xy=(th_label_x,th_label_y), **self.thetalabelkwargs)
+        ax.annotate(self.thetalabel, xy=(th_label_x,th_label_y), annotation_clip=False, **self.thetalabelkwargs)
         return
 
     def plot_LVisPCanvas(self,
@@ -152,26 +150,169 @@ class LVisPCanvas:
 
         return
 
+    #panel methods
+    def add_panel(self,
+        theta:float,
+        yticks:Tuple[List[float],List[Any]]=None,
+        panelsize:float=np.pi/8,
+        show_panelbounds:bool=False, show_yticks:bool=True,
+        ytickkwargs:dict=None,
+        yticklabelkwargs:dict=None,
+        panelboundskwargs:dict=None,
+        ):
+
+        #default parameters
+        if isinstance(yticks, (list, np.ndarray)):
+            yticks = (yticks, yticks)
+        elif yticks is None and self.yticks is not None:
+            yticks = self.yticks
+        else:
+            yticks = yticks
+
+
+        LVPP = LVisPPanel(self,
+            theta=theta,
+            yticks=yticks,
+            panelsize=panelsize,
+            show_panelbounds=show_panelbounds, show_yticks=show_yticks,
+            ytickkwargs=ytickkwargs,
+            yticklabelkwargs=yticklabelkwargs,
+            panelboundskwargs=panelboundskwargs,
+        )
+        print(LVPP)
+
+        self.Panels.append(LVPP)
+
+        return LVPP
+    
+
 #%%
-panelsize = np.pi/5
+class LVisPPanel:
+
+    def __init__(self,
+        LVPC:LVisPCanvas,
+        theta:float,
+        yticks:Tuple[List[float],List[Any]]=None,
+        panelsize:float=np.pi/8,
+        show_panelbounds:bool=False, show_yticks:bool=True,
+        ytickkwargs:dict=None, yticklabelkwargs:dict=None,
+        panelboundskwargs:dict=None,
+        ):
+
+        self.LVPC           = LVPC
+        
+        self.theta          = theta
+        
+        self.yticks         = yticks
+        
+        self.panelsize      = panelsize
+
+        self.show_panelbounds    = show_panelbounds
+        self.show_yticks          = show_yticks
+
+        self.ytickkwargs            = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if ytickkwargs is None else ytickkwargs
+        self.yticklabelkwargs       = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.1) if yticklabelkwargs is None else yticklabelkwargs
+        
+        self.panelboundskwargs      = dict(c=plt.rcParams["axes.edgecolor"]) if panelboundskwargs is None else panelboundskwargs
+
+        return
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
+
+    def get_thetabounds(self) -> Tuple[float,float,float]:
+        thetaoffset = lvisu.minmaxscale(self.theta, #panel position
+            self.LVPC.thetaplotlims[0], self.LVPC.thetaplotlims[1],
+            xmin_ref=self.LVPC.thetaticks[0][0], xmax_ref=self.LVPC.thetaticks[0][-1]
+        )
+        theta_lb = thetaoffset - self.panelsize/2   #lower bound of panel
+        theta_ub = thetaoffset + self.panelsize/2   #upper bound of panel
+        return thetaoffset, theta_lb, theta_ub
+
+    def get_rbounds(self) -> Tuple[float,float]:
+        r_lb = self.LVPC.xlimdeadzone*self.LVPC.xlimrange
+        r_ub = self.LVPC.xlimrange
+        return r_lb, r_ub
+
+    def get_yticks(self,
+        th_lb:float, th_ub:float
+        ) -> Tuple[List[float],List[Any]]:
+        ytickpos_th = lvisu.minmaxscale(self.yticks[0], th_lb, th_ub)
+        yticklabs = self.yticks[1]
+
+        return ytickpos_th, yticklabs
+
+    def plot_LVisPPanel(self,
+        ax:plt.Axes,
+        ):
+
+        #get panel boundaries
+        thetaoffset, theta_lb, theta_ub = self.get_thetabounds()
+        r_lb, r_ub = self.get_rbounds()
+        r_bounds = np.array([r_lb, r_ub])
+
+        #get yticks
+        ytickpos_th, yticklabs = self.get_yticks(theta_lb, theta_ub)
+
+        #convert to carthesian for plotting
+        x_lb, y_lb  = lvisu.polar2carth(r_bounds, theta_lb)
+        x_ub, y_ub  = lvisu.polar2carth(r_bounds, theta_ub)
+        x_bounds = np.array([x_lb,x_ub])
+        y_bounds = np.array([y_lb,y_ub])
+
+        pad = self.yticklabelkwargs.pop("pad")   #padding for yticklabels
+        r_, th_ = np.meshgrid(r_bounds, ytickpos_th)
+        ytickpos_x, ytickpos_y              = lvisu.polar2carth(r_, th_)
+        yticklabelpos_x, yticklabelpos_y    = lvisu.polar2carth((1+pad)*r_ub, ytickpos_th)
+
+        if self.show_yticks:
+            ax.plot(ytickpos_x.T, ytickpos_y.T, **self.ytickkwargs)
+            for i in range(len(ytickpos_th)):
+                ax.annotate(yticklabs[i], xy=(yticklabelpos_x[i],yticklabelpos_y[i]), annotation_clip=False, **self.yticklabelkwargs)
+        if self.show_panelbounds: ax.plot(x_bounds.T, y_bounds.T, **self.panelboundskwargs)
+
+        return
+    
+
+#%%
+panelsize = np.pi/8
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.grid()
 
 LVPC = LVisPCanvas(
-    [-3,0,7], [-20,0,100], [0, 1, 10],
+    [-3,0,1,7], [-20,0,100], [0, 1, 6, 10],
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     xlimdeadzone=0.3,
-    panelsize=panelsize,
     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
     thetaarrowlength=np.pi/2,
     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 )
+LVPP = LVPC.add_panel(
+    theta=1,
+    # yticks=None, 
+    yticks=([0,10,50], ["A", "B", "C"]), 
+    panelsize=panelsize,
+    show_panelbounds=True, show_yticks=True,
+    ytickkwargs=None, yticklabelkwargs=None,
+    panelboundskwargs=None,
+)
+LVPP2 = LVPC.add_panel(
+    theta=5,
+    yticks=None, 
+    # yticks=([0,10,50], ["A", "B", "C"]), 
+    panelsize=panelsize,
+    show_panelbounds=True, show_yticks=True,
+    ytickkwargs=None, yticklabelkwargs=None,
+    panelboundskwargs=None,
+)
+
 LVPC.plot_LVisPCanvas(ax)
-# LVPC.add_xaxis(ax)
-# LVPC.add_thetaaxis(ax)
+# # LVPC.add_xaxis(ax)
+# # LVPC.add_thetaaxis(ax)
 
-fig.tight_layout()
+LVPP.plot_LVisPPanel(ax)
+LVPP2.plot_LVisPPanel(ax)
 
-    
+# fig.tight_layout()
+plt.show()

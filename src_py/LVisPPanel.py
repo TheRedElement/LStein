@@ -1,12 +1,12 @@
-
 #%%imports
 import matplotlib.pyplot as plt
+from matplotlib import patches as mpatches
 import numpy as np
-from typing import List, Tuple, Any
+from typing import Any, List, Tuple
 
-from LVisPCanvas import LVisPCanvas
+import utils as lvisu
 
-#%%
+#%%classes
 class LVisPPanel:
 
     def __init__(self,
@@ -37,34 +37,12 @@ class LVisPPanel:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
 
-
-#%%definitions
-class LVisP:
-
-    def __init__(self,
-        LVPC:LVisPCanvas,
-        LVPP:List[LVisPPanel]
-        ):
-        return
-    
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
-
-    def add_panel(
-            theta
-        ):
-
-        return
-    
-
 #%%
 from LVisPCanvas import LVisPCanvas
 panelsize = np.pi/5
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.grid()
-
-LVP = LVisP()
 
 LVPC = LVisPCanvas(
     [-3,0,7], [-20,0,100], [0, 1, 10],
