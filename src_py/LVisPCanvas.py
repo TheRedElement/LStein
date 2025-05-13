@@ -172,7 +172,7 @@ class LVisPCanvas:
         yticks:Tuple[List[float],List[Any]]=None,
         panelsize:float=np.pi/8,
         show_panelbounds:bool=False, show_yticks:bool=True,
-        y_projection_mode:Literal["theta", "y"]="theta",
+        y_projection_method:Literal["y","theta"]="y",
         ytickkwargs:dict=None,
         yticklabelkwargs:dict=None,
         panelboundskwargs:dict=None,
@@ -192,7 +192,7 @@ class LVisPCanvas:
             yticks=yticks,
             panelsize=panelsize,
             show_panelbounds=show_panelbounds, show_yticks=show_yticks,
-            y_projection_mode=y_projection_mode,
+            y_projection_method=y_projection_method,
             ytickkwargs=ytickkwargs,
             yticklabelkwargs=yticklabelkwargs,
             panelboundskwargs=panelboundskwargs,
@@ -218,7 +218,7 @@ class LVisPPanel:
         yticks:Tuple[List[float],List[Any]]=None,
         panelsize:float=np.pi/8,
         show_panelbounds:bool=False, show_yticks:bool=True,
-        y_projection_mode:Literal["theta", "y"]="y",
+        y_projection_method:Literal["y","theta"]="y",
         ytickkwargs:dict=None, yticklabelkwargs:dict=None,
         panelboundskwargs:dict=None,
         ):
@@ -234,7 +234,7 @@ class LVisPPanel:
         self.show_panelbounds   = show_panelbounds
         self.show_yticks        = show_yticks
 
-        self.y_projection_mode  = y_projection_mode
+        self.y_projection_method= y_projection_method
 
         self.ytickkwargs        = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if ytickkwargs is None else ytickkwargs
         self.yticklabelkwargs   = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.1) if yticklabelkwargs is None else yticklabelkwargs
@@ -331,11 +331,11 @@ class LVisPPanel:
 
         #modifications of array kwargs
         if "c" in kwargs.keys():
-            if hasattr(kwargs["c"], "__iter__") : kwargs["c"] = kwargs["c"][limitbool]
+            if isinstance(kwargs["c"], (np.ndarray, list)) : kwargs["c"] = kwargs["c"][limitbool]
         if "s" in kwargs.keys(): 
-            if hasattr(kwargs["s"], "__iter__") : kwargs["s"] = kwargs["s"][limitbool]
+            if isinstance(kwargs["s"], (np.ndarray, list)) : kwargs["s"] = kwargs["s"][limitbool]
         if "alpha" in kwargs.keys(): 
-            if hasattr(kwargs["alpha"], "__iter__") : kwargs["alpha"] = kwargs["alpha"][limitbool]
+            if isinstance(kwargs["alpha"], (np.ndarray, list)) : kwargs["alpha"] = kwargs["alpha"][limitbool]
             
         
         return x_cut, y_cut, kwargs
@@ -371,6 +371,7 @@ class LVisPPanel:
         ##rescale theta (i.e., make sure y obeys axis limits)
         theta = lvisu.minmaxscale(theta,
             theta_lb, theta_ub,
+            # theta_lb, theta_ub,
             xmin_ref=th_min, xmax_ref=th_max,
         )
 
@@ -393,15 +394,14 @@ class LVisPPanel:
         )
 
         #project y to fit into panel
-
         y_scaler = lvisu.minmaxscale(x_proj,
             self.LVPC.xlimdeadzone, 1,
             xmin_ref=self.LVPC.xlimdeadzone*self.LVPC.xlimrange, xmax_ref=self.LVPC.xlimrange
         )
-        y_proj = lvisu.minmaxscale(y, 0,1,)
+        y_proj = lvisu.minmaxscale(y, 0, 1, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
         y_proj = y_scaler * y_proj
         
-        
+        ##rescale to fill panel (considering bounds)
         y_slice = x_proj * np.tan(self.panelsize)
         y_proj = np.max(y_slice) * y_proj - y_slice/2
         
@@ -445,7 +445,7 @@ class LVisPPanel:
         x_cut, y_cut, kwargs = self.apply_axis_limits(x, y, **kwargs)
 
         #project x and y
-        x_proj, y_proj = self.project_xy(x_cut, y_cut, self.y_projection_mode)
+        x_proj, y_proj = self.project_xy(x_cut, y_cut, self.y_projection_method)
 
         #plotting
         line = ax.plot(x_proj, y_proj, **kwargs)
@@ -473,7 +473,7 @@ class LVisPPanel:
         x_cut, y_cut, kwargs = self.apply_axis_limits(x, y, **kwargs)
 
         #project x and y
-        x_proj, y_proj = self.project_xy(x_cut, y_cut, self.y_projection_mode)
+        x_proj, y_proj = self.project_xy(x_cut, y_cut, self.y_projection_method)
 
         #plotting
         sctr = ax.scatter(x_proj, y_proj, **kwargs)
@@ -498,11 +498,11 @@ def lc_sim(
         - function to define a very simplistic phenomenological LC simulation
     """
     f = (gaussian_pdf(t, t_peak - stretch0/2, stretch1) + gaussian_pdf(t, t_peak + stretch0/2, stretch2))
-    f = f_peak * f / np.max(f) + noiselevel * np.random.randn(len(t))
+    f = f_peak * f / np.max(f) + noiselevel * np.random.randn(*t.shape)
     f *= lbda
     return f
 def sin_sim(
-    t:float,
+    t:np.array,
     f_peak:float,
     p:float, offset:float=0.,
     noiselevel:float=0.0
@@ -510,14 +510,14 @@ def sin_sim(
     """
         - function to evaluate a sin with period `p` and `offset`
     """
-    f = f_peak * np.sin(t * 2*np.pi/p + offset) + noiselevel * np.random.randn()
+    f = f_peak * np.sin(t * 2*np.pi/p + offset) + noiselevel * np.random.randn(*t.shape)
     return f
 def simulate(
     nobjects:int=6,
     opt:Literal["lc","sin"]="lc"
     ):
-    res = 200
-    x = np.sort(np.random.choice(np.linspace(-50,100,100), size=(nobjects,res)), axis=1)
+    res = 500
+    x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
     theta_options = np.arange(0.4, 4, 0.5)
     theta = np.random.choice(theta_options, size=nobjects, replace=False)
     
@@ -527,7 +527,7 @@ def simulate(
         y_nonoise   = np.array([*map(lambda i: lc_sim(x[i], t_peak=t_peak[i], f_peak=20, lbda=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=0.0), range(nobjects))])
     else:
         theta *= 10
-        y           = np.array([*map(lambda i: sin_sim(x[i], f_peak=1, p=theta[i], offset=0.0, noiselevel=0.5), range(nobjects))])
+        y           = np.array([*map(lambda i: sin_sim(x[i], f_peak=1, p=theta[i], offset=0.0, noiselevel=0.1), range(nobjects))])
         y_nonoise   = np.array([*map(lambda i: sin_sim(x[i], f_peak=1, p=theta[i], offset=0.0, noiselevel=0.0), range(nobjects))])
 
     return theta, x, y, y_nonoise
@@ -535,16 +535,18 @@ def simulate(
 theta, X, Y, Y_nonoise = simulate(4, opt="lc")
 theta, X, Y, Y_nonoise = simulate(4, opt="sin")
 
-# fig = plt.figure()
-# plt.scatter(X.T, Y.T)
-# plt.plot(X.T, Y_nonoise.T)
+fig = plt.figure()
+for i in range(len(theta)):
+    plt.scatter(X[i], Y[i])
+    plt.plot(X[i], Y_nonoise[i])
 
 #%%
 
 thetaticks = np.linspace(np.floor(np.min(theta)), np.ceil(np.max(theta)), 4)
-yticks = np.round(np.linspace(np.min(np.concat(Y)), np.max(np.concat(Y)), 4), decimals=0)
+yticks = np.round(np.linspace(np.floor(np.min(np.concat(Y))), np.ceil(np.max(np.concat(Y))), 4), decimals=0)
+# yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
-fig = plt.figure()
+fig = plt.figure(figsize=(5,9))
 ax = fig.add_subplot(111)
 
 LVPC = LVisPCanvas(ax,
@@ -557,26 +559,22 @@ LVPC = LVisPCanvas(ax,
     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 )
 for i in range(len(X)):
-
     LVPP = LVPC.add_panel(
         theta=theta[i],
         # yticks=None,
-        # yticks=yticks,
-        yticks=(yticks, ["A", "B", "C", "D"]), 
+        yticks=yticks,
+        # yticks=(yticks, ["A", "B", "C", "D"]), 
         panelsize=panelsize,
         show_panelbounds=True, show_yticks=True,
-        y_projection_mode="y",
-        # y_projection_mode="theta",
+        # y_projection_method="y",
+        y_projection_method="theta",
         ytickkwargs=None, yticklabelkwargs=None,
         panelboundskwargs=None,
     )
 
     LVPP.scatter(X[i], Y[i], c=Y[i], s=5,  alpha=np.linspace(0, 1, Y[i].shape[0]))
+    LVPP.plot(X[i], Y_nonoise[i], c="w", lw=3)
     LVPP.plot(X[i], Y_nonoise[i])
-
-# LVPC.draw_LVisPCanvas()
-# # LVPC.add_xaxis()
-# # LVPC.add_thetaaxis()
 
 
 # fig.tight_layout()
