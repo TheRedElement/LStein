@@ -16,7 +16,7 @@ class LVisPCanvas:
         thetaticks:Tuple[List[float],List[Any]], xticks:Tuple[List[float],List[Any]], yticks:Tuple[List[float],List[Any]],
         thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, 
         thetalabel:str=None, xlabel:str=None, ylabel:str=None,
-        thetaarrowpos:float=np.pi/4, ylabpos_th:float=None,
+        thetaarrowpos_th:float=None, ylabpos_th:float=None,
         thetatickkwargs:dict=None,
         thetaticklabelkwargs:dict=None,
         thetalabelkwargs:dict=None,
@@ -28,9 +28,9 @@ class LVisPCanvas:
         
         self.ax             = ax
 
-        self.thetaticks     = (thetaticks, np.round(thetaticks,0).astype(int)) if isinstance(thetaticks, (list, np.ndarray)) else thetaticks
-        self.xticks         = (xticks, np.round(xticks,0).astype(int)) if isinstance(xticks, (list, np.ndarray)) else xticks
-        self.yticks         = (yticks, np.round(yticks,0).astype(int)) if isinstance(yticks, (list, np.ndarray)) else yticks
+        self.thetaticks     = (thetaticks, thetaticks) if isinstance(thetaticks, (list, np.ndarray)) else thetaticks
+        self.xticks         = (xticks, xticks) if isinstance(xticks, (list, np.ndarray)) else xticks
+        self.yticks         = (yticks, yticks) if isinstance(yticks, (list, np.ndarray)) else yticks
         
         self.thetaguidelims = (0,2,np.pi) if thetaguidelims is None else thetaguidelims
         self.thetaplotlims  = thetaguidelims if thetaplotlims is None else thetaplotlims
@@ -41,8 +41,8 @@ class LVisPCanvas:
         self.xlabel         = "" if xlabel is None else xlabel
         self.ylabel         = "" if ylabel is None else ylabel
 
-        self.thetaarrowpos  = thetaarrowpos
-        self.ylabpos_th     = self.thetaticks[0][0] if ylabpos_th is None else ylabpos_th
+        self.thetaarrowpos_th   = np.mean(self.thetaticks[0]) if thetaarrowpos_th is None else thetaarrowpos_th
+        self.ylabpos_th         = self.thetaticks[0][0] if ylabpos_th is None else ylabpos_th
 
         self.thetatickkwargs        = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if thetatickkwargs is None else thetatickkwargs
         self.thetaticklabelkwargs   = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.2) if thetaticklabelkwargs is None else thetaticklabelkwargs
@@ -55,6 +55,7 @@ class LVisPCanvas:
         self.ylabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"], pad=0.15) if ylabelkwargs is None else ylabelkwargs
 
         #infered attributes
+        self.thetalims = (np.min(self.thetaticks[0]), np.max(self.thetaticks[1]))
         self.xlims = (np.min(self.xticks[0]), np.max(self.xticks[1]))
         self.xlimrange = np.max(self.xticks[0]) - np.min(self.xticks[0])
         self.Panels = []
@@ -118,8 +119,12 @@ class LVisPCanvas:
         thetatickpos_xo, thetatickpos_yo            = lvisu.polar2carth(thetatickpos_ro, thetatickpos_th)
 
         #indicator
-        th_arrow    = np.linspace(self.thetaguidelims[0], self.thetaguidelims[0]+self.thetaarrowpos, 101)
-        x_arrow, y_arrow = lvisu.polar2carth(1.0*thetatickpos_ro, th_arrow)
+        thetaarrowpos_th = lvisu.minmaxscale(self.thetaarrowpos_th,
+            self.thetaplotlims[0], self.thetaplotlims[1],
+            xmin_ref=self.thetaticks[0][0], xmax_ref=self.thetaticks[0][-1],
+        )
+
+        x_arrow, y_arrow = lvisu.polar2carth(1.0*thetatickpos_ro, np.array([thetaarrowpos_th,thetaarrowpos_th+1e-3]))
 
         #label
         # th_label_x, th_label_y = lvisu.polar2carth(1.45 * self.xlimrange, np.mean(th_arrow))
@@ -366,8 +371,8 @@ for i in range(len(theta)):
     plt.plot(X[i], Y_nonoise[i])
 
 #%%
-thetaticks = np.linspace(np.floor(np.min(theta)), np.ceil(np.max(theta)), 4)
-yticks = np.round(np.linspace(np.floor(np.min(np.concat(Y))), np.ceil(np.max(np.concat(Y))), 4), decimals=0)
+thetaticks = np.round(np.linspace(np.floor(np.min(theta)), np.ceil(np.max(theta)), 4),0).astype(int)
+yticks = np.round(np.linspace(np.floor(np.min(np.concat(Y))), np.ceil(np.max(np.concat(Y))), 4), decimals=0).astype(int)
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
 print(thetaticks)
@@ -380,7 +385,7 @@ LVPC = LVisPCanvas(ax,
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     xlimdeadzone=0.3,
     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
-    thetaarrowpos=np.pi/2, ylabpos_th=np.min(theta),
+    thetaarrowpos_th=None, ylabpos_th=np.min(theta),
     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 )
@@ -407,6 +412,7 @@ for i in range(len(X)):
 plt.show()
 
 #%%convenience usage
+print(np.sort(theta))
 fig = plt.figure(figsize=(5,9))
 ax = fig.add_subplot(111)
 LVPC = LVisPCanvas(ax,
@@ -414,7 +420,7 @@ LVPC = LVisPCanvas(ax,
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     xlimdeadzone=0.3,
     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
-    thetaarrowpos=np.pi/2, ylabpos_th=None,
+    thetaarrowpos_th=2, ylabpos_th=None,
     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 )
