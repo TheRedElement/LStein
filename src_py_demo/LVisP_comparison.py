@@ -90,7 +90,7 @@ def simulate(
 fnames = glob.glob("../data/*.csv")
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[0]
+fname = fnames[6]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -130,9 +130,10 @@ xticks = np.round(np.linspace(np.floor(np.min(np.concat(x_raw))), np.ceil(np.max
 yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), 4), decimals=0).astype(int)
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/10
-colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral")
+colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=300)
 
 #%%plotting
+plt.style.use("dark_background")
 #LVisP
 fig = plt.figure(figsize=(12,9))
 fig.suptitle(f"{otype} ({survey})")
@@ -143,7 +144,7 @@ LVPC = LVisPCanvas.LVisPCanvas(ax,
     xlimdeadzone=0.3,
     thetalabel=r"Passband Wavelength [nm]", xlabel="MJD-min(MJD) [d]", ylabel="Fuxcal []",
     thetaarrowpos_th=None, ylabpos_th=None,
-    thetatickkwargs=dict(c="k"), thetaticklabelkwargs=None, thetalabelkwargs=None,
+    thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=None,
     xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(-3.5,0)),
     ylabelkwargs=dict(rotation=0)
 )
@@ -160,10 +161,10 @@ LVPC.plot(theta_pro, x_pro, y_pro,
 )
 LVPC.plot(theta_pro, x_pro, y_pro,
     plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
-    )
+)
 
 
-#traditions
+#traditional
 axt1 = fig.add_subplot(222, xlabel="MJD-min(MJD) [d]", ylabel="Fuxcal []")
 
 for i in range(len(theta_raw)):
@@ -177,6 +178,7 @@ for i in range(len(theta_raw)):
 # for i in range(6):
     pos = 16+i if i < 3 else 22+(i-3)
     axt2 = fig.add_subplot(4, 6, pos, xlabel="MJD-min(MJD) [d]", ylabel="Fuxcal []")
+    # axt2 = fig.add_subplot(5, 1, i+1, xlabel="MJD-min(MJD) [d]", ylabel="Fuxcal []")
     axt2.scatter(x_raw[i], y_raw[i], c=colors[i])
     axt2.plot(x_pro[i], y_pro[i], c="w", lw=3)
     axt2.plot(x_pro[i], y_pro[i], c=colors[i], label=f"{np.round(theta_raw[i], decimals=0)} nm")
