@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple
 
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # from LVisPCanvas import LVisPCanvas   #no import because leads to curcular import
 import utils as lvisu
 

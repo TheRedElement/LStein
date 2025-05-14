@@ -5,6 +5,11 @@ import matplotlib.colors as mcolors
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple, Union
 
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+print(sys.path)
+
 import utils as lvisu
 from LVisPPanel import LVisPPanel
 
@@ -196,7 +201,7 @@ class LVisPCanvas:
     def __init__(self,
         ax:plt.Axes,
         thetaticks:Union[Tuple[List[float],List[Any]],List[float]], xticks:Union[Tuple[List[float],List[Any]],List[float]], yticks:Union[Tuple[List[float],List[Any]],List[float]],
-        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, 
+        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3,
         thetalabel:str=None, xlabel:str=None, ylabel:str=None,
         thetaarrowpos_th:float=None, ylabpos_th:float=None,
         thetatickkwargs:dict=None, thetaticklabelkwargs:dict=None, thetalabelkwargs:dict=None,
@@ -213,7 +218,6 @@ class LVisPCanvas:
         self.thetaguidelims = (0,2*np.pi) if thetaguidelims is None else thetaguidelims
         self.thetaplotlims  = thetaguidelims if thetaplotlims is None else thetaplotlims
         self.xlimdeadzone   = xlimdeadzone
-        self.panelsize      = panelsize
 
         self.thetalabel     = "" if thetalabel is None else thetalabel
         self.xlabel         = "" if xlabel is None else xlabel
@@ -491,122 +495,72 @@ class LVisPCanvas:
         return    
 
 #%%pseudo data
-def gaussian_pdf(x, mu, sigma):
-    """
-        - function defining a gaussian normal distribution
-    """    
-    y = 1/(sigma*np.sqrt(2*np.pi)) * np.exp(-(x - mu)**2 / (2*sigma**2))
-    return y
-def lc_sim(
-    t:np.ndarray,
-    t_peak:float, f_peak:float,
-    stretch0:float, stretch1:float, stretch2:float,
-    lbda:float=1.0,
-    noiselevel:float=0.0,
-    ) -> np.ndarray:
-    """
-        - function to define a very simplistic phenomenological LC simulation
-    """
-    f = (gaussian_pdf(t, t_peak - stretch0/2, stretch1) + gaussian_pdf(t, t_peak + stretch0/2, stretch2))
-    f = f_peak * f / np.max(f) + noiselevel * np.random.randn(*t.shape)
-    f *= lbda
-    return f
-def sin_sim(
-    t:np.array,
-    f_peak:float,
-    p:float, offset:float=0.,
-    noiselevel:float=0.0
-    ) -> float:
-    """
-        - function to evaluate a sin with period `p` and `offset`
-    """
-    f = f_peak * np.sin(t * 2*np.pi/p + offset) + noiselevel * np.random.randn(*t.shape)
-    return f
-def simulate(
-    nobjects:int=6,
-    opt:Literal["lc","sin"]="lc"
-    ):
-    res = 500
-    x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
-    theta_options = np.arange(0.4, 4, 0.5)
-    theta = np.random.choice(theta_options, size=nobjects, replace=False)
-    
-    if opt == "lc":
-        t_peak = np.linspace(0,40,nobjects) * 0
-        y           = np.array([*map(lambda i: lc_sim(x[i], t_peak=t_peak[i], f_peak=20, lbda=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=1.0), range(nobjects))])
-        y_nonoise   = np.array([*map(lambda i: lc_sim(x[i], t_peak=t_peak[i], f_peak=20, lbda=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=0.0), range(nobjects))])
-    else:
-        theta *= 10
-        y           = np.array([*map(lambda i: sin_sim(x[i], f_peak=1, p=theta[i], offset=0.0, noiselevel=0.1), range(nobjects))])
-        y_nonoise   = np.array([*map(lambda i: sin_sim(x[i], f_peak=1, p=theta[i], offset=0.0, noiselevel=0.0), range(nobjects))])
 
-    return theta, x, y, y_nonoise
+# theta, X, Y, Y_nonoise = simulate(4, opt="lc")
+# # theta, X, Y, Y_nonoise = simulate(5, opt="sin")
 
-theta, X, Y, Y_nonoise = simulate(4, opt="lc")
-# theta, X, Y, Y_nonoise = simulate(5, opt="sin")
+# fig = plt.figure()
+# for i in range(len(theta)):
+#     plt.scatter(X[i], Y[i])
+#     plt.plot(X[i], Y_nonoise[i])
 
-fig = plt.figure()
-for i in range(len(theta)):
-    plt.scatter(X[i], Y[i])
-    plt.plot(X[i], Y_nonoise[i])
+# #%%
+# thetaticks = np.round(np.linspace(np.floor(np.min(theta)), np.ceil(np.max(theta)), 4),0).astype(int)
+# yticks = np.round(np.linspace(np.floor(np.min(np.concat(Y))), np.ceil(np.max(np.concat(Y))), 4), decimals=0).astype(int)
+# # yticks = np.sort(np.append(yticks, [-10, 80]))
+# panelsize = np.pi/8
+# print(thetaticks)
 
-#%%
-thetaticks = np.round(np.linspace(np.floor(np.min(theta)), np.ceil(np.max(theta)), 4),0).astype(int)
-yticks = np.round(np.linspace(np.floor(np.min(np.concat(Y))), np.ceil(np.max(np.concat(Y))), 4), decimals=0).astype(int)
-# yticks = np.sort(np.append(yticks, [-10, 80]))
-panelsize = np.pi/8
-print(thetaticks)
+# #%%standard usage
+# fig = plt.figure(figsize=(5,9))
+# ax = fig.add_subplot(111)
+# LVPC = LVisPCanvas(ax,
+#     thetaticks, [-20,0,100,120], yticks,
+#     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
+#     xlimdeadzone=0.3,
+#     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
+#     thetaarrowpos_th=None, ylabpos_th=np.min(theta),
+#     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
+#     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
+# )
+# colors = lvisu.get_colors(theta)
 
-#%%standard usage
-fig = plt.figure(figsize=(5,9))
-ax = fig.add_subplot(111)
-LVPC = LVisPCanvas(ax,
-    thetaticks, [-20,0,100,120], yticks,
-    thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
-    xlimdeadzone=0.3,
-    thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
-    thetaarrowpos_th=None, ylabpos_th=np.min(theta),
-    thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
-    xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
-)
-colors = lvisu.get_colors(theta)
+# for i in range(len(X)):
+#     LVPP = LVPC.add_panel(
+#         theta=theta[i],
+#         # yticks=None,
+#         yticks=yticks,
+#         # yticks=(yticks, ["A", "B", "C", "D"]), 
+#         panelsize=panelsize,
+#         show_panelbounds=True, show_yticks=True,
+#         y_projection_method="y",
+#         # y_projection_method="theta",
+#         ytickkwargs=None, yticklabelkwargs=None,
+#         panelboundskwargs=None,
+#     )
 
-for i in range(len(X)):
-    LVPP = LVPC.add_panel(
-        theta=theta[i],
-        # yticks=None,
-        yticks=yticks,
-        # yticks=(yticks, ["A", "B", "C", "D"]), 
-        panelsize=panelsize,
-        show_panelbounds=True, show_yticks=True,
-        y_projection_method="y",
-        # y_projection_method="theta",
-        ytickkwargs=None, yticklabelkwargs=None,
-        panelboundskwargs=None,
-    )
+#     LVPP.scatter(X[i], Y[i], c=Y[i], s=5,  alpha=np.linspace(0, 1, Y[i].shape[0]))
+#     LVPP.plot(X[i], Y_nonoise[i], c="w", lw=3)
+#     LVPP.plot(X[i], Y_nonoise[i], color=colors[i])
 
-    LVPP.scatter(X[i], Y[i], c=Y[i], s=5,  alpha=np.linspace(0, 1, Y[i].shape[0]))
-    LVPP.plot(X[i], Y_nonoise[i], c="w", lw=3)
-    LVPP.plot(X[i], Y_nonoise[i], color=colors[i])
+# plt.show()
 
-plt.show()
+# #%%convenience usage
+# print(np.sort(theta))
+# fig = plt.figure(figsize=(5,9))
+# ax = fig.add_subplot(111)
+# LVPC = LVisPCanvas(ax,
+#     thetaticks, [-20,0,100,120], yticks,
+#     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
+#     xlimdeadzone=0.3,
+#     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
+#     thetaarrowpos_th=2, ylabpos_th=None,
+#     thetatickkwargs=dict(c="k"), thetaticklabelkwargs=None, thetalabelkwargs=None,
+#     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
+# )
+# LVPC.scatter(theta, X, Y)
+# LVPC.plot(theta, X, Y_nonoise, plot_kwargs=[dict(lw=3, c="w") for _ in theta])
+# LVPC.plot(theta, X, Y_nonoise)
 
-#%%convenience usage
-print(np.sort(theta))
-fig = plt.figure(figsize=(5,9))
-ax = fig.add_subplot(111)
-LVPC = LVisPCanvas(ax,
-    thetaticks, [-20,0,100,120], yticks,
-    thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
-    xlimdeadzone=0.3,
-    thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
-    thetaarrowpos_th=2, ylabpos_th=None,
-    thetatickkwargs=dict(c="k"), thetaticklabelkwargs=None, thetalabelkwargs=None,
-    xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
-)
-LVPC.scatter(theta, X, Y)
-LVPC.plot(theta, X, Y_nonoise, plot_kwargs=[dict(lw=3, c="w") for _ in theta])
-LVPC.plot(theta, X, Y_nonoise)
-
-# fig.tight_layout()
-plt.show()
+# # fig.tight_layout()
+# plt.show()
