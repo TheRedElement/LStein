@@ -10,19 +10,197 @@ from LVisPPanel import LVisPPanel
 
 #%%classes
 class LVisPCanvas:
+    """
+        - class containing the canvas to draw `LVisPPanel`s into
+        - analogous to `matplotlib.figure.Figure`
+        - parent to `LVisPPanel`
 
+        Attributes
+        ----------
+            - `ax`
+                `plt.Axes`
+                - axes to add the `LVisPlot` to
+            - `thetaticks`
+                - `Tuple[List[float],List[Any]]`, `List[float]`
+                - ticks to draw for the theta-axis (angular positioning)
+                - also defines axis limits applied to `theta`
+                    - i.e., in azimuthal direction
+                    - `np.min(thetaticks[0])` corresponds to the lowest value of `theta` that will be plotted
+                    - `np.max(thetaticks[0])` corresponds to the highest value of `theta` that will be plotted
+                - if `List[float]`
+                    - will use `thetaticks` as labels as well
+                - if `Tuple[List[float],List[Any]]`
+                    - will use `thetaticks[1]` as ticklabels
+            - `xticks`
+                - `Tuple[List[float],List[Any]]`, `List[float]`
+                - ticks (circles) to draw for the x-axis
+                - also defines axis limits applied to `x`
+                    - i.e., in radial direction
+                    - `np.min(xticks[0])` corresponds to the end of `xlimdeadzone`
+                    - `np.max(xticks[0])` corresponds to the value plotted at the outer bound of the LVisPlot
+                - if `List[float]`
+                    - will use `xticks` as labels as well
+                - if `Tuple[List[float],List[Any]]`
+                    - will use `xticks[1]` as ticklabels
+            - `yticks`
+                - `Tuple[List[float],List[Any]]`, `List[float]`
+                - ticks to draw for the y-axis
+                - also defines axis limits applied to `y`
+                    - i.e., bounds of the respective panel
+                    - `np.min(yticks[0])` corresponds to the start of the panel
+                    - `np.max(yticks[0])` corresponds to the end of the panel
+                - if `List[float]`
+                    - will use `yticks` as ticklabels as well
+                - if `Tuple[List[float],List[Any]]`
+                    - will use `yticks[1]` as ticklabels
+            - `thetaguidelims`
+                - `Tuple[float,float]`, optional
+                - range to be spanned by the entire plot guides
+                    - only affects the background grid
+                - in radians
+                - the default is `None`
+                    - will be set to `(0,2*np.pi)`
+                    - an entire circle will be plotted
+            - `thetaplotlims`
+                - `Tuple[float,float]`, optional
+                - range to be populated by with theta-panels
+                - sets the reference point for `thetaticks`
+                    - `np.min(thetaticks[0])` will be plotted at `thetaplotlims[0]`
+                    - `np.max(thetaticks[0])` will be plotted at `thetaplotlims[1]`
+                - in radians
+                - the default is `None`
+                    - will be set to `thetaguidelims`
+            - `xlimdeadzone`
+                - `float`, optional
+                - amount of space to leave empty in the center of the plot
+                - provided as a fraction of the entire plot-radius
+                - used to
+                    - reduce projection effects at small radii
+                    - have space for labelling
+                - the default is `0.3`
+                    - 30% of the radial direction is left empty
+            - `thetalabel`
+                - `str`, optional
+                - label of the theta-axis
+                - the default is `None`
+                    - will be set to `""`
+            - `xlabel`
+                - `str`, optional
+                - label of the x-axis
+                - the default is `None`
+                    - will be set to `""`
+            - `ylabel`
+                - `str`, optional
+                - label of the y-axis
+                - the default is `None`
+                    - will be set to `""`
+            - `th_arrowpos_th`
+                - `float`, optional
+                - position of the arrow indicating the theta-axis
+                - given in units of `theta`
+                - the default is `None`
+                    - will be set to `np.mean(thetaticks[0])`
+            - `ylabpos_th`
+                - `float`, optional
+                - position of `ylabel`
+                - given in units of `theta`
+                - the default is `None`
+                    - will be set to `thetaticks[0][0]`
+                    - at the first tick of the theta axis
+            - `thetatickkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.plot()` when drawing the theta ticks
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"])`
+            - `thetaticklabelkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.annotate()` calls used for defining the ticklabels of the theta-axis
+                - used for styling
+                - `pad` determines the padding w.r.t. the ticks        
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.2)`
+            - `thetalabelkwargs`
+                - `dict`, optional
+                - kwargs to pass to `annotate()` call used for defining the axis label of the theta-axis
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center")`
+            - `xtickkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.plot()` when drawing xticks (circles)
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"])`
+            - `xticklabelkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.annotate()` calls used for defining the ticklabels of the x-axis
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.labelcolor"], textcoords="offset fontsize", xytext=(-1,-1))`
+            - `xlabelkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.annotate()` call used for defining the axis label of the x-axis
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.labelcolor"], textcoords="offset fontsize", xytext=(-2,-2))`
+            - `ylabelkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.annotate()` call used for defining the axis label of the y-axis
+                - used for styling
+                - `pad` determines the padding w.r.t. the ticks     
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.labelcolor"], pad=0.15)`
+            
+        Infered Attributes
+        ------------------
+            - `thetalims`
+                - `Tuple[float,float]`
+                - axis limits applied to `theta`
+                    - i.e., in azimuthal direction
+                    - `thetalims[0]` corresponds to the lowest value of `theta` that will be plotted
+                    - `thetalims[1]` corresponds to the highest value of `theta` that will be plotted
+            - `xlims`
+                - `Tuple[float,float]`
+                - axis limits applied to `x`
+                    - i.e., in radial direction
+                    - `xlims[0]` corresponds to the value plotted at the end of `xlimdeadzone`
+                    - `xlims[1]` corresponds to the value plotted at the outer bound of the LVisPlot
+            - `xlimrange`
+                - `real`
+                - range of x-values
+                - convenience field for relative definitions of plot elements
+            - `Panels`
+                - `List[LVisPPanel]`
+                - collection of panels associated with `LVisPCanvas` instance
+            - `canvas_drawn`
+                - `bool`
+                - flag denoting if the canvas has been drawn alrady
+                - to prevent drawing the canvas several times when plotting
+
+        Methods
+        -------
+            - `add_xaxis()`
+            - `add_thetaaxis()`
+            - `add_ylabel()`
+            - `draw_LVisPCanvas()`
+            - `add_panel()`
+            - `get_thetas()`
+            - `get_panel()`
+            - `plot()`
+            - `scatter()`
+
+        Comments
+        --------
+    """
     def __init__(self,
         ax:plt.Axes,
-        thetaticks:Tuple[List[float],List[Any]], xticks:Tuple[List[float],List[Any]], yticks:Tuple[List[float],List[Any]],
+        thetaticks:Union[Tuple[List[float],List[Any]],List[float]], xticks:Union[Tuple[List[float],List[Any]],List[float]], yticks:Union[Tuple[List[float],List[Any]],List[float]],
         thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, 
         thetalabel:str=None, xlabel:str=None, ylabel:str=None,
         thetaarrowpos_th:float=None, ylabpos_th:float=None,
-        thetatickkwargs:dict=None,
-        thetaticklabelkwargs:dict=None,
-        thetalabelkwargs:dict=None,
-        xtickkwargs:dict=None,
-        xticklabelkwargs:dict=None,
-        xlabelkwargs:dict=None,
+        thetatickkwargs:dict=None, thetaticklabelkwargs:dict=None, thetalabelkwargs:dict=None,
+        xtickkwargs:dict=None, xticklabelkwargs:dict=None, xlabelkwargs:dict=None,
         ylabelkwargs:dict=None,
         ):
         
@@ -32,7 +210,7 @@ class LVisPCanvas:
         self.xticks         = (xticks, xticks) if isinstance(xticks, (list, np.ndarray)) else xticks
         self.yticks         = (yticks, yticks) if isinstance(yticks, (list, np.ndarray)) else yticks
         
-        self.thetaguidelims = (0,2,np.pi) if thetaguidelims is None else thetaguidelims
+        self.thetaguidelims = (0,2*np.pi) if thetaguidelims is None else thetaguidelims
         self.thetaplotlims  = thetaguidelims if thetaplotlims is None else thetaplotlims
         self.xlimdeadzone   = xlimdeadzone
         self.panelsize      = panelsize
@@ -46,6 +224,7 @@ class LVisPCanvas:
 
         self.thetatickkwargs        = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if thetatickkwargs is None else thetatickkwargs
         self.thetaticklabelkwargs   = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.2) if thetaticklabelkwargs is None else thetaticklabelkwargs
+        if "pad" not in self.thetaticklabelkwargs.keys(): self.thetalabelkwargs["pad"] = 0.2
         self.thetalabelkwargs       = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center") if thetalabelkwargs is None else thetalabelkwargs
         
         self.xtickkwargs            = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if xtickkwargs is None else xtickkwargs
@@ -53,6 +232,7 @@ class LVisPCanvas:
         self.xlabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"], textcoords="offset fontsize", xytext=(-2,-2)) if xlabelkwargs is None else xlabelkwargs
         
         self.ylabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"], pad=0.15) if ylabelkwargs is None else ylabelkwargs
+        if "pad" not in self.ylabelkwargs.keys(): self.ylabelkwargs["pad"] = 0.15
 
         #infered attributes
         self.thetalims = (np.min(self.thetaticks[0]), np.max(self.thetaticks[1]))
@@ -119,12 +299,12 @@ class LVisPCanvas:
         thetatickpos_xo, thetatickpos_yo            = lvisu.polar2carth(thetatickpos_ro, thetatickpos_th)
 
         #indicator
-        thetaarrowpos_th = lvisu.minmaxscale(self.thetaarrowpos_th,
+        thetaarrowpos_th = lvisu.minmaxscale(np.linspace(self.thetalims[0], self.thetaarrowpos_th, 101),
             self.thetaplotlims[0], self.thetaplotlims[1],
             xmin_ref=self.thetaticks[0][0], xmax_ref=self.thetaticks[0][-1],
         )
 
-        x_arrow, y_arrow = lvisu.polar2carth(1.0*thetatickpos_ro, np.array([thetaarrowpos_th,thetaarrowpos_th+1e-3]))
+        x_arrow, y_arrow = lvisu.polar2carth(1.0*thetatickpos_ro, thetaarrowpos_th)
 
         #label
         # th_label_x, th_label_y = lvisu.polar2carth(1.45 * self.xlimrange, np.mean(th_arrow))
@@ -421,7 +601,7 @@ LVPC = LVisPCanvas(ax,
     xlimdeadzone=0.3,
     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
     thetaarrowpos_th=2, ylabpos_th=None,
-    thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
+    thetatickkwargs=dict(c="k"), thetaticklabelkwargs=None, thetalabelkwargs=None,
     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 )
 LVPC.scatter(theta, X, Y)
