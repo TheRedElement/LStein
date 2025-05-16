@@ -68,14 +68,14 @@ for oidx in np.random.randint(0,len(dfs), 5):
         # print(f)
         fig = plt.figure()
         ax1 = fig.add_subplot(121, xlabel="MJD [d]", ylabel="FLUXCAL []")
-        ax2 = fig.add_subplot(122, xlabel="Phase", ylabel="FLUXCAL []")
+        ax2 = fig.add_subplot(122, xlabel="Period [d]", ylabel="FLUXCAL []")
         for b in dfo["BAND"].unique():
             dfo_b = dfo.filter(
                 (pl.col("BAND")==b),
                 # (pl.col("FLUXCAL")/pl.col("FLUXCALERR") > 3)
             )
             ax1.scatter(dfo_b["MJD"], dfo_b["FLUXCAL"] - 0*dfo_b["RDNOISE"] - dfo_b["SIM_FLUXCAL_HOSTERR"], c=colors_passbands[b], marker=markers_passbands[b], label=b)
-            ax2.scatter(dfo_b["MJD"]%(1/f), dfo_b["FLUXCAL"], c=colors_passbands[b], marker=markers_passbands[b])
+            ax2.scatter(np.mod(dfo_b["MJD"]/(1/f),1) * (1/f), dfo_b["FLUXCAL"], c=colors_passbands[b], marker=markers_passbands[b])
         ax1.legend()
         fig.tight_layout()
     else:

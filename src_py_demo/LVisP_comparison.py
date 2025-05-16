@@ -15,6 +15,8 @@ sys.path.append("../")
 from src_py import LVisPCanvas, utils as lvisu
 
 importlib.reload(LVisPCanvas)
+# plt.style.use("dark_background")
+
 #%%definitions
 def gaussian_pdf(x, mu, sigma):
     """
@@ -90,7 +92,7 @@ def simulate(
 fnames = glob.glob("../data/*.csv")
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[6]
+fname = fnames[31]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -130,10 +132,10 @@ xticks = np.round(np.linspace(np.floor(np.min(np.concat(x_raw))), np.ceil(np.max
 yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), 4), decimals=0).astype(int)
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/10
-colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=300)
+vmin = 300 if ".py" not in fname else None
+colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 
 #%%plotting
-plt.style.use("dark_background")
 #LVisP
 fig = plt.figure(figsize=(12,9))
 fig.suptitle(f"{otype} ({survey})")
