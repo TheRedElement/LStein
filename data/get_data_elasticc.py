@@ -4,9 +4,10 @@ from astropy.io import fits
 from astropy.timeseries import LombScargleMultiband
 from IPython.display import display
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import numpy as np
 import polars as pl
-import pandas as pd
+import sys
 
 #%%global definitions
 
@@ -15,6 +16,15 @@ passbands = ["u", "g", "r", "i", "z", "y"]
 colors_passbands  = dict(u="#0c71ff", g= "#49be61", r="#c61c00", i="#ffc200", z="#f341a2", Y="#5d0000")
 markers_passbands = dict(u="o", g= "^", r="v", i="s", z="*", Y="p")
 
+assert len(sys.argv) > 1, "This script needs to be called as follows: `python3 get_data_elasticc.py fname [pmin] [pmax] [objidx]`" 
+fname = sys.argv[1]
+pmin = eval(sys.argv[2]) if len(sys.argv) > 2 else None
+pmax = eval(sys.argv[3]) if len(sys.argv) > 3 else None
+objidx = eval(sys.argv[4]) if len(sys.argv) > 4 else None
+print(fname, pmin, pmax, objidx)
+
+fmax = 1/pmin if pmin is not None else None
+fmin = 1/pmax if pmax is not None else None
 
 #%%
 # elasticc_mapping = pd.read_csv("~/Downloads/elasticc_origmap.txt", sep=r"\s+", comment="#", header=None).to_dict("split")
@@ -37,45 +47,65 @@ markers_passbands = dict(u="o", g= "^", r="v", i="s", z="*", Y="p")
 # display(df_head["SNID"].value_counts())
 # display(df_phot["SourceID"].value_counts())
 #%%
-# hdul = fits.open("~/Downloads/ELASTICC2_TRAIN_02_NONIaMODEL0-0001_PHOT.FITS.gz") #CEPH
-# hdul = fits.open("~/Downloads/ELASTICC2_TRAIN_02_NONIaMODEL0-0002_PHOT.FITS.gz") #EB
-# hdul = fits.open("~/Downloads/ELASTICC2_TRAIN_02_NONIaMODEL0-0003_PHOT.FITS.gz") #SNII
-# hdul = fits.open("~/Downloads/ELASTICC2_TRAIN_02_NONIaMODEL0-0004_PHOT.FITS.gz") #SNIb
-hdul = fits.open("~/Downloads/ELASTICC2_TRAIN_02_NONIaMODEL0-0005_PHOT.FITS.gz") #RRLyr
+hdul = fits.open(fname)
 
 df = pl.DataFrame(
     [list(hdul[1].data[c]) for c in hdul[1].columns.names],
     schema=list(hdul[1].columns.names),
 )
 hdul.close()
-
+# for c in sorted(df.columns): print(c)
 
 df = df.filter(pl.col("PHOTFLAG")==0).with_columns(pl.col("BAND").cast(pl.Categorical))
-print(df.columns)
-print(df["PHOTPROB"].value_counts())
-print(df["PHOTFLAG"].value_counts())
+# print(df.columns)
+# print(df["PHOTPROB"].value_counts())
+# print(df["PHOTFLAG"].value_counts())
 idxs = np.where(df["MJD"]==-777)[0]
 dfs = [df[i1:i2].filter(pl.col("MJD") != -777) for i1, i2 in zip(np.append([0], idxs[:-1]), idxs)]
 
+oidxs = np.array([objidx]).flatten() if objidx is not None else np.random.randint(0,len(dfs), 20)
 # for oidx in range(0,5):
-for oidx in np.random.randint(0,len(dfs), 5):
+for oidx in oidxs:
     dfo = dfs[oidx]
-    if len(dfo) > 10:
+    if len(dfo) > 10 and dfo["BAND"].n_unique() >=6:
         LS = LombScargleMultiband(dfo["MJD"], dfo["FLUXCAL"], dfo["BAND"])
-        # f, p = LS.autopower(minimum_frequency=1/1.2, maximum_frequency=1/0.2)
-        f, p = LS.autopower()
+        f, p = LS.autopower(minimum_frequency=fmin, maximum_frequency=fmax)
         f = f[np.argmin(p)]
         # print(f)
+
+        #saving the data
+        dfo = dfo.with_columns(
+            (pl.col("FLUXCAL")/pl.col("FLUXCALERR")).alias("s2n"),
+            ((pl.col("MJD")/(1/f)).mod(1) * 1/f).alias("period"),
+            (pl.col("MJD")-pl.col("MJD").min()).alias("deltamjd"),
+            pl.lit(oidx).alias("oid"),
+        )
+        fname_save = fname.replace("-Templates", "").replace("SALT3", "").lower()
+        dfo = dfo.rename({c:c.lower() for c in dfo.columns})
+        # if objidx is not None: dfo.write_csv(f"./{objidx:04d}_{fname_save.replace('.fits.gz','_elasticc.csv')}")
+
+        #plotting
         fig = plt.figure()
+        fig.suptitle(f"{oidx:04d}")
         ax1 = fig.add_subplot(121, xlabel="MJD [d]", ylabel="FLUXCAL []")
         ax2 = fig.add_subplot(122, xlabel="Period [d]", ylabel="FLUXCAL []")
-        for b in dfo["BAND"].unique():
+        for b in dfo["band"].unique():
             dfo_b = dfo.filter(
-                (pl.col("BAND")==b),
-                # (pl.col("FLUXCAL")/pl.col("FLUXCALERR") > 3)
+                (pl.col("band")==b),
+                # (pl.col("FLUXCAL")/pl.col("FLUXCALERR") > 5)
             )
-            ax1.scatter(dfo_b["MJD"], dfo_b["FLUXCAL"] - 0*dfo_b["RDNOISE"] - dfo_b["SIM_FLUXCAL_HOSTERR"], c=colors_passbands[b], marker=markers_passbands[b], label=b)
-            ax2.scatter(np.mod(dfo_b["MJD"]/(1/f),1) * (1/f), dfo_b["FLUXCAL"], c=colors_passbands[b], marker=markers_passbands[b])
+            ax1.errorbar(dfo_b["deltamjd"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
+                yerr=dfo_b["fluxcalerr"],
+                c=colors_passbands[b], marker=markers_passbands[b], ls="",
+                ecolor=(*mcolors.to_rgb(colors_passbands[b]), 0.3),
+                label=b,
+            )
+            ax2.errorbar(dfo_b["period"], dfo_b["fluxcal"],
+                yerr=dfo_b["fluxcalerr"],
+                c=colors_passbands[b], marker=markers_passbands[b], ls="",
+                ecolor=(*mcolors.to_rgb(colors_passbands[b]), 0.3),
+                label=b,             
+            )
         ax1.legend()
         fig.tight_layout()
     else:
