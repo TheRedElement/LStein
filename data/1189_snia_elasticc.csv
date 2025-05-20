@@ -1,3 +1,8 @@
+#band: central wavelength of the passband of the observation in nm
+#time: time of the observation in days
+#fluxcal: simulated observed flux (from SNANA)
+#fluxcalerr: error of fluxcal
+#processing: which processing was done to get the datapoint
 band,time,fluxcal,fluxcalerr,processing
 u,0.0,2.417693614959717,4.467446327209473,raw
 u,4.002599999999802,-1.3790485858917236,5.194098472595215,raw

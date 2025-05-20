@@ -2,7 +2,6 @@
 #%%imports
 from astropy.io import fits
 from astropy.timeseries import LombScargleMultiband
-from IPython.display import display
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -48,11 +47,9 @@ def gaussian_process_interpolate_lc(
     return df_lc_gp
 
 #%%global definitions
-
-#from https://github.com/lsst/tutorial-notebooks/blob/main/DP0.2/08_Truth_Tables.ipynb
-passbands = ["u", "g", "r", "i", "z", "Y", "-"]
-colors_passbands  = dict(u="#0c71ff", g= "#49be61", r="#c61c00", i="#ffc200", z="#f341a2", Y="#5d0000")
-markers_passbands = dict(u="o", g= "^", r="v", i="s", z="*", Y="p")
+df_pb = pl.read_csv("passband_specs.csv").filter(pl.col("mission")=="lsst")
+passbands = list(df_pb["name"]) + ["-"]
+pb_mappings = dict(zip(df_pb["name"], df_pb.select(pl.exclude("name")).to_numpy()))
 
 assert len(sys.argv) > 1, "This script needs to be called as follows: `python3 get_data_elasticc.py fname [pmin] [pmax] [objidx]`" 
 fname = sys.argv[1]
@@ -120,6 +117,7 @@ for oidx in oidxs:
                 dfo_b = dfo_b.with_columns(pl.col("period").alias("time"))
             
             ##exec interpolation
+            dfo_b = dfo_b.sort("time")
             df_gp = gaussian_process_interpolate_lc(
                 dfo_b.select(pl.col("time")).to_numpy(),
                 dfo_b.select(pl.col("fluxcal")).to_numpy(),
@@ -139,29 +137,43 @@ for oidx in oidxs:
             # ax1.errorbar(dfo_b["time"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
             ax1.errorbar(dfo_b["deltamjd"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
                 yerr=dfo_b["fluxcalerr"],
-                c=colors_passbands[b], marker=markers_passbands[b], ls="",
-                ecolor=(*mcolors.to_rgb(colors_passbands[b]), 0.3),
+                c=pb_mappings[b][1], marker=pb_mappings[b][2], ls="",
+                ecolor=(*mcolors.to_rgb(pb_mappings[b][1]), 0.3),
                 label=b,
             )
             ax2.errorbar(dfo_b["period"], dfo_b["fluxcal"],
                 yerr=dfo_b["fluxcalerr"],
-                c=colors_passbands[b], marker=markers_passbands[b], ls="",
-                ecolor=(*mcolors.to_rgb(colors_passbands[b]), 0.3),
+                c=pb_mappings[b][1], marker=pb_mappings[b][2], ls="",
+                ecolor=(*mcolors.to_rgb(pb_mappings[b][1]), 0.3),
                 label=b,             
             )
             # ax1.plot(df_gp["time"], df_gp["fluxcal"],
-            #     c=colors_passbands[b], ls="-",
+            #     c=pb_mappings[b][1], ls="-",
             # )
             # ax1.fill_between(df_gp["time"], df_gp["fluxcal"]-df_gp["fluxcalerr"], df_gp["fluxcal"]+df_gp["fluxcalerr"],
-            #     color=colors_passbands[b], alpha=0.3,
+            #     color=pb_mappings[b][1], alpha=0.3,
             # )
         ax1.legend()
         fig.tight_layout()
-        # plt.close()
+        plt.close()
 
         #saving
         df_out = pl.concat(dfs) #merge passbands
-        if objidx is not None: df_out.write_csv(f"./{objidx:04d}_{fname_save.replace('.fits.gz','_elasticc.csv')}")
+        if objidx is not None:
+            s_fn = f"./{objidx:04d}_{fname_save.replace('.fits.gz','_elasticc.csv')}"
+            file_doc = (
+                "#band: central wavelength of the passband of the observation in nm\n"
+                "#time: time of the observation in days" + " (folded)"*(fmin is not None) + "\n"
+                "#fluxcal: simulated observed flux (from SNANA)\n"
+                "#fluxcalerr: error of fluxcal\n"
+                "#processing: which processing was done to get the datapoint\n"
+            )
+            df_out.write_csv(s_fn)
+            with open(s_fn, "r+") as f:
+                content = f.read()
+                content = file_doc + content
+                f.seek(0,0)
+                f.write(content)
 
     else:
         print("Not enough data")
