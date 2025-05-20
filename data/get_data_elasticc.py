@@ -7,12 +7,50 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 import polars as pl
+from sklearn.gaussian_process import GaussianProcessRegressor, kernels
+from sklearn.exceptions import ConvergenceWarning
 import sys
+import warnings
+
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+#%%definitions
+def gaussian_process_interpolate_lc(
+    x:np.ndarray, y:np.ndarray, y_err:np.ndarray,
+    kernel:kernels.Kernel=None,
+    n_interp:int=100,
+    verbose:int=0,
+    ) -> pl.DataFrame:
+    """
+        - function to execute gaussion process interpolation on one single lc
+    """
+    
+    #default parameters
+    if kernel is None:  kernel = kernels.Matern(5, (1,100), nu=3/2) * kernels.ConstantKernel(y.mean(), (1e-5,1e10))
+    
+    #fit gaussian process
+    GPR = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0, n_targets=1, alpha=y_err.flatten()**2)
+    GPR.fit(x, y)
+
+    #make prediction (interpolate)
+    x_pred = np.linspace(x.min(), x.max(), n_interp).reshape(-1,1)
+    y_pred, y_pred_std = GPR.predict(x_pred, return_std=True)
+
+    #save to dataframe
+    df_lc_gp = pl.DataFrame(dict(
+        time=x_pred.flatten(),
+        fluxcal=y_pred,
+        fluxcalerr=y_pred_std,
+        processing="gp",
+    ))
+
+    return df_lc_gp
 
 #%%global definitions
 
 #from https://github.com/lsst/tutorial-notebooks/blob/main/DP0.2/08_Truth_Tables.ipynb
-passbands = ["u", "g", "r", "i", "z", "y"]
+passbands = ["u", "g", "r", "i", "z", "Y", "-"]
 colors_passbands  = dict(u="#0c71ff", g= "#49be61", r="#c61c00", i="#ffc200", z="#f341a2", Y="#5d0000")
 markers_passbands = dict(u="o", g= "^", r="v", i="s", z="*", Y="p")
 
@@ -27,26 +65,6 @@ fmax = 1/pmin if pmin is not None else None
 fmin = 1/pmax if pmax is not None else None
 
 #%%
-# elasticc_mapping = pd.read_csv("~/Downloads/elasticc_origmap.txt", sep=r"\s+", comment="#", header=None).to_dict("split")
-# elasticc_mapping = {kv[0]:kv[1] for kv in elasticc_mapping["data"]}
-# print(elasticc_mapping)
-
-# df_head = pd.read_csv("~/Downloads/elasticc_objects_nonia_truth.csv", nrows=1000000)
-# df_phot = pl.read_csv("~/Downloads/elasticc_alerts_nonia_truth.csv", separator=",", n_rows=10000)
-# df_phot = df_phot.rename({c:c.strip() for c in df_phot.columns})
-# df_phot = df_phot.with_columns(
-#     pl.col(pl.Utf8).str.strip_chars(" ")
-# ).with_columns(
-#     pl.col("SourceID").cast(pl.Utf8),
-#     pl.col("MJD", "TRUE_GENMAG").cast(pl.Float64),
-#     pl.col("DETECT", "TRUE_GENTYPE").cast(int),
-# )
-# print(df_phot.columns)
-# print(df_head.columns)
-# display(df_head["GENTYPE"].value_counts())
-# display(df_head["SNID"].value_counts())
-# display(df_phot["SourceID"].value_counts())
-#%%
 hdul = fits.open(fname)
 
 df = pl.DataFrame(
@@ -54,12 +72,8 @@ df = pl.DataFrame(
     schema=list(hdul[1].columns.names),
 )
 hdul.close()
-# for c in sorted(df.columns): print(c)
 
-df = df.filter(pl.col("PHOTFLAG")==0).with_columns(pl.col("BAND").cast(pl.Categorical))
-# print(df.columns)
-# print(df["PHOTPROB"].value_counts())
-# print(df["PHOTFLAG"].value_counts())
+df = df.filter(pl.col("PHOTFLAG")==0).with_columns(pl.col("BAND").cast(pl.Enum(passbands)))
 idxs = np.where(df["MJD"]==-777)[0]
 dfs = [df[i1:i2].filter(pl.col("MJD") != -777) for i1, i2 in zip(np.append([0], idxs[:-1]), idxs)]
 
@@ -67,6 +81,7 @@ oidxs = np.array([objidx]).flatten() if objidx is not None else np.random.randin
 # for oidx in range(0,5):
 for oidx in oidxs:
     dfo = dfs[oidx]
+    dfs = []  #list of output dataframes
     if len(dfo) > 10 and dfo["BAND"].n_unique() >=6:
         LS = LombScargleMultiband(dfo["MJD"], dfo["FLUXCAL"], dfo["BAND"])
         f, p = LS.autopower(minimum_frequency=fmin, maximum_frequency=fmax)
@@ -79,10 +94,10 @@ for oidx in oidxs:
             ((pl.col("MJD")/(1/f)).mod(1) * 1/f).alias("period"),
             (pl.col("MJD")-pl.col("MJD").min()).alias("deltamjd"),
             pl.lit(oidx).alias("oid"),
+            pl.lit("raw").alias("processing"),
         )
-        fname_save = fname.replace("-Templates", "").replace("SALT3", "").lower()
+        fname_save = fname.replace("-Templates", "").replace("-SALT3", "").lower()
         dfo = dfo.rename({c:c.lower() for c in dfo.columns})
-        # if objidx is not None: dfo.write_csv(f"./{objidx:04d}_{fname_save.replace('.fits.gz','_elasticc.csv')}")
 
         #plotting
         fig = plt.figure()
@@ -93,7 +108,35 @@ for oidx in oidxs:
             dfo_b = dfo.filter(
                 (pl.col("band")==b),
                 # (pl.col("FLUXCAL")/pl.col("FLUXCALERR") > 5)
+            ).with_columns(
+                pl.col(pl.Float32).cast(pl.Float64),
             )
+
+            #gaussian process interpolation
+            ##decide what to use as x-values
+            if fmin is None:    #if transient
+                dfo_b = dfo_b.with_columns((pl.col("mjd")-pl.col("mjd").min()).alias("time"))
+            else:               #if periodic variable
+                dfo_b = dfo_b.with_columns(pl.col("period").alias("time"))
+            
+            ##exec interpolation
+            df_gp = gaussian_process_interpolate_lc(
+                dfo_b.select(pl.col("time")).to_numpy(),
+                dfo_b.select(pl.col("fluxcal")).to_numpy(),
+                dfo_b.select(pl.col("fluxcalerr")).to_numpy(),
+            ).with_columns(
+                pl.lit(b, pl.Enum(passbands)).alias("band"),
+                pl.col(pl.Float32).cast(pl.Float64),
+            ).select(pl.col("band","time","fluxcal","fluxcalerr","processing"))
+            
+            #add current passband to output dataframes (one for each passband)
+            dfs.append(pl.concat([
+                dfo_b.select(pl.col("band","time","fluxcal","fluxcalerr","processing")).with_columns(pl.lit("raw").alias("processing")),
+                df_gp,
+            ], how="vertical"))
+
+            #testplot
+            # ax1.errorbar(dfo_b["time"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
             ax1.errorbar(dfo_b["deltamjd"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
                 yerr=dfo_b["fluxcalerr"],
                 c=colors_passbands[b], marker=markers_passbands[b], ls="",
@@ -106,8 +149,22 @@ for oidx in oidxs:
                 ecolor=(*mcolors.to_rgb(colors_passbands[b]), 0.3),
                 label=b,             
             )
+            # ax1.plot(df_gp["time"], df_gp["fluxcal"],
+            #     c=colors_passbands[b], ls="-",
+            # )
+            # ax1.fill_between(df_gp["time"], df_gp["fluxcal"]-df_gp["fluxcalerr"], df_gp["fluxcal"]+df_gp["fluxcalerr"],
+            #     color=colors_passbands[b], alpha=0.3,
+            # )
         ax1.legend()
         fig.tight_layout()
+        # plt.close()
+
+        #saving
+        df_out = pl.concat(dfs) #merge passbands
+        if objidx is not None: df_out.write_csv(f"./{objidx:04d}_{fname_save.replace('.fits.gz','_elasticc.csv')}")
+
     else:
         print("Not enough data")
+
+
 plt.show()

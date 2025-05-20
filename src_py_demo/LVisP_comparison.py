@@ -89,10 +89,10 @@ def simulate(
 
 #%%data loading
 
-fnames = glob.glob("../data/*.csv")
+fnames = glob.glob("../data/*_elasticc.csv")
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[31]
+fname = fnames[1]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
