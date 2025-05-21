@@ -2,9 +2,24 @@
 
 ## Naming
 * LViSP: Linked Values in Series Plot
-* Muhlstein
-* Stonetrnr
-    * sequential transformation of n... extration
+Alternate names:
+* LuStPlot: Linking using Series Transformation
+* LukasSt: Linking using  ... associating separate series
+* LukasSt: Linking unique ... as separate series
+* LukasSt: Learning useful knowledge ...
+* Stonetrnr: sequential transformation of n... extration
+
+Words starting with:
+* a: as, associated, association
+* e: extraction, elevating
+* k: keen, keep, key, kind, knowledge
+* l: learning, linking
+* n: new, novelty, novel, neat, nice
+* o: of, observation, object, objective
+* r: relation, related, round
+* s: series, separate
+* t: translation, transformation
+* u: using, ultimate, unique, useful, ultra, unaesthetic
 
 ## Data For Testing
 Data used for demos and testing can be found in [data/](./data/).
