@@ -204,12 +204,12 @@ class LVisPPanel:
         ##rescale theta (i.e., make sure y obeys axis limits)
         theta = lvisu.minmaxscale(theta,
             theta_lb, theta_ub,
-            # theta_lb, theta_ub,
             xmin_ref=th_min, xmax_ref=th_max,
         )
 
         #convert back to carthesian coords for plotting
-        x_proj, y_proj = lvisu.polar2carth(r, theta)
+        #NOTE: use x_proj as radius because x is plotted in radial direction
+        x_proj, y_proj = lvisu.polar2carth(x_proj, theta)
 
         return x_proj, y_proj
     

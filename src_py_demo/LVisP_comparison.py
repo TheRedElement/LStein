@@ -94,10 +94,10 @@ passbands = list(df_pb["name"])
 pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength")).to_numpy()))
 
 #LCs
-fnames = sorted(glob.glob("../data/*_elasticc.csv"))
+fnames = sorted(glob.glob("../data/*_*.csv"))
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[2]
+fname = fnames[8]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -171,7 +171,7 @@ LVPC = LVisPCanvas.LVisPCanvas(ax,
 )
 LVPC.scatter(theta_raw, x_raw, y_raw,
     panel_kwargs=[dict(
-        y_projection_method="y",
+        y_projection_method="theta",
         panelsize=panelsize,
         show_panelbounds=True, show_yticks=True
     ) for _ in theta_raw],
