@@ -8,11 +8,10 @@ import numpy as np
 import polars as pl
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.preprocessing import StandardScaler
 import sys
 import warnings
 
-# warnings.filterwarnings("ignore", category=ConvergenceWarning)
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 #%%definitions
