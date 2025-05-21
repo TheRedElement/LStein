@@ -4,21 +4,19 @@
 * LViSP: Linked Values in Series Plot
 Alternate names:
 * LuStPlot: Linking using Series Transformation
-* LukasSt: Linking using  ... associating separate series
-* LukasSt: Linking unique ... as separate series
-* LukasSt: Learning useful knowledge ...
+* LukasSt: 
 * Stonetrnr: sequential transformation of n... extration
 
 Words starting with:
 * a: as, associated, association
-* e: extraction, elevating
+* e: extraction, elevating, element
 * k: keen, keep, key, kind, knowledge
 * l: learning, linking
-* n: new, novelty, novel, neat, nice
+* n: new, novelty, novel, neat, nice, "n"
 * o: of, observation, object, objective
 * r: relation, related, round
-* s: series, separate
-* t: translation, transformation
+* s: series, separate, sequential,
+* t: translation, transformation, through
 * u: using, ultimate, unique, useful, ultra, unaesthetic
 
 ## Data For Testing

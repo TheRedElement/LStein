@@ -127,7 +127,7 @@ class LVisPCanvas:
                     - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.2)`
             - `thetalabelkwargs`
                 - `dict`, optional
-                - kwargs to pass to `annotate()` call used for defining the axis label of the theta-axis
+                - kwargs to pass to `ax.annotate()` call used for defining the axis label of the theta-axis
                 - used for styling
                 - the default is `None`
                     - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center")`
@@ -254,6 +254,26 @@ class LVisPCanvas:
     def add_xaxis(self,
         ax:plt.Axes=None,                 
         ):
+        """
+            - method to add the x-axis to the Canvas
+
+            Parameters
+            ----------
+                - `ax`
+                    - `plt.Axes`, optiona
+                    - axis to draw into
+                    - the default is `None`
+                        - will draw into parent axis of `LVisPCanvas`
+
+            Raises
+            ------
+
+            Returns
+            -------
+
+            Comments
+            --------
+        """
 
         #default parameters
         if ax is None: ax = self.ax
@@ -289,7 +309,26 @@ class LVisPCanvas:
     def add_thetaaxis(self,
         ax:plt.Axes=None,                 
         ):
+        """
+            - method to add the theta-axis (azimuthal) to the Canvas
 
+            Parameters
+            ----------
+                - `ax`
+                    - `plt.Axes`, optiona
+                    - axis to draw into
+                    - the default is `None`
+                        - will draw into parent axis of `LVisPCanvas`
+
+            Raises
+            ------
+
+            Returns
+            -------
+
+            Comments
+            --------
+        """
         #default parameters
         if ax is None: ax = self.ax
 
@@ -341,7 +380,26 @@ class LVisPCanvas:
     def add_ylabel(self,
         ax:plt.Axes=None,                 
         ):
+        """
+            - method to add the y-label to the Canvas
 
+            Parameters
+            ----------
+                - `ax`
+                    - `plt.Axes`, optiona
+                    - axis to draw into
+                    - the default is `None`
+                        - will draw into parent axis of `LVisPCanvas`
+
+            Raises
+            ------
+
+            Returns
+            -------
+
+            Comments
+            --------
+        """
         #default parameters
         if ax is None: ax = self.ax
 
@@ -360,7 +418,26 @@ class LVisPCanvas:
     def draw_LVisPCanvas(self,
         ax:plt.Axes=None,                 
         ):
+        """
+            - method to combine Canvas elements and draw the canvas
 
+            Parameters
+            ----------
+                - `ax`
+                    - `plt.Axes`, optiona
+                    - axis to draw into
+                    - the default is `None`
+                        - will draw into parent axis of `LVisPCanvas`
+
+            Raises
+            ------
+
+            Returns
+            -------
+
+            Comments
+            --------
+        """
         #default parameters
         if ax is None: ax = self.ax
 
@@ -368,6 +445,7 @@ class LVisPCanvas:
         ax.set_aspect("equal")
         ax.set_axis_off()
 
+        #add canvas elements
         self.add_xaxis(ax)
         self.add_thetaaxis(ax)
         self.add_ylabel(ax)
@@ -380,15 +458,91 @@ class LVisPCanvas:
     #panel methods
     def add_panel(self,
         theta:float,
-        yticks:Tuple[List[float],List[Any]]=None,
+        yticks:Union[Tuple[List[float],List[Any]],List[float]]=None,
         panelsize:float=np.pi/8,
         show_panelbounds:bool=False, show_yticks:bool=True,
-        y_projection_method:Literal["y","theta"]="y",
+        y_projection_method:Literal["y","theta"]="theta",
         ytickkwargs:dict=None,
         yticklabelkwargs:dict=None,
         panelboundskwargs:dict=None,
-        ):
+        ) -> LVisPPanel:
+        """
+            - method to add a `LVisPPanel` to the Canvas
+            - similar to matplotlibs `fig.add_subplot()`
 
+            Parameters
+            ----------
+                - `theta`
+                    - `float`
+                    - theta value the panel is associated with
+                    - equivalent to 2.5th dimension of the dataset
+                    - determines where on the Canvas the panel will be located
+                        - created panel will be centered around `theta`
+                - `yticks`
+                    `Tuple[List[float],List[Any]]`, `List[float]`, optional
+                    - ticks to draw for the y-axis
+                    - also defines axis limits applied to `y`
+                        - i.e., bounds of the respective panel
+                        - `np.min(yticks[0])` corresponds to the start of the panel
+                        - `np.max(yticks[0])` corresponds to the end of the panel
+                    - if `List[float]`
+                        - will use `yticks` as ticklabels as well
+                    - if `Tuple[List[float],List[Any]]`
+                        - will use `yticks[1]` as ticklabels
+                    - overrides `self.yticks`
+                    - the default is `None`
+                        - will fall back to `self.yticks`
+                - `panelsize`
+                    - `float`, optional
+                    - (angular)space the created panel will occupy
+                    - in radians
+                    - the entire Canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
+                    - the default is `np.pi/8`
+                - `show_panelbounds`
+                    - `bool`, optional
+                    - whether to show bounds of the individual panels when rendering
+                    - the default is `False`
+                - `show_yticks`
+                    - `bool`, optional
+                    - whether to show ticks and gridlines for y-values
+                    - the default is `True`
+                - `y_projection_mode`
+                    - `Literal["theta","y"]`, optioal
+                    - method to use for the projection
+                    - the default is `theta`
+                        - uses `LVisPPanel.project_xy_theta()`
+                - `ytickkwargs`
+                    - `dict`, optional
+                    - kwargs to pass to `ax.plot()` when drawing yticks (lines in radial direction)
+                    - used for styling
+                    - the default is `None`
+                        - will be set to `dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"])`
+                - `yticklabelkwargs`
+                    - `dict`, optional
+                    - kwargs to pass to `ax.annotate()` calls used for defining the ticklabels of the y-axis
+                    - used for styling
+                    - `pad` determines the padding w.r.t. the ticks        
+                    - the default is `None`
+                        - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.1)`
+                - `panelboundskwargs`
+                    - `dict`, optional
+                    - kwargs to pass to `ax.plot()` when drawing bounds of each panel
+                    - used for styling
+                    - the default is `None`
+                        - will be set to `dict(c=plt.rcParams["axes.edgecolor"])`
+                    
+            Raises
+            ------
+
+            Returns
+            -------
+                - `LVPP`
+                    - `LVisPPanel`
+                    - created panel
+
+            Comments
+            --------
+        """
         #default parameters
         if isinstance(yticks, (list, np.ndarray)):
             yticks = (yticks, yticks)
@@ -415,6 +569,24 @@ class LVisPCanvas:
     
     #get methods
     def get_thetas(self) -> List[float]:
+        """
+            - method to get `theta` of all currently added Panels
+
+            Parameters
+            ----------
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `thetas`
+                    - `List[float]`
+                    - theta values associated with each Panel in `self.Panels`
+
+            Comments
+            --------
+        """        
         thetas = [P.theta for P in self.Panels]
 
         return thetas
@@ -422,10 +594,35 @@ class LVisPCanvas:
     def get_panel(self,
         theta:float,
         ) -> LVisPPanel:
+        """
+            - method to get Panel associated with `theta`
+            - only returns the first match
 
-        panel = [P for P in self.Panels if P.theta == theta][0]
+            Parameters
+            ----------
+                - `theta`
+                    - `float`
+                    - theta-value to extract panel of
 
-        return panel
+            Raises
+            ------
+
+            Returns
+            -------
+                - `panel`
+                    - `LVisPPanel`, `None`
+                    - Panel associated with `theta`
+                    - `None` if no Panel associated with `theta`
+
+            Comments
+            --------
+        """  
+
+        for P in self.Panels:
+            if P.theta == theta:
+                return P
+        return None
+
 
     #convenience methods
     def plot(self,
