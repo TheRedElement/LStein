@@ -97,7 +97,7 @@ pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength"
 fnames = sorted(glob.glob("../data/*_elasticc.csv"))
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[15]
+fname = fnames[2]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -116,13 +116,13 @@ elif fname == "../data/sin_simulated.py":
     ylab = "Amplitude []"
 else:
     df = pl.read_csv(fname, comment_prefix="#")
+    df = df.sort(pl.col(df.columns[1]))
     legend = True
     thetalab = "Wavelength [nm]"
     xlab = "MJD-min(MJD) [d]" if "mjd" in df.columns else "Period [d]"
     ylab = "m [mag]" if "mag" in df.columns else "Fluxcal []"
 
 # df = df.drop_nans()
-
 
 parts = re.split(r"[/\_\.]", fname)
 survey = parts[-2]

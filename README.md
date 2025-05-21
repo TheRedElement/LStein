@@ -3,7 +3,8 @@
 ## Naming
 * LViSP: Linked Values in Series Plot
 * Muhlstein
-* Stoneturner
+* Stonetrnr
+    * sequential transformation of n... extration
 
 ## Data For Testing
 Data used for demos and testing can be found in [data/](./data/).
