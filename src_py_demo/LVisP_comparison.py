@@ -97,7 +97,7 @@ pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength"
 fnames = sorted(glob.glob("../data/*_*.csv"))
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[8]
+fname = fnames[11]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -123,6 +123,12 @@ else:
     ylab = "m [mag]" if "mag" in df.columns else "Fluxcal []"
 
 # df = df.drop_nans()
+
+#sigma clipping
+df = df.filter(
+    pl.col(df.columns[2]).median()-3*pl.col(df.columns[2]).std() <= pl.col(df.columns[2]),
+    pl.col(df.columns[2]) <= pl.col(df.columns[2]).median()+3*pl.col(df.columns[2]).std(),
+)
 
 parts = re.split(r"[/\_\.]", fname)
 survey = parts[-2]
@@ -171,7 +177,7 @@ LVPC = LVisPCanvas.LVisPCanvas(ax,
 )
 LVPC.scatter(theta_raw, x_raw, y_raw,
     panel_kwargs=[dict(
-        y_projection_method="theta",
+        y_projection_method="y",
         panelsize=panelsize,
         show_panelbounds=True, show_yticks=True
     ) for _ in theta_raw],

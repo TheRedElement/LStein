@@ -28,3 +28,8 @@ You can try your own data as well, but make sure to
 
 ## TODO
 * docstrings
+* tests
+* demos
+    * also show difference between theta and y-projection
+
+## Known Bugs
