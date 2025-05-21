@@ -1,4 +1,9 @@
-flt_nm,mjd,fluxcal,fluxcalerr,processing
+#band: central wavelength of the passband of the observation in nm
+#mjd: time of the observation as modified julian date in days
+#fluxcal: simulated observed flux (from SNANA)
+#fluxcalerr: error of fluxcal
+#processing: which processing was done to get the datapoint
+band,mjd,fluxcal,fluxcalerr,processing
 473,57356.096,425.6395,6.671728,raw
 473,57366.054,973.6672,11.118492,raw
 473,57373.051,431.06097,13.522814,raw

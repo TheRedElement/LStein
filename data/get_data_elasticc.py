@@ -159,11 +159,17 @@ for oidx in oidxs:
 
         #saving
         df_out = pl.concat(dfs) #merge passbands
+        df_out = df_out.with_columns(
+            pl.col("band").cast(pl.Utf8).replace(df_pb["name"], df_pb["wavelength"]).cast(pl.Float64)
+        )
+        if fmin is None:    df_out = df_out.rename({"time":"mjd"})
+        else:               df_out = df_out.rename({"time":"period"})
         if objidx is not None:
             s_fn = f"./{objidx:04d}_{fname_save.replace('.fits.gz','_elasticc.csv')}"
             file_doc = (
                 "#band: central wavelength of the passband of the observation in nm\n"
-                "#time: time of the observation in days" + " (folded)"*(fmin is not None) + "\n"
+                "#mjd: time of the observation as modified julian date in days\n" * (fmin is None) + ""
+                "#period: folded  time of the object shown over one period in days\n" * (fmin is not None) + ""
                 "#fluxcal: simulated observed flux (from SNANA)\n"
                 "#fluxcalerr: error of fluxcal\n"
                 "#processing: which processing was done to get the datapoint\n"
