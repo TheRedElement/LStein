@@ -8,28 +8,33 @@ import numpy as np
 import polars as pl
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.preprocessing import StandardScaler
 import sys
 import warnings
 
-warnings.filterwarnings("ignore", category=ConvergenceWarning)
+# warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 #%%definitions
 def gaussian_process_interpolate_lc(
     x:np.ndarray, y:np.ndarray, y_err:np.ndarray,
-    kernel:kernels.Kernel=None,
     n_interp:int=100,
-    verbose:int=0,
     ) -> pl.DataFrame:
     """
         - function to execute gaussion process interpolation on one single lc
     """
     
     #default parameters
-    if kernel is None:  kernel = kernels.Matern(5, (1,100), nu=3/2) * kernels.ConstantKernel(y.mean(), (1e-5,1e10))
-    
+    kernel = kernels.Matern(x.std(), (1e-2*x.std(),1e2*x.std()), nu=3/2)
+    kernel *= kernels.ConstantKernel(y.var(), (1e-3*y.var(),1e3*y.var()))
+    kernel += kernels.WhiteKernel(2*y.std(), noise_level_bounds=(1e-6*y.std(),y.std()))
+
     #fit gaussian process
-    GPR = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0, n_targets=1, alpha=y_err.flatten()**2)
+    GPR = GaussianProcessRegressor(
+        kernel=kernel, n_restarts_optimizer=0, n_targets=1,
+        alpha=y_err.flatten()**2,
+        normalize_y=False,
+    )
     GPR.fit(x, y)
 
     #make prediction (interpolate)
@@ -134,8 +139,8 @@ for oidx in oidxs:
             ], how="vertical"))
 
             #testplot
-            # ax1.errorbar(dfo_b["time"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
-            ax1.errorbar(dfo_b["deltamjd"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
+            ax1.errorbar(dfo_b["time"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
+            # ax1.errorbar(dfo_b["deltamjd"], dfo_b["fluxcal"] - 0*dfo_b["rdnoise"] - 0*dfo_b["sim_fluxcal_hosterr"],
                 yerr=dfo_b["fluxcalerr"],
                 c=pb_mappings[b][1], marker=pb_mappings[b][2], ls="",
                 ecolor=(*mcolors.to_rgb(pb_mappings[b][1]), 0.3),
@@ -147,12 +152,12 @@ for oidx in oidxs:
                 ecolor=(*mcolors.to_rgb(pb_mappings[b][1]), 0.3),
                 label=b,             
             )
-            # ax1.plot(df_gp["time"], df_gp["fluxcal"],
-            #     c=pb_mappings[b][1], ls="-",
-            # )
-            # ax1.fill_between(df_gp["time"], df_gp["fluxcal"]-df_gp["fluxcalerr"], df_gp["fluxcal"]+df_gp["fluxcalerr"],
-            #     color=pb_mappings[b][1], alpha=0.3,
-            # )
+            ax1.plot(df_gp["time"], df_gp["fluxcal"],
+                c=pb_mappings[b][1], ls="-",
+            )
+            ax1.fill_between(df_gp["time"], df_gp["fluxcal"]-df_gp["fluxcalerr"], df_gp["fluxcal"]+df_gp["fluxcalerr"],
+                color=pb_mappings[b][1], alpha=0.3,
+            )
         ax1.legend()
         fig.tight_layout()
         plt.close()
