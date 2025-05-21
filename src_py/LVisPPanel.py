@@ -20,7 +20,7 @@ class LVisPPanel:
         yticks:Tuple[List[float],List[Any]]=None,
         panelsize:float=np.pi/8,
         show_panelbounds:bool=False, show_yticks:bool=True,
-        y_projection_method:Literal["y","theta"]="y",
+        y_projection_method:Literal["theta","y"]="theta",
         ytickkwargs:dict=None, yticklabelkwargs:dict=None,
         panelboundskwargs:dict=None,
         ):
@@ -296,8 +296,8 @@ class LVisPPanel:
                 - `y_projection_mode`
                     - `Literal["theta","y"]`, optioal
                     - method to use for the projection
-                    - the default is `y`
-                        - uses `self.project_xy_y()`
+                    - the default is `theta`
+                        - uses `self.project_xy_theta()`
 
             Raises
             ------
