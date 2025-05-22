@@ -181,7 +181,7 @@ LVPC.scatter(theta_raw, x_raw, y_raw,
         panelsize=panelsize,
         show_panelbounds=True, show_yticks=True
     ) for _ in theta_raw],
-    scatter_kwargs=[dict(
+    sctr_kwargs=[dict(
         c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
     ) for i in range(len(theta_raw))],
 )
