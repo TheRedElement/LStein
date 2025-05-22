@@ -40,7 +40,6 @@ You can try your own data as well, but make sure to
 2. update the file-name in the script
 
 ## TODO
-* docstrings
 * tests
 * demos
     * also show difference between theta and y-projection

@@ -12,80 +12,12 @@ import sys
 from typing import Literal
 
 sys.path.append("../")
-from src_py import LVisPCanvas, utils as lvisu
+from src_py import LVisPCanvas, utils as lvisu, makedata as md
 
 importlib.reload(LVisPCanvas)
 # plt.style.use("dark_background")
 
 #%%definitions
-def gaussian_pdf(x, mu, sigma):
-    """
-        - function defining a gaussian normal distribution
-    """    
-    y = 1/(sigma*np.sqrt(2*np.pi)) * np.exp(-(x - mu)**2 / (2*sigma**2))
-    return y
-def lc_sim(
-    t:np.ndarray,
-    t_peak:float, f_peak:float,
-    stretch0:float, stretch1:float, stretch2:float,
-    lbda:float=1.0,
-    noiselevel:float=0.0,
-    ) -> np.ndarray:
-    """
-        - function to define a very simplistic phenomenological LC simulation
-    """
-    f = (gaussian_pdf(t, t_peak - stretch0/2, stretch1) + gaussian_pdf(t, t_peak + stretch0/2, stretch2))
-    f = f_peak * f / np.max(f) + noiselevel * np.random.randn(*t.shape)
-    f *= lbda
-    return f
-def sin_sim(
-    t:np.array,
-    f_peak:float,
-    p:float, offset:float=0.,
-    noiselevel:float=0.0
-    ) -> float:
-    """
-        - function to evaluate a sin with period `p` and `offset`
-    """
-    f = f_peak * np.sin(t * 2*np.pi/p + offset) + noiselevel * np.random.randn(*t.shape)
-    return f
-def simulate(
-    nobjects:int=6,
-    opt:Literal["lc","sin"]="lc"
-    ):
-    res = 500
-    x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
-    theta_options = np.arange(0.2, 4, 0.2)
-    theta = np.sort(np.random.choice(theta_options, size=nobjects, replace=False))
-    
-    if opt == "lc":
-        t_peak = np.linspace(0,40,nobjects) * 0
-        y           = np.array([*map(lambda i: lc_sim(x[i], t_peak=t_peak[i], f_peak=20, lbda=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=1.0), range(nobjects))])
-        y_nonoise   = np.array([*map(lambda i: lc_sim(x[i], t_peak=t_peak[i], f_peak=20, lbda=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=0.0), range(nobjects))])
-    else:
-        theta *= 10
-        y           = np.array([*map(lambda i: sin_sim(x[i], f_peak=1, p=theta[i], offset=0.0, noiselevel=0.1), range(nobjects))])
-        y_nonoise   = np.array([*map(lambda i: sin_sim(x[i], f_peak=1, p=theta[i], offset=0.0, noiselevel=0.0), range(nobjects))])
-
-    df_raw = pl.from_dict(dict(
-            period=np.repeat(theta.reshape(-1,1), x.shape[1], axis=1).flatten(),
-            time=x.flatten(),
-            amplitude=y.flatten(),
-            amplitude_e=np.nan,
-            processing="raw",
-        ))
-    df_pro = pl.from_dict(dict(
-            period=np.repeat(theta.reshape(-1,1), x.shape[1], axis=1).flatten(),
-            time=x.flatten(),
-            amplitude=y_nonoise.flatten(),
-            amplitude_e=np.nan,
-            processing="nonoise",
-        ))
-    
-    df = pl.concat([df_raw, df_pro])
-    
-
-    return df
 
 #%%data loading
 #passbands
@@ -94,21 +26,23 @@ passbands = list(df_pb["name"])
 pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength")).to_numpy()))
 
 #LCs
-fnames = sorted(glob.glob("../data/*_ogle.csv"))
+fnames = sorted(glob.glob("../data/*_*.csv"))
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[0]
+fname = fnames[3]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
-    df = simulate(9, opt="lc")
+    raw, pro = md.simulate(9, opt="lc")
+    df = pl.concat([pl.from_dict(raw), pl.from_dict(pro)])
     for t in df["period"].unique(): pb_mappings[t] = [np.round(t, 3)]
     legend = False
-    thetalab = "Maximum Scale"
+    thetalab = "Maximum Amplitude"
     xlab = "Time [d]"
     ylab = "Amplitude []"
 elif fname == "../data/sin_simulated.py":
-    df = simulate(9, opt="sin")
+    raw, pro = md.simulate(9, opt="sin")
+    df = pl.concat([pl.from_dict(raw), pl.from_dict(pro)])
     for t in df["period"].unique(): pb_mappings[t] = [np.round(t, 3)]
     legend = False
     thetalab = "Period [s]"
