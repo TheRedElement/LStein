@@ -1,9 +1,10 @@
 #%%imports
 import matplotlib.pyplot as plt
+from matplotlib.collections import PathCollection
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple
 
-# from LVisPCanvas import LVisPCanvas   #no import because leads to curcular import
+# from .LVisPCanvas import LVisPCanvas   #no import because leads to curcular import
 from .utils import minmaxscale, polar2carth, carth2polar
 
 
@@ -46,7 +47,7 @@ class LVisPPanel:
                 - `bool`, optional
                 - whether to show ticks and gridlines for y-values
                 - the default is `True`
-            - `y_projection_mode`
+            - `y_projection_method`
                 - `Literal["theta","y"]`, optioal
                 - method to use for the projection
                 - the default is `theta`
@@ -100,6 +101,9 @@ class LVisPPanel:
 
         Dependencies
         ------------
+            - `matplotlib`
+            - `numpy`
+            - `typing`
 
         Comments
         --------
@@ -147,6 +151,35 @@ class LVisPPanel:
 
     #panel methods
     def get_thetabounds(self) -> Tuple[float,float,float]:
+        """
+            - method to compute bounds of the panel as an angle measured from the x-axis counterclockwise (in radians)
+
+            Parameters
+            ----------
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `theta_lb`
+                    - `float`
+                    - lower bound of the panel as an angle in radians
+                    - corresponds to `self.ylims[0]`
+                - `theta_ub`
+                    - `float`
+                    - upper bound of the panel as an angle in radians
+                    - corresponds to `self.ylims[1]`
+                - `theta_offset`
+                    - `float`
+                    - offset of the panel w.r.t. the x-axis
+                    - defines the angular position of the central ray of the panel
+                        - as an angle measured from the x-axis counterclockwise
+                        - in radians
+
+            Comments
+            --------
+        """
         theta_offset = minmaxscale(self.theta, #panel position
             self.LVPC.thetaplotlims[0], self.LVPC.thetaplotlims[1],
             xmin_ref=self.LVPC.thetaticks[0][0], xmax_ref=self.LVPC.thetaticks[0][-1]
@@ -156,14 +189,69 @@ class LVisPPanel:
         return theta_offset, theta_lb, theta_ub
 
     def get_rbounds(self) -> Tuple[float,float]:
+        """
+            - method to compute bounds of the panel in radial direction
+
+            Parameters
+            ----------
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `r_lb`
+                    - `float`
+                    - lower bound of the panel in x-direction (radially)
+                    - located at `self.xlimdeadzone*self.LVPC.xlimrange`
+                    - corresponds to `self.xlims[0]`
+                - `r_ub`
+                    - `float`
+                    - upper bound of the panel in x-direction (radially)
+                    - located at `self.LVPC.xlimrange`
+                    - corresponds to `self.xlims[1]`
+
+            Comments
+            --------
+        """        
         r_lb = self.LVPC.xlimdeadzone*self.LVPC.xlimrange
         r_ub = self.LVPC.xlimrange
         return r_lb, r_ub
 
     def get_yticks(self,
-        th_lb:float, th_ub:float
+        theta_lb:float, theta_ub:float
         ) -> Tuple[List[float],List[Any]]:
-        ytickpos_th = minmaxscale(self.yticks[0], th_lb, th_ub)
+        """
+            - method to compute angular positions of the y-ticks angles measured from the x-axis counterclockwise (in radians)
+
+            Parameters
+            ----------
+                - `theta_lb`
+                    - `float`
+                    - lower bound of the panel as an angle in radians
+                    - corresponds to `self.ylims[0]`
+                - `theta_ub`
+                    - `float`
+                    - upper bound of the panel as an angle in radians
+                    - corresponds to `self.ylims[1]`
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `ytickpos_th`
+                    - `List[float]`
+                    - tickpositions angles measured from the x-axis counterclockwise (in radians)
+                - `yticklabs`
+                    - `List[Any]`
+                    - labels assigned to each tick
+                    - same length as `ytickpos_th` 
+            
+            Comments
+            --------
+        """
+        ytickpos_th = minmaxscale(self.yticks[0], theta_lb, theta_ub)
         yticklabs = self.yticks[1]
 
         return ytickpos_th, yticklabs
@@ -174,6 +262,23 @@ class LVisPPanel:
         """
             - method to draw the panel
                 - just outlines, no data-series
+
+            Parameters
+            ----------
+                - `ax`
+                    - `plt.Axes`, optional
+                    - axis to draw into
+                    - the default is `None`
+                        - will be set to `self.LVPC.ax` (axis of parent)
+
+            Raises
+            ------
+
+            Returns
+            -------
+            
+            Comments
+            --------
         """
 
         #default parameters
@@ -214,7 +319,48 @@ class LVisPPanel:
     def apply_axis_limits(self,
         x:np.ndarray, y:np.ndarray,
         **kwargs,
-        ) -> Tuple[np.ndarray,np.ndarray, Dict]:
+        ) -> Tuple[np.ndarray,np.ndarray,Dict]:
+        """
+            - method enforce axis limits onto the dataseries
+                - only applies out-of-bounds cuts
+                - removes any datapoints that are out of bounds in x- or y-direction
+
+            Parameters
+            ----------
+                - `x`
+                    - `np.ndarray`
+                    - x-values of the series to be plotted
+                    - will serve as reference for enforcing `self.LVPC.xlims`
+                - `y`
+                    - `np.ndarray`
+                    - y-values of the series to be plotted
+                    - will serve as reference for enforcing `self.ylims`
+                - `**kwargs`
+                    - `kwargs` ultimately used when plotting `y` vs `x`
+                    - also get modified accordingly i.e.,
+                        - `"c"` needs to be set to same size as `x_cut` and `y_cut`
+                        - `"s"` needs to be set to same size as `x_cut` and `y_cut`
+                        - `"alpha"` needs to be set to same size as `x_cut` and `y_cut`
+
+            Raises
+            ------
+
+            Returns
+            -------
+                - `x_cut`
+                    - `np.ndarray`
+                    - `x` after applying axis-limit cuts
+                - `y_cut`
+                    - `np.ndarray`
+                    - `y` after applying axis-limit cuts
+                - `kwargs`
+                    - `Dict`
+                    - `**kwargs` after applying axis-limit cuts
+
+            
+            Comments
+            --------
+        """
 
         x_bool = (self.LVPC.xlims[0]<=x)&(x<=self.LVPC.xlims[1])
         y_bool = (self.ylims[0]<=y)&(y<=self.ylims[1])
@@ -230,7 +376,6 @@ class LVisPPanel:
             if isinstance(kwargs["s"], (np.ndarray, list)) : kwargs["s"] = kwargs["s"][limitbool]
         if "alpha" in kwargs.keys(): 
             if isinstance(kwargs["alpha"], (np.ndarray, list)) : kwargs["alpha"] = kwargs["alpha"][limitbool]
-            
         
         return x_cut, y_cut, kwargs
     
@@ -250,7 +395,6 @@ class LVisPPanel:
                 - `y`
                     - `np.ndarray`
                     - y-values of the series to be projected into the panel
-
 
             Raises
             ------
@@ -337,7 +481,7 @@ class LVisPPanel:
             Comments
             --------
                 - less distorsion in x-direction
-                - less accurate values in y-direction
+                - can lead to unpredictable offsets in y-direction
         """
 
         #global variables
@@ -372,7 +516,7 @@ class LVisPPanel:
     
     def project_xy(self,
         x:np.ndarray, y:np.ndarray,
-        y_projection_mode:Literal["theta", "y"]="y"
+        y_projection_method:Literal["theta", "y"]="theta"
         ) -> Tuple[np.ndarray,np.ndarray]:
         """
             - method to project `x` and `y` into the panel using `y_projection_method`
@@ -385,7 +529,7 @@ class LVisPPanel:
                 - `y`
                     - `np.ndarray`
                     - y-values of the series to be projected into the panel
-                - `y_projection_mode`
+                - `y_projection_method`
                     - `Literal["theta","y"]`, optioal
                     - method to use for the projection
                     - the default is `theta`
@@ -405,13 +549,12 @@ class LVisPPanel:
 
             Comments
             --------
-                - more distorsion in x-direction
-                - more accurate representation of y-direction
+                - generally `y_projection_method="theta"` is the preferred modus operandi
         """
 
-        if y_projection_mode == "theta":
+        if y_projection_method == "theta":
             x_proj, y_proj = self.project_xy_theta(x, y)
-        elif y_projection_mode == "y":
+        elif y_projection_method == "y":
             x_proj, y_proj = self.project_xy_y(x, y)
 
         return x_proj, y_proj
@@ -422,7 +565,42 @@ class LVisPPanel:
         x:np.ndarray, y:np.ndarray,
         ax:plt.Axes=None,
         **kwargs,
-        ):
+        ) -> List[plt.Line2D]:
+        """
+            - function to plot a series in the panel
+            - similar to `ax.plot()`
+
+            Parameters
+            ----------
+                - `x`
+                    - `np.ndarray`
+                    - x-values of the series
+                    - has to have same length as `y`
+                - `y`
+                    - `np.ndarray`
+                    - y-values of the series
+                    - has to have same length as `x`
+                - `ax`
+                    - `plt.Axes`, optional
+                    - axis to draw into
+                    - the default is `None`
+                        - will be set to `self.LVPC.ax` (axis of parent)
+                -`**kwargs`
+                    - kwargs to pass to `ax.plot()`
+                        
+            Raises
+            ------
+
+            Returns
+            -------
+                - `line`
+                    - `List[plt.Line2D]`
+                    - list of created lines
+                    - output from `ax.plot()`
+
+            Comments
+            --------        
+        """
 
         #default parameters
         if ax is None: ax = self.LVPC.ax
@@ -440,7 +618,7 @@ class LVisPPanel:
         #plotting
         line = ax.plot(x_proj, y_proj, **kwargs)
 
-        # #TODO: temp
+        # #NOTE: temp
         # maxidx = np.argmax(y_cut)
         # ax.scatter(x_proj[maxidx], y_proj[maxidx])
 
@@ -450,8 +628,42 @@ class LVisPPanel:
         x:np.ndarray, y:np.ndarray,
         ax:plt.Axes=None,
         **kwargs,
-        ):
+        ) -> PathCollection:
+        """
+            - function to plot a series in the panel
+            - similar to `ax.scatter()`
 
+            Parameters
+            ----------
+                - `x`
+                    - `np.ndarray`
+                    - x-values of the series
+                    - has to have same length as `y`
+                - `y`
+                    - `np.ndarray`
+                    - y-values of the series
+                    - has to have same length as `x`
+                - `ax`
+                    - `plt.Axes`, optional
+                    - axis to draw into
+                    - the default is `None`
+                        - will be set to `self.LVPC.ax` (axis of parent)
+                -`**kwargs`
+                    - kwargs to pass to `ax.scatter()`
+                        
+            Raises
+            ------
+
+            Returns
+            -------
+                - `sctr`
+                    - `plt.PathCollection`
+                    - list of created datapoints
+                    - output from `ax.scatter()`
+
+            Comments
+            --------        
+        """
         #default parameters
         if ax is None: ax = self.LVPC.ax
 

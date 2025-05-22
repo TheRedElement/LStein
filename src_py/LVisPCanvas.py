@@ -256,12 +256,12 @@ class LVisPCanvas:
         ax:plt.Axes=None,                 
         ):
         """
-            - method to add the x-axis to the Canvas
+            - method to add the x-axis to the canvas
 
             Parameters
             ----------
                 - `ax`
-                    - `plt.Axes`, optiona
+                    - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
                         - will draw into parent axis of `LVisPCanvas`
@@ -311,12 +311,12 @@ class LVisPCanvas:
         ax:plt.Axes=None,                 
         ):
         """
-            - method to add the theta-axis (azimuthal) to the Canvas
+            - method to add the theta-axis (azimuthal) to the canvas
 
             Parameters
             ----------
                 - `ax`
-                    - `plt.Axes`, optiona
+                    - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
                         - will draw into parent axis of `LVisPCanvas`
@@ -382,12 +382,12 @@ class LVisPCanvas:
         ax:plt.Axes=None,                 
         ):
         """
-            - method to add the y-label to the Canvas
+            - method to add the y-label to the canvas
 
             Parameters
             ----------
                 - `ax`
-                    - `plt.Axes`, optiona
+                    - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
                         - will draw into parent axis of `LVisPCanvas`
@@ -420,12 +420,13 @@ class LVisPCanvas:
         ax:plt.Axes=None,                 
         ):
         """
-            - method to combine Canvas elements and draw the canvas
+            - method to combine canvas elements and draw the canvas
+                - just outlines, no data-series or panels
 
             Parameters
             ----------
                 - `ax`
-                    - `plt.Axes`, optiona
+                    - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
                         - will draw into parent axis of `LVisPCanvas`
@@ -468,7 +469,7 @@ class LVisPCanvas:
         panelboundskwargs:dict=None,
         ) -> LVisPPanel:
         """
-            - method to add a `LVisPPanel` to the Canvas
+            - method to add a `LVisPPanel` to the canvas
             - similar to matplotlibs `fig.add_subplot()`
 
             Parameters
@@ -477,7 +478,7 @@ class LVisPCanvas:
                     - `float`
                     - theta value the panel is associated with
                     - equivalent to 2.5th dimension of the dataset
-                    - determines where on the Canvas the panel will be located
+                    - determines where on the canvas the panel will be located
                         - created panel will be centered around `theta`
                 - `yticks`
                     `Tuple[List[float],List[Any]]`, `List[float]`, optional
@@ -497,7 +498,7 @@ class LVisPCanvas:
                     - `float`, optional
                     - (angular) space the created panel will occupy
                     - in radians
-                    - the entire Canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
+                    - the entire canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
                     - the default is `np.pi/8`
                 - `show_panelbounds`
                     - `bool`, optional
@@ -571,7 +572,7 @@ class LVisPCanvas:
     #get methods
     def get_thetas(self) -> List[float]:
         """
-            - method to get `theta` of all currently added Panels
+            - method to get `theta` of all currently added panels
 
             Parameters
             ----------
@@ -583,7 +584,7 @@ class LVisPCanvas:
             -------
                 - `thetas`
                     - `List[float]`
-                    - theta values associated with each Panel in `self.Panels`
+                    - theta values associated with each panel in `self.Panels`
 
             Comments
             --------
@@ -596,7 +597,7 @@ class LVisPCanvas:
         theta:float,
         ) -> LVisPPanel:
         """
-            - method to get Panel associated with `theta`
+            - method to get panel associated with `theta`
             - only returns the first match
 
             Parameters
@@ -612,8 +613,8 @@ class LVisPCanvas:
             -------
                 - `panel`
                     - `LVisPPanel`, `None`
-                    - Panel associated with `theta`
-                    - `None` if no Panel associated with `theta`
+                    - panel associated with `theta`
+                    - `None` if no panel associated with `theta`
 
             Comments
             --------
@@ -633,7 +634,7 @@ class LVisPCanvas:
         ):
         """
             - convenience function to plot a set of series
-            - similar yo `plt.plot()`
+            - similar to `plt.plot()`
 
             Parameters
             ----------
@@ -647,14 +648,14 @@ class LVisPCanvas:
                     - has to have same length as `theta`
                     - can contain arrays of different lengths
                         - have to have same length as corresponding entries in `Y`
-                    - each series will be plotted in it's own Panel associated with `theta`
+                    - each series will be plotted in it's own panel associated with `theta`
                 - `Y`
                     - `List[np.ndarray]`
                     - set of y-values of each series
                     - has to have same length as `theta`
                     - can contain arrays of different lengths
                         - have to have same length as corresponding entries in `y`
-                    - each series will be plotted in it's own Panel associated with `theta`
+                    - each series will be plotted in it's own panel associated with `theta`
                 - `panel_kwargs`
                     - `List[Dict]`, optional
                     - kwargs to pass to `self.add_panel()`
@@ -711,7 +712,7 @@ class LVisPCanvas:
         ):
         """
             - convenience function to plot a set of series
-            - similar yo `plt.plot()`
+            - similar to `plt.scatter()`
 
             Parameters
             ----------
@@ -725,14 +726,14 @@ class LVisPCanvas:
                     - has to have same length as `theta`
                     - can contain arrays of different lengths
                         - have to have same length as corresponding entries in `Y`
-                    - each series will be plotted in it's own Panel associated with `theta`
+                    - each series will be plotted in it's own panel associated with `theta`
                 - `Y`
                     - `List[np.ndarray]`
                     - set of y-values of each series
                     - has to have same length as `theta`
                     - can contain arrays of different lengths
                         - have to have same length as corresponding entries in `y`
-                    - each series will be plotted in it's own Panel associated with `theta`
+                    - each series will be plotted in it's own panel associated with `theta`
                 - `panel_kwargs`
                     - `List[Dict]`, optional
                     - kwargs to pass to `self.add_panel()`
