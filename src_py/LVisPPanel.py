@@ -22,6 +22,7 @@ class LVisPPanel:
                 - `float`
                 - theta value the panel is associated with
                 - equivalent to 2.5th dimension of the dataset
+                - similar to `pos` in `fig.add_subolot(pos)`
                 - determines where on `LVPC` the panel will be located
                     - created panel will be centered around `theta` with a width of `panelsize`
             - `yticks`
@@ -135,9 +136,17 @@ class LVisPPanel:
         self.y_projection_method= y_projection_method
 
         self.ytickkwargs        = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if ytickkwargs is None else ytickkwargs
+        if "c" not in self.ytickkwargs.keys():  self.ytickkwargs["c"]  = plt.rcParams["grid.color"]
+        if "ls" not in self.ytickkwargs.keys(): self.ytickkwargs["ls"] = plt.rcParams["grid.linestyle"]
+        if "lw" not in self.ytickkwargs.keys(): self.ytickkwargs["lw"] = plt.rcParams["grid.linewidth"]
         self.yticklabelkwargs   = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.1) if yticklabelkwargs is None else yticklabelkwargs
+        if "c" not in self.yticklabelkwargs.keys():     self.yticklabelkwargs["c"]   = plt.rcParams["axes.labelcolor"]
+        if "ha" not in self.yticklabelkwargs.keys():    self.yticklabelkwargs["ha"]  = "center"
+        if "va" not in self.yticklabelkwargs.keys():    self.yticklabelkwargs["va"]  = "center"
+        if "pad" not in self.yticklabelkwargs.keys():   self.yticklabelkwargs["pad"] = 0.1
         
         self.panelboundskwargs  = dict(c=plt.rcParams["axes.edgecolor"]) if panelboundskwargs is None else panelboundskwargs
+        if "c" not in self.panelboundskwargs.keys():self.panelboundskwargs["c"] = plt.rcParams["axes.edgecolor"]
 
         #infered attributes
         self.ylims = (np.min(self.yticks[0]), np.max(self.yticks[0]))

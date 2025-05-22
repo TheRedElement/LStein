@@ -228,16 +228,35 @@ class LVisPCanvas:
         self.ylabpos_th         = self.thetaticks[0][0] if ylabpos_th is None else ylabpos_th
 
         self.thetatickkwargs        = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if thetatickkwargs is None else thetatickkwargs
+        if "c" not in self.thetatickkwargs.keys():  self.thetatickkwargs["c"]  = plt.rcParams["grid.color"]
+        if "ls" not in self.thetatickkwargs.keys(): self.thetatickkwargs["ls"] = plt.rcParams["grid.linestyle"]
+        if "lw" not in self.thetatickkwargs.keys(): self.thetatickkwargs["lw"] = plt.rcParams["grid.linewidth"]
         self.thetaticklabelkwargs   = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.2) if thetaticklabelkwargs is None else thetaticklabelkwargs
-        if "pad" not in self.thetaticklabelkwargs.keys(): self.thetalabelkwargs["pad"] = 0.2
+        if "c" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["c"] = plt.rcParams["axes.labelcolor"]
+        if "ha" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["ha"] = "center"
+        if "va" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["va"] = "center"
+        if "pad" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["pad"] = 0.2
         self.thetalabelkwargs       = dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center") if thetalabelkwargs is None else thetalabelkwargs
+        if "c" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["c"] = plt.rcParams["axes.labelcolor"]
+        if "ha" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["ha"] = "center"
+        if "va" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["va"] = "center"
         
         self.xtickkwargs            = dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"]) if xtickkwargs is None else xtickkwargs
+        if "c" not in self.xtickkwargs.keys():  self.xtickkwargs["c"]  = plt.rcParams["grid.color"]
+        if "ls" not in self.xtickkwargs.keys(): self.xtickkwargs["ls"] = plt.rcParams["grid.linestyle"]
+        if "lw" not in self.xtickkwargs.keys(): self.xtickkwargs["lw"] = plt.rcParams["grid.linewidth"]
         self.xticklabelkwargs       = dict(c=plt.rcParams["axes.labelcolor"], textcoords="offset fontsize", xytext=(-1,-1)) if xticklabelkwargs is None else xticklabelkwargs
+        if "c" not in self.xticklabelkwargs.keys():         self.xticklabelkwargs["c"]          = plt.rcParams["axes.labelcolor"]
+        if "textcoords" not in self.xticklabelkwargs.keys():self.xticklabelkwargs["textcoords"] = "offset fontsize"
+        if "xytext" not in self.xticklabelkwargs.keys():    self.xticklabelkwargs["xytext"]     = (-1,-1)        
         self.xlabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"], textcoords="offset fontsize", xytext=(-2,-2)) if xlabelkwargs is None else xlabelkwargs
+        if "c" not in self.xlabelkwargs.keys():         self.xlabelkwargs["c"]          = plt.rcParams["axes.labelcolor"]
+        if "textcoords" not in self.xlabelkwargs.keys():self.xlabelkwargs["textcoords"] = "offset fontsize"
+        if "xytext" not in self.xlabelkwargs.keys():    self.xlabelkwargs["xytext"]     = (-2,-2)        
         
         self.ylabelkwargs           = dict(c=plt.rcParams["axes.labelcolor"], pad=0.15) if ylabelkwargs is None else ylabelkwargs
-        if "pad" not in self.ylabelkwargs.keys(): self.ylabelkwargs["pad"] = 0.15
+        if "c" not in self.ylabelkwargs.keys():     self.ylabelkwargs["c"] = plt.rcParams["axes.labelcolor"]
+        if "pad" not in self.ylabelkwargs.keys():   self.ylabelkwargs["pad"] = 0.15
 
         #infered attributes
         self.thetalims = (np.min(self.thetaticks[0]), np.max(self.thetaticks[1]))
@@ -782,57 +801,6 @@ class LVisPCanvas:
             LVPP.scatter(X[i], Y[i], **sctr_kwargs[i])
 
         return    
-
-#%%pseudo data
-
-# theta, X, Y, Y_nonoise = simulate(4, opt="lc")
-# # theta, X, Y, Y_nonoise = simulate(5, opt="sin")
-
-# fig = plt.figure()
-# for i in range(len(theta)):
-#     plt.scatter(X[i], Y[i])
-#     plt.plot(X[i], Y_nonoise[i])
-
-# #%%
-# thetaticks = np.round(np.linspace(np.floor(np.min(theta)), np.ceil(np.max(theta)), 4),0).astype(int)
-# yticks = np.round(np.linspace(np.floor(np.min(np.concat(Y))), np.ceil(np.max(np.concat(Y))), 4), decimals=0).astype(int)
-# # yticks = np.sort(np.append(yticks, [-10, 80]))
-# panelsize = np.pi/8
-# print(thetaticks)
-
-# #%%standard usage
-# fig = plt.figure(figsize=(5,9))
-# ax = fig.add_subplot(111)
-# LVPC = LVisPCanvas(ax,
-#     thetaticks, [-20,0,100,120], yticks,
-#     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
-#     xlimdeadzone=0.3,
-#     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
-#     thetaarrowpos_th=None, ylabpos_th=np.min(theta),
-#     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
-#     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
-# )
-# colors = get_colors(theta)
-
-# for i in range(len(X)):
-#     LVPP = LVPC.add_panel(
-#         theta=theta[i],
-#         # yticks=None,
-#         yticks=yticks,
-#         # yticks=(yticks, ["A", "B", "C", "D"]), 
-#         panelsize=panelsize,
-#         show_panelbounds=True, show_yticks=True,
-#         y_projection_method="y",
-#         # y_projection_method="theta",
-#         ytickkwargs=None, yticklabelkwargs=None,
-#         panelboundskwargs=None,
-#     )
-
-#     LVPP.scatter(X[i], Y[i], c=Y[i], s=5,  alpha=np.linspace(0, 1, Y[i].shape[0]))
-#     LVPP.plot(X[i], Y_nonoise[i], c="w", lw=3)
-#     LVPP.plot(X[i], Y_nonoise[i], color=colors[i])
-
-# plt.show()
 
 # #%%convenience usage
 # print(np.sort(theta))
