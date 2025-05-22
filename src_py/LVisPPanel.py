@@ -3,21 +3,113 @@ import matplotlib.pyplot as plt
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple
 
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 # from LVisPCanvas import LVisPCanvas   #no import because leads to curcular import
-import utils as lvisu
+from .utils import minmaxscale, polar2carth, carth2polar
 
 
 #%%classes
 class LVisPPanel:
+    """
+        - class defining a panel sitting within a `LVisPCanvas`
+
+        Attributes
+        ----------
+            - `LVPC`
+                - `LVisPCanvas`
+                - parent canvas the panel is associated with
+            - `theta`
+                - `float`
+                - theta value the panel is associated with
+                - equivalent to 2.5th dimension of the dataset
+                - determines where on `LVPC` the panel will be located
+                    - created panel will be centered around `theta` with a width of `panelsize`
+            - `yticks`
+                `Tuple[List[float],List[Any]]`
+                - ticks to draw for the y-axis
+                - also defines axis limits applied to `y`
+                    - i.e., bounds of the respective panel
+                    - `np.min(yticks[0])` corresponds to the start of the panel
+                    - `np.max(yticks[0])` corresponds to the end of the panel
+                    - `yticks[0]` will be used as tickpositions
+                    - `yticks[1]` will be used as ticklabels
+            - `panelsize`
+                - `float`, optional
+                - (angular) space the created panel will occupy
+                - in radians
+                - the entire Canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
+                - the default is `np.pi/8`
+            - `show_panelbounds`
+                - `bool`, optional
+                - whether to show bounds of the individual panels when rendering
+                - the default is `False`
+            - `show_yticks`
+                - `bool`, optional
+                - whether to show ticks and gridlines for y-values
+                - the default is `True`
+            - `y_projection_mode`
+                - `Literal["theta","y"]`, optioal
+                - method to use for the projection
+                - the default is `theta`
+                    - uses `LVisPPanel.project_xy_theta()`
+            - `ytickkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.plot()` when drawing yticks (lines in radial direction)
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"])`
+            - `yticklabelkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.annotate()` calls used for defining the ticklabels of the y-axis
+                - used for styling
+                - `pad` determines the padding w.r.t. the ticks        
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.1)`
+            - `panelboundskwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.plot()` when drawing bounds of each panel
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.edgecolor"])`
+
+        Infered Attributes
+        ------------------
+            - `ylims`
+                - `Tuple[float,float]`
+                - axis limits applied to `y`
+            - `ylimrange`
+                - `real`
+                - range of y-values
+                - convenience field for relative definitions of plot elements
+            - `panel_drawn`
+                - `bool`
+                - flag denoting if the panel has been drawn alrady
+                - to prevent drawing the panel several times when plotting
+        
+        Methods
+        -------
+            - `get_thetabounds()`
+            - `get_rbounds()`
+            - `set_yticks()`
+            - `draw()`
+            - `apply_axis_limits()`
+            - `project_xy_theta()`
+            - `project_xy_y()`
+            - `project_xy()`
+            - `plot()`
+            - `scatter()`
+
+        Dependencies
+        ------------
+
+        Comments
+        --------
+        
+    """
 
     def __init__(self,
         LVPC,#:LVisPCanvas,
         theta:float,
-        yticks:Tuple[List[float],List[Any]]=None,
+        yticks:Tuple[List[float],List[Any]],
         panelsize:float=np.pi/8,
         show_panelbounds:bool=False, show_yticks:bool=True,
         y_projection_method:Literal["theta","y"]="theta",
@@ -55,7 +147,7 @@ class LVisPPanel:
 
     #panel methods
     def get_thetabounds(self) -> Tuple[float,float,float]:
-        theta_offset = lvisu.minmaxscale(self.theta, #panel position
+        theta_offset = minmaxscale(self.theta, #panel position
             self.LVPC.thetaplotlims[0], self.LVPC.thetaplotlims[1],
             xmin_ref=self.LVPC.thetaticks[0][0], xmax_ref=self.LVPC.thetaticks[0][-1]
         )
@@ -71,12 +163,12 @@ class LVisPPanel:
     def get_yticks(self,
         th_lb:float, th_ub:float
         ) -> Tuple[List[float],List[Any]]:
-        ytickpos_th = lvisu.minmaxscale(self.yticks[0], th_lb, th_ub)
+        ytickpos_th = minmaxscale(self.yticks[0], th_lb, th_ub)
         yticklabs = self.yticks[1]
 
         return ytickpos_th, yticklabs
 
-    def draw_LVisPPanel(self,
+    def draw(self,
         ax:plt.Axes=None,
         ):
         """
@@ -96,15 +188,15 @@ class LVisPPanel:
         ytickpos_th, yticklabs = self.get_yticks(theta_lb, theta_ub)
 
         #convert to carthesian for plotting
-        x_lb, y_lb  = lvisu.polar2carth(r_bounds, theta_lb)
-        x_ub, y_ub  = lvisu.polar2carth(r_bounds, theta_ub)
+        x_lb, y_lb  = polar2carth(r_bounds, theta_lb)
+        x_ub, y_ub  = polar2carth(r_bounds, theta_ub)
         x_bounds = np.array([x_lb,x_ub])
         y_bounds = np.array([y_lb,y_ub])
 
         pad = self.yticklabelkwargs.pop("pad")   #padding for yticklabels
         r_, th_ = np.meshgrid(r_bounds, ytickpos_th)
-        ytickpos_x, ytickpos_y              = lvisu.polar2carth(r_, th_)
-        yticklabelpos_x, yticklabelpos_y    = lvisu.polar2carth((1+pad)*r_ub, ytickpos_th)
+        ytickpos_x, ytickpos_y              = polar2carth(r_, th_)
+        yticklabelpos_x, yticklabelpos_y    = polar2carth((1+pad)*r_ub, ytickpos_th)
 
         if self.show_yticks:
             ax.plot(ytickpos_x.T, ytickpos_y.T, **self.ytickkwargs)
@@ -182,34 +274,34 @@ class LVisPPanel:
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
         #convert ylims to theta-values
-        r_min, th_min = lvisu.carth2polar(self.LVPC.xlims[1], self.ylims[0])
-        r_max, th_max = lvisu.carth2polar(self.LVPC.xlims[1], self.ylims[1])
+        r_min, th_min = carth2polar(self.LVPC.xlims[1], self.ylims[0])
+        r_max, th_max = carth2polar(self.LVPC.xlims[1], self.ylims[1])
 
         #project x to obey axis-limits
-        x_proj = lvisu.minmaxscale(x,
+        x_proj = minmaxscale(x,
             self.LVPC.xlimdeadzone*self.LVPC.xlimrange, self.LVPC.xlimrange,
             xmin_ref=self.LVPC.xlims[0], xmax_ref=self.LVPC.xlims[1],
         )
 
         #project y to fit into panel
-        y_scaler = lvisu.minmaxscale(x_proj,
+        y_scaler = minmaxscale(x_proj,
             self.LVPC.xlimdeadzone, 1,
             xmin_ref=self.LVPC.xlimdeadzone*self.LVPC.xlimrange, xmax_ref=self.LVPC.xlimrange
         )
         y_proj = y_scaler * y
         
         #convert to polar coords for transformations
-        r, theta = lvisu.carth2polar(x_proj, y_proj)
+        r, theta = carth2polar(x_proj, y_proj)
         
         ##rescale theta (i.e., make sure y obeys axis limits)
-        theta = lvisu.minmaxscale(theta,
+        theta = minmaxscale(theta,
             theta_lb, theta_ub,
             xmin_ref=th_min, xmax_ref=th_max,
         )
 
         #convert back to carthesian coords for plotting
         #NOTE: use x_proj as radius because x is plotted in radial direction
-        x_proj, y_proj = lvisu.polar2carth(x_proj, theta)
+        x_proj, y_proj = polar2carth(x_proj, theta)
 
         return x_proj, y_proj
     
@@ -252,17 +344,17 @@ class LVisPPanel:
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
         #project x to obey axis-limits
-        x_proj = lvisu.minmaxscale(x,
+        x_proj = minmaxscale(x,
             self.LVPC.xlimdeadzone*self.LVPC.xlimrange, self.LVPC.xlimrange,
             xmin_ref=self.LVPC.xlims[0], xmax_ref=self.LVPC.xlims[1],
         )
 
         #project y to fit into panel
-        y_scaler = lvisu.minmaxscale(x_proj,
+        y_scaler = minmaxscale(x_proj,
             self.LVPC.xlimdeadzone, 1,
             xmin_ref=self.LVPC.xlimdeadzone*self.LVPC.xlimrange, xmax_ref=self.LVPC.xlimrange
         )
-        y_proj = lvisu.minmaxscale(y, 0, 1, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
+        y_proj = minmaxscale(y, 0, 1, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
         y_proj = y_scaler * y_proj
         
         ##rescale to fill panel (considering bounds)
@@ -270,11 +362,11 @@ class LVisPPanel:
         y_proj = np.max(y_slice) * y_proj - y_slice/2
         
         #convert to polar coords for transformations
-        r, theta = lvisu.carth2polar(x_proj, y_proj)
+        r, theta = carth2polar(x_proj, y_proj)
         theta += theta_offset + np.pi
 
         #convert back to carthesian coords for plotting
-        x_proj, y_proj = lvisu.polar2carth(r, theta)
+        x_proj, y_proj = polar2carth(r, theta)
 
         return x_proj, y_proj
     
@@ -336,8 +428,8 @@ class LVisPPanel:
         if ax is None: ax = self.LVPC.ax
 
         #draw canvas, panel if not done already
-        if not self.LVPC.canvas_drawn: self.LVPC.draw_LVisPCanvas()
-        if not self.panel_drawn: self.draw_LVisPPanel()
+        if not self.LVPC.canvas_drawn: self.LVPC.draw()
+        if not self.panel_drawn: self.draw()
 
         #apply axis limits
         x_cut, y_cut, kwargs = self.apply_axis_limits(x, y, **kwargs)
@@ -364,8 +456,8 @@ class LVisPPanel:
         if ax is None: ax = self.LVPC.ax
 
         #draw canvas, panel if not done already
-        if not self.LVPC.canvas_drawn: self.LVPC.draw_LVisPCanvas()
-        if not self.panel_drawn: self.draw_LVisPPanel()
+        if not self.LVPC.canvas_drawn: self.LVPC.draw()
+        if not self.panel_drawn: self.draw()
 
         #apply axis limits
         x_cut, y_cut, kwargs = self.apply_axis_limits(x, y, **kwargs)

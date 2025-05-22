@@ -5,13 +5,8 @@ import matplotlib.colors as mcolors
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple, Union
 
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-print(sys.path)
-
-import utils as lvisu
-from LVisPPanel import LVisPPanel
+from .utils import minmaxscale, polar2carth, carth2polar, get_colors
+from .LVisPPanel import LVisPPanel
 
 #%%classes
 class LVisPCanvas:
@@ -188,12 +183,18 @@ class LVisPCanvas:
             - `add_xaxis()`
             - `add_thetaaxis()`
             - `add_ylabel()`
-            - `draw_LVisPCanvas()`
+            - `draw()`
             - `add_panel()`
             - `get_thetas()`
             - `get_panel()`
             - `plot()`
             - `scatter()`
+
+        Dependencies
+        ------------
+            - `matplotlib`
+            - `numpy`
+            - `typing`
 
         Comments
         --------
@@ -281,7 +282,7 @@ class LVisPCanvas:
         #xticks
         th_circ = np.linspace(self.thetaguidelims[0], self.thetaguidelims[1], 100)
         r_circ = self.xticks[0] - np.min(self.xticks[0])
-        r_circ = lvisu.minmaxscale(r_circ, self.xlimrange * self.xlimdeadzone, self.xlimrange)
+        r_circ = minmaxscale(r_circ, self.xlimrange * self.xlimdeadzone, self.xlimrange)
         circles_x = r_circ.reshape(-1,1) @ np.cos(th_circ).reshape(1,-1)
         circles_y = r_circ.reshape(-1,1) @ np.sin(th_circ).reshape(1,-1)
 
@@ -336,25 +337,25 @@ class LVisPCanvas:
         th_pad = 1-self.thetaticklabelkwargs.pop("pad")     #get padding (scales position)
         thetatickpos_ri = th_pad * self.xlimdeadzone*self.xlimrange     #inner edge of theta ticks
         thetatickpos_ro = self.xlimdeadzone*self.xlimrange              #outer edge of theta ticks
-        thetatickpos_th = lvisu.minmaxscale(self.thetaticks[0], self.thetaplotlims[0], self.thetaplotlims[1])
-        thetaticklabelpos_x, thetaticklabelpos_y    = lvisu.polar2carth(thetatickpos_ri, thetatickpos_th)
-        thetatickpos_xi, thetatickpos_yi            = lvisu.polar2carth(thetatickpos_ro*(th_pad+0.15), thetatickpos_th)
-        thetatickpos_xo, thetatickpos_yo            = lvisu.polar2carth(thetatickpos_ro, thetatickpos_th)
+        thetatickpos_th = minmaxscale(self.thetaticks[0], self.thetaplotlims[0], self.thetaplotlims[1])
+        thetaticklabelpos_x, thetaticklabelpos_y    = polar2carth(thetatickpos_ri, thetatickpos_th)
+        thetatickpos_xi, thetatickpos_yi            = polar2carth(thetatickpos_ro*(th_pad+0.15), thetatickpos_th)
+        thetatickpos_xo, thetatickpos_yo            = polar2carth(thetatickpos_ro, thetatickpos_th)
 
         #indicator
-        thetaarrowpos_th = lvisu.minmaxscale(np.linspace(self.thetalims[0], self.thetaarrowpos_th, 101),
+        thetaarrowpos_th = minmaxscale(np.linspace(self.thetalims[0], self.thetaarrowpos_th, 101),
             self.thetaplotlims[0], self.thetaplotlims[1],
             xmin_ref=self.thetaticks[0][0], xmax_ref=self.thetaticks[0][-1],
         )
 
-        x_arrow, y_arrow = lvisu.polar2carth(1.0*thetatickpos_ro, thetaarrowpos_th)
+        x_arrow, y_arrow = polar2carth(1.0*thetatickpos_ro, thetaarrowpos_th)
 
         #label
-        # th_label_x, th_label_y = lvisu.polar2carth(1.45 * self.xlimrange, np.mean(th_arrow))
+        # th_label_x, th_label_y = polar2carth(1.45 * self.xlimrange, np.mean(th_arrow))
         th_label_x, th_label_y = (0,0)
 
         ##get correct rotation
-        # th_rot = lvisu.correct_labelrotation(np.mean(th_arrow)/np.pi*180)-90 if self.thetalabelkwargs["rotation"] == "auto" else self.thetalabelkwargs["rotation"]
+        # th_rot = correct_labelrotation(np.mean(th_arrow)/np.pi*180)-90 if self.thetalabelkwargs["rotation"] == "auto" else self.thetalabelkwargs["rotation"]
         # thetalabelkwargs = self.thetalabelkwargs.copy()
         # thetalabelkwargs["rotation"] = th_rot
 
@@ -403,19 +404,19 @@ class LVisPCanvas:
         #default parameters
         if ax is None: ax = self.ax
 
-        ylabpos = lvisu.minmaxscale(self.ylabpos_th,
+        ylabpos = minmaxscale(self.ylabpos_th,
             self.thetaplotlims[0], self.thetaplotlims[1],
             xmin_ref=self.thetaticks[0][0], xmax_ref=self.thetaticks[0][-1],
         )
 
         pad = self.ylabelkwargs.pop("pad")
-        ylabpos_x, ylabpos_y = lvisu.polar2carth((1+pad) * self.xlimrange, ylabpos)
+        ylabpos_x, ylabpos_y = polar2carth((1+pad) * self.xlimrange, ylabpos)
 
         ax.annotate(self.ylabel, xy=(ylabpos_x, ylabpos_y), annotation_clip=False, **self.ylabelkwargs)
 
         return
 
-    def draw_LVisPCanvas(self,
+    def draw(self,
         ax:plt.Axes=None,                 
         ):
         """
@@ -494,7 +495,7 @@ class LVisPCanvas:
                         - will fall back to `self.yticks`
                 - `panelsize`
                     - `float`, optional
-                    - (angular)space the created panel will occupy
+                    - (angular) space the created panel will occupy
                     - in radians
                     - the entire Canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
                     - the default is `np.pi/8`
@@ -684,7 +685,7 @@ class LVisPCanvas:
         thetas = self.get_thetas()
 
         #generate colors
-        colors = lvisu.get_colors(theta)
+        colors = get_colors(theta)
         for i in range(len(plot_kwargs)):
             if "c" not in plot_kwargs[i].keys(): plot_kwargs[i]["c"] = mcolors.to_hex(colors[i])
         
@@ -762,7 +763,7 @@ class LVisPCanvas:
         thetas = self.get_thetas()
 
         #generate colors
-        colors = lvisu.get_colors(theta)
+        colors = get_colors(theta)
         for i in range(len(sctr_kwargs)):
             if "c" not in sctr_kwargs[i].keys(): sctr_kwargs[i]["c"] = mcolors.to_hex(colors[i])
         
@@ -810,7 +811,7 @@ class LVisPCanvas:
 #     thetatickkwargs=None, thetaticklabelkwargs=None, thetalabelkwargs=None,
 #     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
 # )
-# colors = lvisu.get_colors(theta)
+# colors = get_colors(theta)
 
 # for i in range(len(X)):
 #     LVPP = LVPC.add_panel(
