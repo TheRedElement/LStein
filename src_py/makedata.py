@@ -197,7 +197,7 @@ def simulate(
         y_nonoise   = np.array([*map(lambda i: lc_sim(x[i], t_peak=t_peak[i], f_peak=theta[i], stretch0=5, stretch1=15, stretch2=40, noiselevel=0.0), range(nobjects))])
     else:
         # theta *= 10
-        y           = np.array([*map(lambda i: sin_sim(x[i], f_minmax=1, p=theta[i], offset=0.0, noiselevel=0.1), range(nobjects))])
+        y           = np.array([*map(lambda i: sin_sim(x[i], f_minmax=1, p=theta[i], offset=0.0, noiselevel=0.3), range(nobjects))])
         y_nonoise   = np.array([*map(lambda i: sin_sim(x[i], f_minmax=1, p=theta[i], offset=0.0, noiselevel=0.0), range(nobjects))])
 
     raw = dict(

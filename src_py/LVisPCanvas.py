@@ -648,8 +648,8 @@ class LVisPCanvas:
     #convenience methods
     def plot(self,
         theta:np.ndarray, X:List[np.ndarray], Y:List[np.ndarray],
-        panel_kwargs:List[Dict]=None,
-        plot_kwargs:List[Dict]=None,
+        panel_kwargs:Union[List[Dict],Dict]=None,
+        plot_kwargs:Union[List[Dict],Dict]=None,
         ):
         """
             - convenience function to plot a set of series
@@ -676,15 +676,23 @@ class LVisPCanvas:
                         - have to have same length as corresponding entries in `y`
                     - each series will be plotted in it's own panel associated with `theta`
                 - `panel_kwargs`
-                    - `List[Dict]`, optional
+                    - `List[Dict]`, `Dict` optional
                     - kwargs to pass to `self.add_panel()`
-                    - has to have same length as `theta`
+                    - if `List[Dict]`
+                        - has to have same length as `theta`
+                        - the panel created for each `theta` will use the respective specifications
+                    - if `Dict`
+                        - specifications will be applied to all created panels
                     - the default is `None`
                         - will be set to `dict()` for all panels
                 - `plot_kwargs`
-                    - `List[Dict]`
+                    - `List[Dict]`, `Dict`, optional
                     - kwargs to pass to `LVisPPanel.plot()`
-                    - has to have same length as `theta`
+                    - if `List[Dict]`
+                        - has to have same length as `theta`
+                        - the series plotted for each `theta` will use the respective specifications
+                    - if `Dict`
+                        - specifications will be applied to all plotted series                    
                     - the default is `None`
                         - will be set to `dict()` for all panels
             
@@ -698,15 +706,17 @@ class LVisPCanvas:
             --------
         """
         #default parameters
-        panel_kwargs = [dict() for _ in theta.__iter__()] if panel_kwargs is None else panel_kwargs
-        plot_kwargs  = [dict() for _ in theta.__iter__()] if plot_kwargs is None else plot_kwargs
+        panel_kwargs = dict() if panel_kwargs is None else panel_kwargs
+        panel_kwargs = [panel_kwargs.copy() for _ in theta.__iter__()] if isinstance(panel_kwargs, dict) else panel_kwargs
+        plot_kwargs  = dict() if plot_kwargs is None else plot_kwargs
+        plot_kwargs  = [plot_kwargs.copy() for _ in theta.__iter__()] if isinstance(plot_kwargs, dict) else plot_kwargs
 
         #get existing panels
         thetas = self.get_thetas()
 
         #generate colors
         colors = get_colors(theta)
-        for i in range(len(plot_kwargs)):
+        for i in range(len(theta)):
             if "c" not in plot_kwargs[i].keys(): plot_kwargs[i]["c"] = mcolors.to_hex(colors[i])
         
         for i in range(len(theta)):
@@ -718,7 +728,7 @@ class LVisPCanvas:
                 )
             else:
                 LVPP = self.get_panel(theta[i])
-            
+                        
             #draw the series
             LVPP.plot(X[i], Y[i], **plot_kwargs[i])
             
@@ -754,15 +764,23 @@ class LVisPCanvas:
                         - have to have same length as corresponding entries in `y`
                     - each series will be plotted in it's own panel associated with `theta`
                 - `panel_kwargs`
-                    - `List[Dict]`, optional
+                    - `List[Dict]`, `Dict` optional
                     - kwargs to pass to `self.add_panel()`
-                    - has to have same length as `theta`
+                    - if `List[Dict]`
+                        - has to have same length as `theta`
+                        - the panel created for each `theta` will use the respective specifications
+                    - if `Dict`
+                        - specifications will be applied to all created panels
                     - the default is `None`
                         - will be set to `dict()` for all panels
                 - `sctr_kwargs`
-                    - `List[Dict]`
+                    - `List[Dict]`, `Dict`, optional
                     - kwargs to pass to `LVisPPanel.scatter()`
-                    - has to have same length as `theta`
+                    - if `List[Dict]`
+                        - has to have same length as `theta`
+                        - the series plotted for each `theta` will use the respective specifications
+                    - if `Dict`
+                        - specifications will be applied to all plotted series                    
                     - the default is `None`
                         - will be set to `dict()` for all panels
             
@@ -776,15 +794,17 @@ class LVisPCanvas:
             --------
         """
         #default parameters
-        panel_kwargs    = [dict() for _ in theta.__iter__()] if panel_kwargs is None else panel_kwargs
-        sctr_kwargs     = [dict() for _ in theta.__iter__()] if sctr_kwargs is None else sctr_kwargs
+        panel_kwargs = dict() if panel_kwargs is None else panel_kwargs
+        panel_kwargs = [panel_kwargs.copy() for _ in theta.__iter__()] if isinstance(panel_kwargs, dict) else panel_kwargs
+        sctr_kwargs  = dict() if sctr_kwargs is None else sctr_kwargs
+        sctr_kwargs  = [sctr_kwargs.copy() for _ in theta.__iter__()] if isinstance(sctr_kwargs, dict) else sctr_kwargs
 
         #get existing panels
         thetas = self.get_thetas()
 
         #generate colors
         colors = get_colors(theta)
-        for i in range(len(sctr_kwargs)):
+        for i in range(len(theta)):
             if "c" not in sctr_kwargs[i].keys(): sctr_kwargs[i]["c"] = mcolors.to_hex(colors[i])
         
         for i in range(len(theta)):
@@ -801,23 +821,3 @@ class LVisPCanvas:
             LVPP.scatter(X[i], Y[i], **sctr_kwargs[i])
 
         return    
-
-# #%%convenience usage
-# print(np.sort(theta))
-# fig = plt.figure(figsize=(5,9))
-# ax = fig.add_subplot(111)
-# LVPC = LVisPCanvas(ax,
-#     thetaticks, [-20,0,100,120], yticks,
-#     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
-#     xlimdeadzone=0.3,
-#     thetalabel=r"$\theta$-label", xlabel=r"$x$-label", ylabel=r"$y$-label",
-#     thetaarrowpos_th=2, ylabpos_th=None,
-#     thetatickkwargs=dict(c="k"), thetaticklabelkwargs=None, thetalabelkwargs=None,
-#     xtickkwargs=None, xticklabelkwargs=None, xlabelkwargs=None,
-# )
-# LVPC.scatter(theta, X, Y)
-# LVPC.plot(theta, X, Y_nonoise, plot_kwargs=[dict(lw=3, c="w") for _ in theta])
-# LVPC.plot(theta, X, Y_nonoise)
-
-# # fig.tight_layout()
-# plt.show()
