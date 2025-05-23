@@ -29,7 +29,8 @@ pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength"
 fnames = sorted(glob.glob("../data/*_*.csv"))
 fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
 print(fnames)
-fname = fnames[3]
+fname = fnames[3]   #snib
+fname = fnames[7]   #snii
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -90,7 +91,7 @@ thetaticks = np.round(np.linspace(np.floor(np.min(theta_raw)), np.ceil(np.max(th
 xticks = np.round(np.linspace(np.floor(np.min(np.concat(x_raw))), np.ceil(np.max(np.concat(x_raw))), 4), decimals=0).astype(int)
 yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), 4), decimals=0).astype(int)
 # yticks = np.sort(np.append(yticks, [-10, 80]))
-panelsize = np.pi/10
+panelsize = np.pi/8
 vmin = 300 if ".py" not in fname else None
 colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 
