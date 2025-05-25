@@ -31,6 +31,7 @@ fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py
 print(fnames)
 fname = fnames[3]   #snib
 fname = fnames[7]   #snii
+# fname = fnames[-2]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
