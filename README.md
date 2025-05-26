@@ -12,15 +12,15 @@ Alternate names:
 
 Words starting with:
 * a: as, associated, association
-* e: extraction, elevating, element
+* e: extraction, elevating, element, ensemble, example
 * i: information
 * k: keen, keep, key, kind, knowledge
 * l: learning, linking
-* n: new, novelty, novel, neat, nice, "n"
-* o: of, observation, object, objective
-* r: relation, related, round
+* n: new, novelty, novel, neat, nice, "n", nearby
+* o: of, observation, object, objective, on, order
+* r: relation, related, round, reveal,
 * s: series, separate, sequential, such,
-* t: translation, transformation, through, that
+* t: translation, transformation, through, that, to
 * u: using, ultimate, unique, useful, ultra, unaesthetic
 
 ## Data For Testing
