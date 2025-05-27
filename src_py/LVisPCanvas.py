@@ -217,7 +217,7 @@ class LVisPCanvas:
         self.yticks         = (yticks, yticks) if isinstance(yticks, (list, np.ndarray)) else yticks
         
         self.thetaguidelims = (0,2*np.pi) if thetaguidelims is None else thetaguidelims
-        self.thetaplotlims  = thetaguidelims if thetaplotlims is None else thetaplotlims
+        self.thetaplotlims  = self.thetaguidelims if thetaplotlims is None else thetaplotlims
         self.xlimdeadzone   = xlimdeadzone
 
         self.thetalabel     = "" if thetalabel is None else thetalabel
