@@ -33,7 +33,7 @@ fname = fnames[3]   #snib
 fname = fnames[7]   #snii
 fname = fnames[11]   #snia
 fname = fnames[21]   #tde
-# fname = fnames[-2]
+fname = fnames[-1]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
