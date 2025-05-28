@@ -31,6 +31,8 @@ fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py
 print(fnames)
 fname = fnames[3]   #snib
 fname = fnames[7]   #snii
+fname = fnames[11]   #snia
+fname = fnames[21]   #tde
 # fname = fnames[-2]
 
 #deal with on-the-fly data generation (pseudo filenames)
@@ -77,6 +79,7 @@ df_raw_p = df_raw.partition_by(df_raw.columns[0], maintain_order=True)
 x_raw = [df[:,1].to_numpy().astype(np.float64) for df in df_raw_p]
 x_raw = [xi - np.nanmin(xi) for xi in x_raw]
 y_raw = [df[:,2].to_numpy().astype(np.float64) for df in df_raw_p]
+y_raw_e = [df[:,3].to_numpy().astype(np.float64) for df in df_raw_p]
 theta_pro = np.sort(np.unique(df_pro[:,0]))
 df_pro_p = df_pro.partition_by(df_pro.columns[0], maintain_order=True)
 x_pro = [df[:,1].to_numpy().astype(np.float64) for df in df_pro_p]
@@ -135,7 +138,8 @@ ax.legend()
 axt1 = fig.add_subplot(222, xlabel=xlab, ylabel=ylab)
 
 for i in range(len(theta_raw)):
-    axt1.scatter(x_raw[i], y_raw[i], c=colors[i])
+    markers, caps, bars = axt1.errorbar(x_raw[i], y_raw[i], yerr=y_raw_e[i], c=colors[i], ls="", marker="o")
+    for bar in bars: bar.set_alpha(0.1)
 for i in range(len(theta_pro)):
     axt1.plot(x_pro[i], y_pro[i], c="w", lw=3)
     axt1.plot(x_pro[i], y_pro[i], c=colors[i], label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
@@ -150,7 +154,8 @@ for i in range(len(theta_raw)):
     pos = (1 + nrows_theta * ncols + ncols_theta) + i%ncols_theta + ncols*(i//ncols_theta)
     axt2 = fig.add_subplot(nrows, ncols, pos, xlabel=xlab, ylabel=ylab)
     # axt2 = fig.add_subplot(5, 1, i+1, xlabel="MJD-min(MJD) [d]", ylabel="Fuxcal []")
-    axt2.scatter(x_raw[i], y_raw[i], c=colors[i])
+    markers, caps, bars = axt2.errorbar(x_raw[i], y_raw[i],yerr=y_raw_e[i], c=colors[i], ls="", marker="o")
+    for bar in bars: bar.set_alpha(0.1)
     axt2.plot(x_pro[i], y_pro[i], c="w", lw=3)
     axt2.plot(x_pro[i], y_pro[i], c=colors[i], label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
     if legend: axt2.legend()
