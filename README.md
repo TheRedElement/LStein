@@ -3,16 +3,16 @@
 ## Naming
 * LViSP: Linked Values in Series Plot
 Alternate names:
+* **LStein**: Linking Series to envision information neatly
 * LuStPlot: Linking using Series Transformation
 * LukasSt:
     * Learning using knowledge (by) associating sequences 
 * Stonetrnr: sequential transformation of n... extration
-* LStein: Linking Series to extract informative novelty
 * LSteinwender: Linking Series to extract informative novelty with ...
 
 Words starting with:
 * a: as, associated, association
-* e: extraction, elevating, element, ensemble, example
+* e: extraction, elevating, element, ensemble, example, envision
 * i: information
 * k: keen, keep, key, kind, knowledge
 * l: learning, linking
