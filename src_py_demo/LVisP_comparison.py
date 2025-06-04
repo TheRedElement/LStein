@@ -96,7 +96,7 @@ xticks = np.round(np.linspace(np.floor(np.min(np.concat(x_raw))), np.ceil(np.max
 yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), 4), decimals=0).astype(int)
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
-vmin = 300 if ".py" not in fname else None
+vmin = 300 if ".py" not in fname else 0
 colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 
 #%%plotting
