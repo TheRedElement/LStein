@@ -1,14 +1,13 @@
-# LVisP
+# LStein: Linking Series to envision information neatly
 
-## Naming
-* LViSP: Linked Values in Series Plot
+<!-- ## Naming
 Alternate names:
-* **LStein**: Linking Series to envision information neatly
 * LuStPlot: Linking using Series Transformation
 * LukasSt:
     * Learning using knowledge (by) associating sequences 
 * Stonetrnr: sequential transformation of n... extration
 * LSteinwender: Linking Series to extract informative novelty with ...
+* LViSP: Linked Values in Series Plot
 
 Words starting with:
 * a: as, associated, association
@@ -21,7 +20,7 @@ Words starting with:
 * r: relation, related, round, reveal,
 * s: series, separate, sequential, such,
 * t: translation, transformation, through, that, to
-* u: using, ultimate, unique, useful, ultra, unaesthetic
+* u: using, ultimate, unique, useful, ultra, unaesthetic -->
 
 ## Data For Testing
 Data used for demos and testing can be found in [data/](./data/).
@@ -45,7 +44,5 @@ You can try your own data as well, but make sure to
 
 ## TODO
 * tests
-* demos
-    * also show difference between theta and y-projection
 
 ## Known Bugs
