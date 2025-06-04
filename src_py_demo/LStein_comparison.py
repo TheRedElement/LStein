@@ -11,9 +11,9 @@ import sys
 from typing import Literal
 
 sys.path.append("../")
-from src_py import LVisPCanvas, utils as lvisu, makedata as md
+from src_py import LSteinCanvas, utils as lvisu, makedata as md
 
-importlib.reload(LVisPCanvas)
+importlib.reload(LSteinCanvas)
 # plt.style.use("dark_background")
 
 #%%definitions
@@ -99,11 +99,11 @@ vmin = 300 if ".py" not in fname else 0
 colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 
 #%%plotting
-#LVisP
+#LStein
 fig = plt.figure(figsize=(12,9))
 fig.suptitle(f"{otype} ({survey})")
 ax = fig.add_subplot(121)
-LVPC = LVisPCanvas.LVisPCanvas(ax,
+LVPC = LSteinCanvas.LSteinCanvas(ax,
     thetaticks, xticks, yticks,
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     xlimdeadzone=0.3,

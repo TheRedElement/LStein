@@ -6,20 +6,20 @@ import numpy as np
 from typing import Any, Dict, List, Literal, Tuple, Union
 
 from .utils import minmaxscale, polar2carth, carth2polar, get_colors
-from .LVisPPanel import LVisPPanel
+from .LSteinPanel import LSteinPanel
 
 #%%classes
-class LVisPCanvas:
+class LSteinCanvas:
     """
-        - class containing the canvas to draw `LVisPPanel`s into
+        - class containing the canvas to draw `LSteinPanel`s into
         - analogous to `matplotlib.figure.Figure`
-        - parent to `LVisPPanel`
+        - parent to `LSteinPanel`
 
         Attributes
         ----------
             - `ax`
                 `plt.Axes`
-                - axes to add the `LVisPlot` to
+                - axes to add the `LStein` plot to
             - `thetaticks`
                 - `Tuple[List[float],List[Any]]`, `List[float]`
                 - ticks to draw for the theta-axis (angular positioning)
@@ -37,7 +37,7 @@ class LVisPCanvas:
                 - also defines axis limits applied to `x`
                     - i.e., in radial direction
                     - `np.min(xticks[0])` corresponds to the end of `xlimdeadzone`
-                    - `np.max(xticks[0])` corresponds to the value plotted at the outer bound of the LVisPlot
+                    - `np.max(xticks[0])` corresponds to the value plotted at the outer bound of the LStein plot
                 - if `List[float]`
                     - will use `xticks` as labels as well
                 - if `Tuple[List[float],List[Any]]`
@@ -165,14 +165,14 @@ class LVisPCanvas:
                 - axis limits applied to `x`
                     - i.e., in radial direction
                     - `xlims[0]` corresponds to the value plotted at the end of `xlimdeadzone`
-                    - `xlims[1]` corresponds to the value plotted at the outer bound of the LVisPlot
+                    - `xlims[1]` corresponds to the value plotted at the outer bound of the LStein plot
             - `xlimrange`
                 - `real`
                 - range of x-values
                 - convenience field for relative definitions of plot elements
             - `Panels`
-                - `List[LVisPPanel]`
-                - collection of panels associated with `LVisPCanvas` instance
+                - `List[LSteinPanel]`
+                - collection of panels associated with `LSteinCanvas` instance
             - `canvas_drawn`
                 - `bool`
                 - flag denoting if the canvas has been drawn alrady
@@ -283,7 +283,7 @@ class LVisPCanvas:
                     - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
-                        - will draw into parent axis of `LVisPCanvas`
+                        - will draw into parent axis of `LSteinCanvas`
 
             Raises
             ------
@@ -338,7 +338,7 @@ class LVisPCanvas:
                     - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
-                        - will draw into parent axis of `LVisPCanvas`
+                        - will draw into parent axis of `LSteinCanvas`
 
             Raises
             ------
@@ -409,7 +409,7 @@ class LVisPCanvas:
                     - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
-                        - will draw into parent axis of `LVisPCanvas`
+                        - will draw into parent axis of `LSteinCanvas`
 
             Raises
             ------
@@ -448,7 +448,7 @@ class LVisPCanvas:
                     - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
-                        - will draw into parent axis of `LVisPCanvas`
+                        - will draw into parent axis of `LSteinCanvas`
 
             Raises
             ------
@@ -486,9 +486,9 @@ class LVisPCanvas:
         ytickkwargs:dict=None,
         yticklabelkwargs:dict=None,
         panelboundskwargs:dict=None,
-        ) -> LVisPPanel:
+        ) -> LSteinPanel:
         """
-            - method to add a `LVisPPanel` to the canvas
+            - method to add a `LSteinPanel` to the canvas
             - similar to matplotlibs `fig.add_subplot()`
 
             Parameters
@@ -531,7 +531,7 @@ class LVisPCanvas:
                     - `Literal["theta","y"]`, optioal
                     - method to use for the projection
                     - the default is `theta`
-                        - uses `LVisPPanel.project_xy_theta()`
+                        - uses `LSteinPanel.project_xy_theta()`
                 - `ytickkwargs`
                     - `dict`, optional
                     - kwargs to pass to `ax.plot()` when drawing yticks (lines in radial direction)
@@ -558,7 +558,7 @@ class LVisPCanvas:
             Returns
             -------
                 - `LVPP`
-                    - `LVisPPanel`
+                    - `LSteinPanel`
                     - created panel
 
             Comments
@@ -573,7 +573,7 @@ class LVisPCanvas:
             yticks = yticks
 
 
-        LVPP = LVisPPanel(self,
+        LVPP = LSteinPanel(self,
             theta=theta,
             yticks=yticks,
             panelsize=panelsize,
@@ -614,7 +614,7 @@ class LVisPCanvas:
     
     def get_panel(self,
         theta:float,
-        ) -> LVisPPanel:
+        ) -> LSteinPanel:
         """
             - method to get panel associated with `theta`
             - only returns the first match
@@ -631,7 +631,7 @@ class LVisPCanvas:
             Returns
             -------
                 - `panel`
-                    - `LVisPPanel`, `None`
+                    - `LSteinPanel`, `None`
                     - panel associated with `theta`
                     - `None` if no panel associated with `theta`
 
@@ -687,7 +687,7 @@ class LVisPCanvas:
                         - will be set to `dict()` for all panels
                 - `plot_kwargs`
                     - `List[Dict]`, `Dict`, optional
-                    - kwargs to pass to `LVisPPanel.plot()`
+                    - kwargs to pass to `LSteinPanel.plot()`
                     - if `List[Dict]`
                         - has to have same length as `theta`
                         - the series plotted for each `theta` will use the respective specifications
@@ -775,7 +775,7 @@ class LVisPCanvas:
                         - will be set to `dict()` for all panels
                 - `sctr_kwargs`
                     - `List[Dict]`, `Dict`, optional
-                    - kwargs to pass to `LVisPPanel.scatter()`
+                    - kwargs to pass to `LSteinPanel.scatter()`
                     - if `List[Dict]`
                         - has to have same length as `theta`
                         - the series plotted for each `theta` will use the respective specifications

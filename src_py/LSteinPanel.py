@@ -4,19 +4,19 @@ from matplotlib.collections import PathCollection
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple
 
-# from .LVisPCanvas import LVisPCanvas   #no import because leads to curcular import
+# from .LSteinCanvas import LSteinCanvas   #no import because leads to curcular import
 from .utils import minmaxscale, polar2carth, carth2polar
 
 
 #%%classes
-class LVisPPanel:
+class LSteinPanel:
     """
-        - class defining a panel sitting within a `LVisPCanvas`
+        - class defining a panel sitting within a `LSteinCanvas`
 
         Attributes
         ----------
             - `LVPC`
-                - `LVisPCanvas`
+                - `LSteinCanvas`
                 - parent canvas the panel is associated with
             - `theta`
                 - `float`
@@ -52,7 +52,7 @@ class LVisPPanel:
                 - `Literal["theta","y"]`, optioal
                 - method to use for the projection
                 - the default is `theta`
-                    - uses `LVisPPanel.project_xy_theta()`
+                    - uses `LSteinPanel.project_xy_theta()`
             - `ytickkwargs`
                 - `dict`, optional
                 - kwargs to pass to `ax.plot()` when drawing yticks (lines in radial direction)
@@ -112,7 +112,7 @@ class LVisPPanel:
     """
 
     def __init__(self,
-        LVPC,#:LVisPCanvas,
+        LVPC,#:LSteinCanvas,
         theta:float,
         yticks:Tuple[List[float],List[Any]],
         panelsize:float=np.pi/8,
