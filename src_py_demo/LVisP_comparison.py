@@ -5,7 +5,6 @@ import importlib
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 import numpy as np
-import os
 import polars as pl
 import re
 import sys
