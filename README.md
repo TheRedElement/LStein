@@ -23,7 +23,7 @@ Words starting with:
 * u: using, ultimate, unique, useful, ultra, unaesthetic -->
 
 ## Data For Testing
-Data used for demos and testing can be found in [data/](./data/).
+Data used for [demos](./LStein_demo/LStein_demo.ipynb) and [testing](./LStein_tests/) can be found in [data/](./data/).
 Each dataset is a `.csv` file with the following columns:
 
 | Column | Description |
@@ -43,6 +43,6 @@ You can try your own data as well, but make sure to
 2. update the file-name in the script
 
 ## TODO
-* tests
+* [testing](./LStein_tests/)
 
 ## Known Bugs
