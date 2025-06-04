@@ -8,10 +8,9 @@ import numpy as np
 import polars as pl
 import re
 import sys
-from typing import Literal
 
 sys.path.append("../")
-from src_py import LSteinCanvas, utils as lvisu, makedata as md
+from LStein import LSteinCanvas, utils as lvisu, makedata as md
 
 importlib.reload(LSteinCanvas)
 # plt.style.use("dark_background")
