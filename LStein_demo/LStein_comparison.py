@@ -13,7 +13,7 @@ sys.path.append("../")
 from LStein import LSteinCanvas, utils as lvisu, makedata as md
 
 importlib.reload(LSteinCanvas)
-# plt.style.use("dark_background")
+plt.style.use("dark_background")
 
 #%%definitions
 
@@ -29,9 +29,9 @@ fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py
 print(fnames)
 fname = fnames[3]   #snib
 fname = fnames[7]   #snii
-fname = fnames[11]   #snia
-fname = fnames[21]   #tde
-fname = fnames[-1]
+# fname = fnames[11]   #snia
+# fname = fnames[21]   #tde
+# fname = fnames[-1]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -102,6 +102,7 @@ colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 fig = plt.figure(figsize=(12,9))
 fig.suptitle(f"{otype} ({survey})")
 ax = fig.add_subplot(121)
+# ax.set_title(f"SN II (ELAsTiCC)")
 LVPC = LSteinCanvas.LSteinCanvas(ax,
     thetaticks, xticks, yticks,
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
