@@ -30,10 +30,12 @@ class LSteinPanel:
                 - ticks to draw for the y-axis
                 - also defines axis limits applied to `y`
                     - i.e., bounds of the respective panel
-                    - `np.min(yticks[0])` corresponds to the start of the panel
-                    - `np.max(yticks[0])` corresponds to the end of the panel
+                    - `yticks[0][0]` corresponds to the start of the panel
+                    - `yticks[0][-1]` corresponds to the end of the panel
                     - `yticks[0]` will be used as tickpositions
                     - `yticks[1]` will be used as ticklabels
+                - `yticks[0]` has to be sorted in ascending or descending order
+                - to invert the y-axis pass `yticks[0]` in a reverse sorted manner
             - `panelsize`
                 - `float`, optional
                 - (angular) space the created panel will occupy
@@ -149,8 +151,8 @@ class LSteinPanel:
         if "c" not in self.panelboundskwargs.keys():self.panelboundskwargs["c"] = plt.rcParams["axes.edgecolor"]
 
         #infered attributes
-        self.ylims = (np.min(self.yticks[0]), np.max(self.yticks[0]))
-        self.ylimrange = np.max(self.yticks[0]) - np.min(self.yticks[0])        
+        self.ylims = (self.yticks[0][0], self.yticks[0][-1])
+        self.ylimrange = np.max(self.yticks[0]) - np.min(self.yticks[0])
         self.panel_drawn = False
 
         return
@@ -260,7 +262,7 @@ class LSteinPanel:
             Comments
             --------
         """
-        ytickpos_th = minmaxscale(self.yticks[0], theta_lb, theta_ub)
+        ytickpos_th = minmaxscale(self.yticks[0], theta_lb, theta_ub, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
         yticklabs = self.yticks[1]
 
         return ytickpos_th, yticklabs
@@ -311,6 +313,9 @@ class LSteinPanel:
         r_, th_ = np.meshgrid(r_bounds, ytickpos_th)
         ytickpos_x, ytickpos_y              = polar2carth(r_, th_)
         yticklabelpos_x, yticklabelpos_y    = polar2carth((1+pad)*r_ub, ytickpos_th)
+
+        # ytickpos_x, ytickpos_y = ytickpos_x[::-1], ytickpos_y[::-1]
+        # yticklabelpos_x, yticklabelpos_y = yticklabelpos_x[::-1], yticklabelpos_y[::-1]
 
         if self.show_yticks:
             ax.plot(ytickpos_x.T, ytickpos_y.T, **self.ytickkwargs)
@@ -371,8 +376,8 @@ class LSteinPanel:
             --------
         """
 
-        x_bool = (self.LSC.xlims[0]<=x)&(x<=self.LSC.xlims[1])
-        y_bool = (self.ylims[0]<=y)&(y<=self.ylims[1])
+        x_bool = (np.min(self.LSC.xlims)<=x)&(x<=np.max(self.LSC.xlims))
+        y_bool = (np.min(self.ylims)<=y)&(y<=np.max(self.ylims))
         limitbool = (x_bool&y_bool)
 
         x_cut = x[limitbool]
@@ -427,8 +432,8 @@ class LSteinPanel:
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
         #convert ylims to theta-values
-        r_min, th_min = carth2polar(self.LSC.xlims[1], self.ylims[0])
-        r_max, th_max = carth2polar(self.LSC.xlims[1], self.ylims[1])
+        r_min, th_min = carth2polar(np.max(self.LSC.xlims), self.ylims[0])
+        r_max, th_max = carth2polar(np.max(self.LSC.xlims), self.ylims[1])
 
         #project x to obey axis-limits
         x_proj = minmaxscale(x,

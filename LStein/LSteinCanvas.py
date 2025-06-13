@@ -36,8 +36,10 @@ class LSteinCanvas:
                 - ticks (circles) to draw for the x-axis
                 - also defines axis limits applied to `x`
                     - i.e., in radial direction
-                    - `np.min(xticks[0])` corresponds to the end of `xlimdeadzone`
-                    - `np.max(xticks[0])` corresponds to the value plotted at the outer bound of the LStein plot
+                    - `xticks[0][0]` corresponds to the end of `xlimdeadzone`
+                    - `xticks[0][-1]` corresponds to the value plotted at the outer bound of the LStein plot
+                - `xticks[0]` has to be sorted in ascending or descending order
+                - to invert the x-axis pass `xticks[0]` in a reverse sorted manner
                 - if `List[float]`
                     - will use `xticks` as labels as well
                 - if `Tuple[List[float],List[Any]]`
@@ -47,8 +49,10 @@ class LSteinCanvas:
                 - ticks to draw for the y-axis
                 - also defines axis limits applied to `y`
                     - i.e., bounds of the respective panel
-                    - `np.min(yticks[0])` corresponds to the start of the panel
-                    - `np.max(yticks[0])` corresponds to the end of the panel
+                    - `yticks[0][0]` corresponds to the start of the panel
+                    - `yticks[0][-1]` corresponds to the end of the panel
+                - `yticks[0]` has to be sorted in ascending or descending order
+                - to invert the y-axis pass `yticks[0]` in a reverse sorted manner
                 - if `List[float]`
                     - will use `yticks` as ticklabels as well
                 - if `Tuple[List[float],List[Any]]`
@@ -259,11 +263,16 @@ class LSteinCanvas:
         if "pad" not in self.ylabelkwargs.keys():   self.ylabelkwargs["pad"] = 0.15
 
         #infered attributes
-        self.thetalims = (np.min(self.thetaticks[0]), np.max(self.thetaticks[1]))
-        self.xlims = (np.min(self.xticks[0]), np.max(self.xticks[1]))
+        self.thetalims = (np.min(self.thetaticks[0]), np.max(self.thetaticks[0]))
+        self.xlims = (self.xticks[0][0], self.xticks[0][-1])
         self.xlimrange = np.max(self.xticks[0]) - np.min(self.xticks[0])
         self.Panels = []
         self.canvas_drawn = False
+
+        #checks
+        # assert (sorted(self.thetaticks[0]) == self.thetaticks[0]).all(), "`thetaticks` must be sorted in ascending order"
+        assert (sorted(self.xticks[0]) == self.xticks[0]).all() or (sorted(self.xticks[0], reverse=True) == self.xticks[0]).all(), "`xticks` must be sorted in ascending or descending order"
+        assert (sorted(self.yticks[0]) == self.yticks[0]).all() or (sorted(self.yticks[0], reverse=True) == self.yticks[0]).all(), "`yticks` must be sorted in ascending or descending order"
 
         return
 
@@ -301,7 +310,7 @@ class LSteinCanvas:
         #xticks
         th_circ = np.linspace(self.thetaguidelims[0], self.thetaguidelims[1], 100)
         r_circ = self.xticks[0] - np.min(self.xticks[0])
-        r_circ = minmaxscale(r_circ, self.xlimrange * self.xlimdeadzone, self.xlimrange)
+        r_circ = minmaxscale(r_circ, self.xlimrange * self.xlimdeadzone, self.xlimrange, xmin_ref=self.xlims[0], xmax_ref=self.xlims[1])  #scale to xlims
         circles_x = r_circ.reshape(-1,1) @ np.cos(th_circ).reshape(1,-1)
         circles_y = r_circ.reshape(-1,1) @ np.sin(th_circ).reshape(1,-1)
 
