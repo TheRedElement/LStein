@@ -557,7 +557,7 @@ class LSteinCanvas:
 
             Returns
             -------
-                - `LVPP`
+                - `LSP`
                     - `LSteinPanel`
                     - created panel
 
@@ -573,7 +573,7 @@ class LSteinCanvas:
             yticks = yticks
 
 
-        LVPP = LSteinPanel(self,
+        LSP = LSteinPanel(self,
             theta=theta,
             yticks=yticks,
             panelsize=panelsize,
@@ -584,9 +584,9 @@ class LSteinCanvas:
             panelboundskwargs=panelboundskwargs,
         )
 
-        self.Panels.append(LVPP)
+        self.Panels.append(LSP)
 
-        return LVPP
+        return LSP
     
     #get methods
     def get_thetas(self) -> List[float]:
@@ -722,15 +722,15 @@ class LSteinCanvas:
         for i in range(len(theta)):
             #avoid drawing the panel twice
             if theta[i] not in thetas:
-                LVPP = self.add_panel(
+                LSP = self.add_panel(
                     theta=theta[i],
                     **panel_kwargs[i]
                 )
             else:
-                LVPP = self.get_panel(theta[i])
+                LSP = self.get_panel(theta[i])
                         
             #draw the series
-            LVPP.plot(X[i], Y[i], **plot_kwargs[i])
+            LSP.plot(X[i], Y[i], **plot_kwargs[i])
             
         return
     
@@ -810,14 +810,14 @@ class LSteinCanvas:
         for i in range(len(theta)):
             #avoid drawing the panel twice
             if theta[i] not in thetas:
-                LVPP = self.add_panel(
+                LSP = self.add_panel(
                     theta=theta[i],
                     **panel_kwargs[i]
                 )
             else:
-                LVPP = self.get_panel(theta[i])
+                LSP = self.get_panel(theta[i])
             
             #draw the series
-            LVPP.scatter(X[i], Y[i], **sctr_kwargs[i])
+            LSP.scatter(X[i], Y[i], **sctr_kwargs[i])
 
         return    

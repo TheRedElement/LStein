@@ -102,10 +102,11 @@ colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 fig = plt.figure(figsize=(12,9))
 fig.suptitle(f"{otype} ({survey})")
 ax = fig.add_subplot(121)
-# ax.set_title(f"SN II (ELAsTiCC)")
+ax.set_title(f"SN II (ELAsTiCC)")
 LVPC = LSteinCanvas.LSteinCanvas(ax,
     thetaticks, xticks, yticks,
-    thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
+    # thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
+    thetaguidelims=(np.pi/2,3*np.pi/2), thetaplotlims=(np.pi/2+panelsize/2,3*np.pi/2-panelsize/2),
     xlimdeadzone=0.3,
     thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
     thetaarrowpos_th=None, ylabpos_th=None,
@@ -160,6 +161,9 @@ for i in range(len(theta_raw)):
     if legend: axt2.legend()
     
 fig.tight_layout()
-fig.savefig(fname.replace("./data/","./gfx/").replace(".csv",".png").replace(".py",".png"), bbox_inches="tight")
+fig.savefig(
+    fname.replace("./data/","./gfx/").replace(".csv",".png").replace(".py",".png"), bbox_inches="tight",
+    transparent=True, dpi=300
+)
 
 plt.show()

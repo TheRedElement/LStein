@@ -15,7 +15,7 @@ class LSteinPanel:
 
         Attributes
         ----------
-            - `LVPC`
+            - `LSC`
                 - `LSteinCanvas`
                 - parent canvas the panel is associated with
             - `theta`
@@ -23,7 +23,7 @@ class LSteinPanel:
                 - theta value the panel is associated with
                 - equivalent to 2.5th dimension of the dataset
                 - similar to `pos` in `fig.add_subolot(pos)`
-                - determines where on `LVPC` the panel will be located
+                - determines where on `LSC` the panel will be located
                     - created panel will be centered around `theta` with a width of `panelsize`
             - `yticks`
                 `Tuple[List[float],List[Any]]`
@@ -112,7 +112,7 @@ class LSteinPanel:
     """
 
     def __init__(self,
-        LVPC,#:LSteinCanvas,
+        LSC,#:LSteinCanvas,
         theta:float,
         yticks:Tuple[List[float],List[Any]],
         panelsize:float=np.pi/8,
@@ -122,7 +122,7 @@ class LSteinPanel:
         panelboundskwargs:dict=None,
         ):
 
-        self.LVPC               = LVPC
+        self.LSC               = LSC
         
         self.theta              = theta
         
@@ -190,8 +190,8 @@ class LSteinPanel:
             --------
         """
         theta_offset = minmaxscale(self.theta, #panel position
-            self.LVPC.thetaplotlims[0], self.LVPC.thetaplotlims[1],
-            xmin_ref=self.LVPC.thetaticks[0][0], xmax_ref=self.LVPC.thetaticks[0][-1]
+            self.LSC.thetaplotlims[0], self.LSC.thetaplotlims[1],
+            xmin_ref=self.LSC.thetaticks[0][0], xmax_ref=self.LSC.thetaticks[0][-1]
         )
         theta_lb = theta_offset - self.panelsize/2   #lower bound of panel
         theta_ub = theta_offset + self.panelsize/2   #upper bound of panel
@@ -212,19 +212,19 @@ class LSteinPanel:
                 - `r_lb`
                     - `float`
                     - lower bound of the panel in x-direction (radially)
-                    - located at `self.xlimdeadzone*self.LVPC.xlimrange`
+                    - located at `self.xlimdeadzone*self.LSC.xlimrange`
                     - corresponds to `self.xlims[0]`
                 - `r_ub`
                     - `float`
                     - upper bound of the panel in x-direction (radially)
-                    - located at `self.LVPC.xlimrange`
+                    - located at `self.LSC.xlimrange`
                     - corresponds to `self.xlims[1]`
 
             Comments
             --------
         """        
-        r_lb = self.LVPC.xlimdeadzone*self.LVPC.xlimrange
-        r_ub = self.LVPC.xlimrange
+        r_lb = self.LSC.xlimdeadzone*self.LSC.xlimrange
+        r_ub = self.LSC.xlimrange
         return r_lb, r_ub
 
     def get_yticks(self,
@@ -278,7 +278,7 @@ class LSteinPanel:
                     - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
-                        - will be set to `self.LVPC.ax` (axis of parent)
+                        - will be set to `self.LSC.ax` (axis of parent)
 
             Raises
             ------
@@ -291,7 +291,7 @@ class LSteinPanel:
         """
 
         #default parameters
-        if ax is None: ax = self.LVPC.ax
+        if ax is None: ax = self.LSC.ax
 
         #get panel boundaries
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
@@ -339,7 +339,7 @@ class LSteinPanel:
                 - `x`
                     - `np.ndarray`
                     - x-values of the series to be plotted
-                    - will serve as reference for enforcing `self.LVPC.xlims`
+                    - will serve as reference for enforcing `self.LSC.xlims`
                 - `y`
                     - `np.ndarray`
                     - y-values of the series to be plotted
@@ -371,7 +371,7 @@ class LSteinPanel:
             --------
         """
 
-        x_bool = (self.LVPC.xlims[0]<=x)&(x<=self.LVPC.xlims[1])
+        x_bool = (self.LSC.xlims[0]<=x)&(x<=self.LSC.xlims[1])
         y_bool = (self.ylims[0]<=y)&(y<=self.ylims[1])
         limitbool = (x_bool&y_bool)
 
@@ -427,19 +427,19 @@ class LSteinPanel:
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
         #convert ylims to theta-values
-        r_min, th_min = carth2polar(self.LVPC.xlims[1], self.ylims[0])
-        r_max, th_max = carth2polar(self.LVPC.xlims[1], self.ylims[1])
+        r_min, th_min = carth2polar(self.LSC.xlims[1], self.ylims[0])
+        r_max, th_max = carth2polar(self.LSC.xlims[1], self.ylims[1])
 
         #project x to obey axis-limits
         x_proj = minmaxscale(x,
-            self.LVPC.xlimdeadzone*self.LVPC.xlimrange, self.LVPC.xlimrange,
-            xmin_ref=self.LVPC.xlims[0], xmax_ref=self.LVPC.xlims[1],
+            self.LSC.xlimdeadzone*self.LSC.xlimrange, self.LSC.xlimrange,
+            xmin_ref=self.LSC.xlims[0], xmax_ref=self.LSC.xlims[1],
         )
 
         #project y to fit into panel
         y_scaler = minmaxscale(x_proj,
-            self.LVPC.xlimdeadzone, 1,
-            xmin_ref=self.LVPC.xlimdeadzone*self.LVPC.xlimrange, xmax_ref=self.LVPC.xlimrange
+            self.LSC.xlimdeadzone, 1,
+            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange, xmax_ref=self.LSC.xlimrange
         )
         y_proj = y_scaler * y
         
@@ -498,14 +498,14 @@ class LSteinPanel:
 
         #project x to obey axis-limits
         x_proj = minmaxscale(x,
-            self.LVPC.xlimdeadzone*self.LVPC.xlimrange, self.LVPC.xlimrange,
-            xmin_ref=self.LVPC.xlims[0], xmax_ref=self.LVPC.xlims[1],
+            self.LSC.xlimdeadzone*self.LSC.xlimrange, self.LSC.xlimrange,
+            xmin_ref=self.LSC.xlims[0], xmax_ref=self.LSC.xlims[1],
         )
 
         #project y to fit into panel
         y_scaler = minmaxscale(x_proj,
-            self.LVPC.xlimdeadzone, 1,
-            xmin_ref=self.LVPC.xlimdeadzone*self.LVPC.xlimrange, xmax_ref=self.LVPC.xlimrange
+            self.LSC.xlimdeadzone, 1,
+            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange, xmax_ref=self.LSC.xlimrange
         )
         y_proj = minmaxscale(y, 0, 1, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
         y_proj = y_scaler * y_proj
@@ -593,7 +593,7 @@ class LSteinPanel:
                     - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
-                        - will be set to `self.LVPC.ax` (axis of parent)
+                        - will be set to `self.LSC.ax` (axis of parent)
                 -`**kwargs`
                     - kwargs to pass to `ax.plot()`
                         
@@ -612,10 +612,10 @@ class LSteinPanel:
         """
 
         #default parameters
-        if ax is None: ax = self.LVPC.ax
+        if ax is None: ax = self.LSC.ax
 
         #draw canvas, panel if not done already
-        if not self.LVPC.canvas_drawn: self.LVPC.draw()
+        if not self.LSC.canvas_drawn: self.LSC.draw()
         if not self.panel_drawn: self.draw()
 
         #apply axis limits
@@ -656,7 +656,7 @@ class LSteinPanel:
                     - `plt.Axes`, optional
                     - axis to draw into
                     - the default is `None`
-                        - will be set to `self.LVPC.ax` (axis of parent)
+                        - will be set to `self.LSC.ax` (axis of parent)
                 -`**kwargs`
                     - kwargs to pass to `ax.scatter()`
                         
@@ -674,10 +674,10 @@ class LSteinPanel:
             --------        
         """
         #default parameters
-        if ax is None: ax = self.LVPC.ax
+        if ax is None: ax = self.LSC.ax
 
         #draw canvas, panel if not done already
-        if not self.LVPC.canvas_drawn: self.LVPC.draw()
+        if not self.LSC.canvas_drawn: self.LSC.draw()
         if not self.panel_drawn: self.draw()
 
         #apply axis limits
