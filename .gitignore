@@ -4,6 +4,7 @@
 ~/
 .vscode
 gfx/*.png
+gfx/*.pdf
 
 ##ignore
 .temp/

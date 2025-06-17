@@ -130,12 +130,13 @@ LVPC.plot(theta_pro, x_pro, y_pro,
     plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
 )
 # if legend: ax.legend()
-ax.legend(loc="upper left", bbox_to_anchor=(-.06, 1.05))
+ax.legend(loc="upper left", bbox_to_anchor=(-.06, 1.05), framealpha=0.2)
 
 
 fig.tight_layout()
 fig.savefig(
-    "../gfx/lstein_poster.png", bbox_inches="tight",
+    "../gfx/lstein_poster.pdf", bbox_inches="tight",
+    # "../gfx/lstein_poster.png", bbox_inches="tight",
     transparent=True, dpi=300
 )
 
