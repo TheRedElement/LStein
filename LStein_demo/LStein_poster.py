@@ -95,14 +95,18 @@ yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
 vmin = 300 if ".py" not in fname else 0
-colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
+colors = lvisu.get_colors(theta_raw,
+    cmap="nipy_spectral",
+    norm=mcolors.LogNorm,
+    vmin=300, vmax=1000
+)
 
 #%%plotting
 #LStein
 fig = plt.figure(figsize=(8,12))
 ax = fig.add_subplot(121)
 ax.set_title(f"SN II (ELAsTiCC)")
-LVPC = LSteinCanvas.LSteinCanvas(ax,
+LSC = LSteinCanvas.LSteinCanvas(ax,
     thetaticks, xticks, yticks,
     # thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
@@ -113,7 +117,7 @@ LVPC = LSteinCanvas.LSteinCanvas(ax,
     xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2,0)),
     ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0,-1))
 )
-LVPC.scatter(theta_raw, x_raw, y_raw,
+LSC.scatter(theta_raw, x_raw, y_raw,
     panel_kwargs=[dict(
         y_projection_method="theta",
         panelsize=panelsize,
@@ -123,10 +127,10 @@ LVPC.scatter(theta_raw, x_raw, y_raw,
         c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
     ) for i in range(len(theta_raw))],
 )
-LVPC.plot(theta_pro, x_pro, y_pro,
+LSC.plot(theta_pro, x_pro, y_pro,
     plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
 )
-LVPC.plot(theta_pro, x_pro, y_pro,
+LSC.plot(theta_pro, x_pro, y_pro,
     plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
 )
 # if legend: ax.legend()
