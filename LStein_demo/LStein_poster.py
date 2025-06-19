@@ -54,7 +54,7 @@ else:
     df = pl.read_csv(fname, comment_prefix="#")
     df = df.sort(pl.col(df.columns[1]))
     legend = True
-    thetalab = "Wavelength [nm]"
+    thetalab = "Wavelength\n[nm]"
     xlab = "MJD-min(MJD) [d]" if "mjd" in df.columns else "Period [d]"
     ylab = "m [mag]" if "mag" in df.columns else "Fluxcal []"
 
@@ -90,8 +90,8 @@ y_pro = [df[:,2].to_numpy().astype(np.float64) for df in df_pro_p]
 #%%get stats
 unique_thetas = np.unique(theta_raw)
 thetaticks = np.round(np.linspace(np.floor(np.min(theta_raw)), np.ceil(np.max(theta_raw)), 4),0).astype(int)
-xticks = np.round(np.linspace(np.floor(np.min(np.concat(x_raw))), np.ceil(np.max(np.concat(x_raw))), 4), decimals=0).astype(int)[::-1]
-yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), 4), decimals=0).astype(int)[::-1]
+xticks = np.round(np.linspace(np.floor(np.min(np.concat(x_raw))), np.ceil(np.max(np.concat(x_raw))), 4), decimals=0).astype(int)#[::-1]
+yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), 4), decimals=0).astype(int)#[::-1]
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
 vmin = 300 if ".py" not in fname else 0
@@ -108,14 +108,17 @@ ax = fig.add_subplot(121)
 ax.set_title(f"SN II (ELAsTiCC)")
 LSC = LSteinCanvas.LSteinCanvas(ax,
     thetaticks, xticks, yticks,
-    # thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
-    thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
+    thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
+    # thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
     xlimdeadzone=0.3,
     thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
     thetaarrowpos_th=None, ylabpos_th=None,
-    thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=None,
-    xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2,0)),
-    ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0,-1))
+    # thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(-1,0)),
+    thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(1.5,0)),
+    # xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2,0)),
+    xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(-2,0)),
+    # ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0,-1))
+    ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-3,-1))
 )
 LSC.scatter(theta_raw, x_raw, y_raw,
     panel_kwargs=[dict(
@@ -134,7 +137,8 @@ LSC.plot(theta_pro, x_pro, y_pro,
     plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
 )
 # if legend: ax.legend()
-ax.legend(loc="upper left", bbox_to_anchor=(-.06, 1.05), framealpha=0.2)
+# ax.legend(loc="upper left", bbox_to_anchor=(-.06, 1.05), framealpha=0.2)
+ax.legend(loc="upper left", bbox_to_anchor=(0.88, 1.05), framealpha=0.2)
 
 
 fig.tight_layout()
