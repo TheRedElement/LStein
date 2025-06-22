@@ -1,7 +1,7 @@
 # LStein: Linking Series to envision information neatly
 
 > [!WARNING]
-> Note that this package is currently under development.
+> Note, that this package is currently under development.
 > Most functionalities should work, but changes will be implemented on a running basis and without notice.
 > No test have been performed yet.
 
