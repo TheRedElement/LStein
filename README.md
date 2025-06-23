@@ -6,21 +6,11 @@
 > No test have been performed yet.
 
 ## Installation
-For now, it is easiest if you just clone this repo:
+You can easily install the package using [`pip`](https://pypi.org/project/pip/):
 
 ```shell
-git clone https://github.com/TheRedElement/LStein.git
+pip3 install git+https://github.com/TheRedElement/LStein.git
 ```
-
-When using in [Python](https://www.python.org/) simply add it to your python-path:
-
-```python
-import sys
-sys.path.append("<path/to/cloned/LStein/repo">)
-from LStein.LSteinCanvas import LSteinCanvas
-```
-
-The package was developed using [Python 3.13.3](https://www.python.org/downloads/release/python-3133/).
 
 ## Reference
 If you use this code in your work please use this entry in your bibliography (for now):
