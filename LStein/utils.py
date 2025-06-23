@@ -239,20 +239,3 @@ def get_colors(
     colors = cmap(norm(x))
 
     return colors
-# %%
-
-# theta = np.linspace(0,2*np.pi,10)
-# r = 1
-
-
-# x, y = polar2carth(r, theta)
-# plt.plot(x,y)
-# r, theta = carth2polar(x, y)
-# x, y = polar2carth(r, theta)
-
-# import matplotlib.pyplot as plt
-
-# for i in range(len(x)): print(x[i], y[i], r[i], theta[i])
-# plt.plot(x, y)
-# # plt.plot(x,y)
-# # plt.ylim(0,None)

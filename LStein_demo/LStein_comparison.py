@@ -9,8 +9,7 @@ import polars as pl
 import re
 import sys
 
-sys.path.append("../")
-from LStein import LSteinCanvas, utils as lvisu, makedata as md
+from LStein import LSteinCanvas, utils as lsu, makedata as md
 
 importlib.reload(LSteinCanvas)
 plt.style.use("dark_background")
@@ -95,7 +94,7 @@ yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
 vmin = 300 if ".py" not in fname else 0
-colors = lvisu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
+colors = lsu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 
 #%%plotting
 #LStein

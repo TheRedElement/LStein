@@ -7,10 +7,8 @@ from matplotlib import colors as mcolors
 import numpy as np
 import polars as pl
 import re
-import sys
 
-sys.path.append("../")
-from LStein import LSteinCanvas, utils as lvisu, makedata as md
+from LStein import LSteinCanvas, utils as lsu, makedata as md
 
 importlib.reload(LSteinCanvas)
 # plt.style.use("dark_background")
@@ -97,7 +95,7 @@ yticks = yticks[::-1]
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
 vmin = 300 if ".py" not in fname else 0
-colors = lvisu.get_colors(theta_raw,
+colors = lsu.get_colors(theta_raw,
     cmap="nipy_spectral",
     norm=mcolors.LogNorm,
     vmin=300, vmax=1000
@@ -157,8 +155,8 @@ ax.legend(
 
 fig.tight_layout()
 fig.savefig(
-    "../gfx/lstein_poster.pdf", bbox_inches="tight",
-    # "../gfx/lstein_poster.png", bbox_inches="tight",
+    # "../gfx/lstein_poster.pdf", bbox_inches="tight",
+    "../gfx/lstein_poster.png", bbox_inches="tight",
     transparent=True, dpi=300
 )
 

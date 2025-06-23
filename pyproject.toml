@@ -1,33 +1,33 @@
 [build-system]
-requires = ["hatchling >= 1.26"]
+requires = [ "hatchling >= 1.26",]
 build-backend = "hatchling.build"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src_py"]
-
 [project]
-name = "src_py"
-version = "0.0.1"
-authors = [
-  { name="Lukas Steinwender", email="" },
-]
-description = "your repo description"
+name = "LStein"
+version = "0.1.0"
+description = "repository of some useful code snippets in various programming languages."
 readme = "README.md"
-requires-python = ">=3.10"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-]
+requires-python = ">=3.13"
+classifiers = [ "Programming Language :: Python :: 3", "Operating System :: OS Independent",]
 license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license-files = [ "LICEN[CS]E*",]
+dependencies = [ "matplotlib==3.10.3", "numpy==2.2.6",]
+[[project.authors]]
+name = "Lukas Steinwender"
+email = ""
+
+[[project.maintaners]]
+name = "Lukas Steinwender"
+email = ""
 
 [project.urls]
-Homepage = "url/to/your/project/"
-Issues = "url/to/your/project/issues"
+Homepage = "https://github.com/TheRedElement/LStein"
+Issues = "https://github.com/TheRedElement/LStein/issues"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = "-ra -q"
-testpaths = [
-    "src_py_tests",
-]
+testpaths = [ "src_py_tests",]
+
+[tool.hatch.build.targets.wheel]
+packages = [ "LStein",]
