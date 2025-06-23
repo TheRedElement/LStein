@@ -7,7 +7,7 @@ name = "LStein"
 version = "0.1.0"
 description = "repository of some useful code snippets in various programming languages."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 classifiers = [ "Programming Language :: Python :: 3", "Operating System :: OS Independent",]
 license = "MIT"
 license-files = [ "LICEN[CS]E*",]
