@@ -58,7 +58,7 @@ You can try your own data as well, but make sure to
 * [testing](./LStein_tests/)
 
 ## Known Bugs
-* `y_projection_method="theta"` goes crazy for tiny intervals of huge values (i.e. `np.linspace(10000,10020,50)`)
+* `y_projection_method="theta"` goes haywire for huge x-values (for sure $\ge10000$)
     * the reason is the necessity to compute $\tan$ and $arc\tan$ when converting back and forth between coordinate systems
     * workarounds
         * formulate your series relative to some value so you remain in a reasonable range
