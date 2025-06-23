@@ -309,7 +309,7 @@ class LSteinCanvas:
 
         #xticks
         th_circ = np.linspace(self.thetaguidelims[0], self.thetaguidelims[1], 100)
-        r_circ = self.xticks[0] - np.min(self.xticks[0])
+        r_circ = self.xticks[0]
         r_circ = minmaxscale(r_circ, self.xlimrange * self.xlimdeadzone, self.xlimrange, xmin_ref=self.xlims[0], xmax_ref=self.xlims[1])  #scale to xlims
         circles_x = r_circ.reshape(-1,1) @ np.cos(th_circ).reshape(1,-1)
         circles_y = r_circ.reshape(-1,1) @ np.sin(th_circ).reshape(1,-1)
