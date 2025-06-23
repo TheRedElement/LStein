@@ -58,3 +58,5 @@ You can try your own data as well, but make sure to
 * [testing](./LStein_tests/)
 
 ## Known Bugs
+* x-axis goes crazy for huge values ($>10000$)
+    * as a workaround try to formulate your series relative to some value so you remain in a reasonable range
