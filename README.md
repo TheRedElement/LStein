@@ -12,6 +12,10 @@ You can easily install the package using [`pip`](https://pypi.org/project/pip/):
 pip3 install git+https://github.com/TheRedElement/LStein.git
 ```
 
+## Try It Yourself
+A jupyter notebook with a minimal working example (and options to use your own data) can be found in [LStein_demo_colab.ipynb](./LStein_demo/LStein_demo_colab.ipynb).
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/TheRedElement/LStein/blob/main/LStein_demo/LStein_demo_colab.ipynb) to try it out without local installations.
+
 ## Reference
 If you use this code in your work please use this entry in your bibliography (for now):
 
