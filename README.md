@@ -54,6 +54,35 @@ You can try your own data as well, but make sure to
 3. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
+## Advantages and Downsides
+
+Pros:
++ no overcrowded panels
++ similar $\theta$-values (i.e., passbands) are plotted closer together
++ allows to preserve amplitude-differences across $\theta$-values for same $y$-values
++ allows to depict arbitrary number of $\theta$-values (by means of reducing the angular size of each $\theta$-panel) 
++ works for people with color-blindness due to relational display of information
++ can be applied to variety of data (not only lightcurves)
+	+ examples: spectra over time, different machine learning models
++ layout entirely customizable
+
+Cons:
+- projection effects close to `xmin`
+- does currently *not* support plotting errorbars
+	- workaround: plot another line if you want to indicate uncertainties
+
+
+## Example Figures
+
+|||
+|:-|:-|
+<a name=fig-lsteinsnia></a>
+|![](./gfx/1189_snia_elasticc.png)|![](./gfx/2025_tde_elasticc.png)|
+|Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN Ia. I compare LStein on the left to traditional displays on the right. | Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) TDE. I compare LStein on the left to traditional displays on the right. |
+|![](./gfx/0901_snii_elasticc.png)|![](./gfx/sin_simulated.png)|
+|Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN II. I compare LStein on the left to traditional displays on the right. | Example for visualizing a set of artificially simulated sine waves. I compare LStein on the left to traditional displays on the right. |
+
+
 ## TODO
 * [testing](./LStein_tests/)
 
