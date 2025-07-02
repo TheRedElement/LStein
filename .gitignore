@@ -16,7 +16,10 @@ code/src_py_demo/data/*
 *.err
 
 ##do NOT ignore
-!report/gfx/animations/2018emt.gif
+!gfx/0901_snii_elasticc.png
+!gfx/1189_snia_elasticc.png
+!gfx/2025_tde_elasticc.png
+!gfx/sin_simulated.png
 
 ##############
 #CUSTOM LATEX#
