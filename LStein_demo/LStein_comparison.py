@@ -101,7 +101,7 @@ colors = lsu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 fig = plt.figure(figsize=(12,9))
 fig.suptitle(f"{otype} ({survey})")
 ax = fig.add_subplot(121)
-LVPC = LSteinCanvas.LSteinCanvas(ax,
+LSC = LSteinCanvas.LSteinCanvas(ax,
     thetaticks, xticks, yticks,
     thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
     xlimdeadzone=0.3,
@@ -111,7 +111,7 @@ LVPC = LSteinCanvas.LSteinCanvas(ax,
     xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(-3.5,0)),
     ylabelkwargs=dict(rotation=0)
 )
-LVPC.scatter(theta_raw, x_raw, y_raw,
+LSC.scatter(theta_raw, x_raw, y_raw,
     panel_kwargs=[dict(
         y_projection_method="theta",
         panelsize=panelsize,
@@ -121,10 +121,10 @@ LVPC.scatter(theta_raw, x_raw, y_raw,
         c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
     ) for i in range(len(theta_raw))],
 )
-LVPC.plot(theta_pro, x_pro, y_pro,
+LSC.plot(theta_pro, x_pro, y_pro,
     plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
 )
-LVPC.plot(theta_pro, x_pro, y_pro,
+LSC.plot(theta_pro, x_pro, y_pro,
     plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
 )
 # if legend: ax.legend()
