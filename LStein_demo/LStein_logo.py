@@ -11,9 +11,13 @@ import re
 from LStein import LSteinCanvas, utils as lsu, makedata as md
 
 importlib.reload(LSteinCanvas)
-plt.style.use("dark_background")
+importlib.reload(md)
+
+theme = "dark"
+if theme == "dark": plt.style.use("dark_background")
 plt.rcParams["savefig.transparent"] = True
 
+np.random.seed(0)
 #%%definitions
 
 #%%data loading
@@ -30,7 +34,7 @@ fname = fnames[3]   #snib
 fname = fnames[7]   #snii
 # fname = fnames[11]   #snia
 # fname = fnames[21]   #tde
-# fname = fnames[-1]
+fname = fnames[-1]
 
 #deal with on-the-fly data generation (pseudo filenames)
 if fname == "../data/lc_simulated.py":
@@ -42,7 +46,7 @@ if fname == "../data/lc_simulated.py":
     xlab = "Time [d]"
     ylab = "Amplitude []"
 elif fname == "../data/sin_simulated.py":
-    raw, pro = md.simulate(9, opt="sin")
+    raw, pro = md.simulate(6, opt="sin", theta=np.linspace(10,40,6))
     df = pl.concat([pl.from_dict(raw), pl.from_dict(pro)])
     for t in df["period"].unique(): pb_mappings[t] = [np.round(t, 3)]
     legend = False
@@ -96,11 +100,12 @@ xticks = (xticks[::-1], [""]*len(xticks))
 yticks = (yticks[::-1], [""]*len(yticks))
 # yticks = np.sort(np.append(yticks, [-10, 80]))
 panelsize = np.pi/8
-vmin = 300 if ".py" not in fname else 0
+vmin = 300 if ".py" not in fname else 0.9*np.min(theta_raw)
+vmax = 1000 if ".py" not in fname else 1.1*np.max(theta_raw)
 colors = lsu.get_colors(theta_raw,
     cmap="nipy_spectral",
     norm=mcolors.LogNorm,
-    vmin=300, vmax=1000
+    vmin=vmin, vmax=vmax,
 )
 
 #%%plotting

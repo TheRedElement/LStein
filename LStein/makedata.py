@@ -146,7 +146,8 @@ def sin_sim(
 
 def simulate(
     nobjects:int=6,
-    opt:Literal["lc","sin"]="lc"
+    opt:Literal["lc","sin"]="lc",
+    theta:np.ndarray=None,
     ) -> Tuple[Dict,Dict]:
     """
         - function to simulate `nobjects` objects using the method specified in `opt`
@@ -161,6 +162,12 @@ def simulate(
                 - method to use for generating the data
                 - `"lc"` uses `lc_sim()`
                 - `"sin"` uses `sin_sim()`
+            - `theta`
+                - `np.ndarrray`, optional
+                - theta-values to use for generating the curves
+                - setting `theta` overrides `nobjects`
+                - the default is `None`
+                    - will be randomly generated
 
         Raises
         ------
@@ -187,9 +194,13 @@ def simulate(
 
     """
     res = 500
-    x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
-    theta_options = np.arange(10, 40, 0.2)
-    theta = np.sort(np.random.choice(theta_options, size=nobjects, replace=False))
+    if theta is None:
+        x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
+        theta_options = np.arange(10, 40, 0.2)
+        theta = np.sort(np.random.choice(theta_options, size=nobjects, replace=False))
+    else:
+        x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
+        nobjects = len(theta)
     
     if opt == "lc":
         t_peak = np.linspace(0,40,nobjects) * 0
