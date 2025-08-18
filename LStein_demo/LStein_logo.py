@@ -113,14 +113,16 @@ colors = lsu.get_colors(theta_raw,
 fig = plt.figure(figsize=(14,9))
 ax = fig.add_subplot(121)
 ax.set_title(r"$\mathbf{L}\mathrm{inking~}\mathbf{S}\mathrm{eries~}\mathbf{t}\mathrm{o~}\mathbf{e}\mathrm{nvision ~}\mathbf{i}\mathrm{nformation~}\mathbf{n}\mathrm{eatly~}$", fontsize=19)
+thetalab = "LStein"
 LSC = LSteinCanvas.LSteinCanvas(ax,
     thetaticks, xticks, yticks,
     xlimdeadzone=0.3,
-    # thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
+    thetalabel=thetalab, 
+    # xlabel=xlab, ylabel=ylab,
     thetaarrowpos_th=None, ylabpos_th=None,
     #top hemicircle
     thetaguidelims=(2*np.pi,1*np.pi), thetaplotlims=(2*np.pi-panelsize/2,1*np.pi+panelsize/2),
-    thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=dict(pad=0.15), thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(0.0,0)),
+    thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=dict(pad=0.15), thetalabelkwargs=dict(fontsize=28, textcoords="offset fontsize", xytext=(0.0,-0.5), weight="bold", c=[161/255,0,0]),
     xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-1,-1)), xlabelkwargs=dict(rotation=0,  textcoords="offset fontsize", xytext=(-8,-2.5)),
     ylabelkwargs=dict(rotation=90, textcoords="offset fontsize", xytext=(0.5,-4))
 )
