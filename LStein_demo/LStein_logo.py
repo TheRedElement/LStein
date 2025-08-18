@@ -122,7 +122,7 @@ LSC = LSteinCanvas.LSteinCanvas(ax,
     thetaarrowpos_th=None, ylabpos_th=None,
     #top hemicircle
     thetaguidelims=(2*np.pi,1*np.pi), thetaplotlims=(2*np.pi-panelsize/2,1*np.pi+panelsize/2),
-    thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=dict(pad=0.15), thetalabelkwargs=dict(fontsize=28, textcoords="offset fontsize", xytext=(0.0,-0.5), weight="bold", c=[161/255,0,0]),
+    thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=dict(pad=0.15), thetalabelkwargs=dict(fontsize=28, textcoords="offset fontsize", xytext=(0.0,-0.5), weight="bold"),
     xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-1,-1)), xlabelkwargs=dict(rotation=0,  textcoords="offset fontsize", xytext=(-8,-2.5)),
     ylabelkwargs=dict(rotation=90, textcoords="offset fontsize", xytext=(0.5,-4))
 )
