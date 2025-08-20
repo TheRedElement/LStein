@@ -85,6 +85,56 @@ def plot_lstein(ax=None, save=False):
 
     return
 
+def plot_lstein_talk(ax=None, save=False):
+    """
+        - function to plot LStein (layout for talks)
+    """
+
+    if ax is None:
+        fig = plt.figure(figsize=(5,9))
+        fig.suptitle(f"{otype_mapping[otype]} ({survey_mapping[survey]})")
+        fig.suptitle(f"SN II (ELAsTiCC)")
+        ax = fig.add_subplot(111)
+
+        LSC = LSteinCanvas.LSteinCanvas(ax,
+            thetaticks, xticks, yticks,
+            thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
+            xlimdeadzone=0.3,
+            thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
+            thetaarrowpos_th=None, ylabpos_th=None,
+            thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=None,
+            xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.5,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2.5,0)),
+            ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1,-1))
+        )
+    LSC.scatter(theta_raw, x_raw, y_raw,
+        panel_kwargs=[dict(
+            y_projection_method="theta",
+            panelsize=panelsize,
+            show_panelbounds=True, show_yticks=True
+        ) for _ in theta_raw],
+        sctr_kwargs=[dict(
+            c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
+        ) for i in range(len(theta_raw))],
+    )
+    LSC.plot(theta_pro, x_pro, y_pro,
+        plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
+    )
+    LSC.plot(theta_pro, x_pro, y_pro,
+        plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
+    )
+    ax.legend(
+        ncol=2,
+        # columnspacing=0.5, handletextpad=0.3, borderpad=0.0, labelspacing=0.1,
+        bbox_to_anchor=(0.3, 1.0),
+        # framealpha=0.2
+    )
+    if save:
+        fig.tight_layout()
+        save_suffix = "_lstein_talk.png"
+        fig.savefig(fname.replace("./data/","./gfx/").replace(".csv",f"{save_suffix}").replace(".py",f"{save_suffix}"), bbox_inches="tight")
+
+    return
+
 def plot_scatter_onepanel(ax=None, save=False):
     """
         - function to plot a scatter with all passbands in the same panel
@@ -251,9 +301,13 @@ def plot_3dsurface(ax=None, save=None):
         save_suffix = "_3dsurface.png"
         fig.savefig(fname.replace("./data/","./gfx/").replace(".csv",f"{save_suffix}").replace(".py",f"{save_suffix}"), bbox_inches="tight")
 
-
     return
 
+
+#%%control
+survey_mapping = {"elasticc":"ELAsTiCC", "des":"DES"}
+otype_mapping = {"snia":"SN Ia", "snii":"SN II", "snibc":"SN Ib/c", "tde":"TDE"}
+    
 
 #%%data loading
 #passbands
@@ -338,6 +392,7 @@ colors = lsu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 #%%plotting
 # plot_combined()
 # plot_lstein(None, True)
+plot_lstein_talk(None, True)
 # plot_scatter_onepanel(None, True)
 # plot_scatter_onepanel_offset(None, True)
 # plot_scatter_multipanel(None, True)
