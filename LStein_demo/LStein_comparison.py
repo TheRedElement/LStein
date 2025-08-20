@@ -93,19 +93,18 @@ def plot_lstein_talk(ax=None, save=False):
     if ax is None:
         fig = plt.figure(figsize=(5,9))
         fig.suptitle(f"{otype_mapping[otype]} ({survey_mapping[survey]})")
-        fig.suptitle(f"SN II (ELAsTiCC)")
         ax = fig.add_subplot(111)
 
-        LSC = LSteinCanvas.LSteinCanvas(ax,
-            thetaticks, xticks, yticks,
-            thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
-            xlimdeadzone=0.3,
-            thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
-            thetaarrowpos_th=None, ylabpos_th=None,
-            thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=None,
-            xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.5,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2.5,0)),
-            ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1,-1))
-        )
+    LSC = LSteinCanvas.LSteinCanvas(ax,
+        thetaticks, xticks, yticks,
+        thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
+        xlimdeadzone=0.3,
+        thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
+        thetaarrowpos_th=None, ylabpos_th=None,
+        thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=None,
+        xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.5,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2.5,0)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1,-1))
+    )
     LSC.scatter(theta_raw, x_raw, y_raw,
         panel_kwargs=[dict(
             y_projection_method="theta",
@@ -131,7 +130,84 @@ def plot_lstein_talk(ax=None, save=False):
     if save:
         fig.tight_layout()
         save_suffix = "_lstein_talk.png"
-        fig.savefig(fname.replace("./data/","./gfx/").replace(".csv",f"{save_suffix}").replace(".py",f"{save_suffix}"), bbox_inches="tight")
+        fig.savefig(
+            fname.replace("./data/","./gfx/").replace(".csv",f"{save_suffix}").replace(".py",f"{save_suffix}"),
+            bbox_inches="tight", dpi=300
+        )
+    return
+
+def plot_lstein_poster(ax=None, save=False):
+    """
+        - function to plot LStein (layout for poster)
+    """
+
+    if ax is None:
+        fig = plt.figure(figsize=(8,5))
+        ax = fig.add_subplot(111)
+        ax.set_title(f"{otype_mapping[otype]} ({survey_mapping[survey]})")
+
+    LSC = LSteinCanvas.LSteinCanvas(ax,
+        thetaticks, xticks, yticks,
+        xlimdeadzone=0.3,
+        thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
+        thetaarrowpos_th=None, ylabpos_th=None,
+        #bottom hemicircle
+        thetaguidelims=(np.pi,2*np.pi), thetaplotlims=(2*np.pi-panelsize/2,np.pi+panelsize/2),
+        thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=dict(pad=0.25), thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(0.0,0)),
+        xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-1,0.3)), xlabelkwargs=dict(rotation=0,  textcoords="offset fontsize", xytext=(-2,1.5)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-4,-9))
+        # #noflip
+        # thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
+        # thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(1.0,0)),
+        # xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(-2,0)),
+        # ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-3,-1))
+        # #flipxy
+        # thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
+        # thetatickkwargs=dict(c=plt.rcParams["text.color"]), thetaticklabelkwargs=None, thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(-1,0)),
+        # xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2,0)),
+        # ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0,-1))
+    )
+    LSC.scatter(theta_raw, x_raw, y_raw,
+        panel_kwargs=[dict(
+            y_projection_method="theta",
+            panelsize=panelsize,
+            show_panelbounds=True, show_yticks=True
+        ) for _ in theta_raw],
+        sctr_kwargs=[dict(
+            c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
+        ) for i in range(len(theta_raw))],
+    )
+    LSC.plot(theta_pro, x_pro, y_pro,
+        plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
+    )
+    LSC.plot(theta_pro, x_pro, y_pro,
+        plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
+    )
+    # if legend: ax.legend()
+    # ax.legend(loc="upper left", bbox_to_anchor=(0.88, 1.05), framealpha=0.2)
+    # ax.legend(loc="upper left", bbox_to_anchor=(-.06, 1.05), framealpha=0.2)
+    ax.legend(
+        ncol=2,
+        columnspacing=0.5, handletextpad=0.1, borderpad=0.0, labelspacing=0.1,
+        bbox_to_anchor=(0.18, 0.2), framealpha=0.2
+    )
+
+
+    fig.tight_layout()
+    fig.savefig(
+        # "../gfx/lstein_poster.pdf", bbox_inches="tight",
+        "../gfx/lstein_poster.png", bbox_inches="tight",
+        transparent=True, dpi=300
+    )
+
+    if save:
+        fig.tight_layout()
+        save_suffix = "_lstein_poster.png"
+        # save_suffix = "_lstein_poster.pdf"
+        fig.savefig(
+            fname.replace("./data/","./gfx/").replace(".csv",f"{save_suffix}").replace(".py",f"{save_suffix}"),
+            bbox_inches="tight", dpi=300
+        )
 
     return
 
@@ -393,6 +469,7 @@ colors = lsu.get_colors(theta_raw, cmap="nipy_spectral", vmin=vmin)
 # plot_combined()
 # plot_lstein(None, True)
 plot_lstein_talk(None, True)
+plot_lstein_poster(None, True)
 # plot_scatter_onepanel(None, True)
 # plot_scatter_onepanel_offset(None, True)
 # plot_scatter_multipanel(None, True)
