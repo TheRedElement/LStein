@@ -13,14 +13,14 @@ pip3 install git+https://github.com/TheRedElement/LStein.git
 ```
 
 ## Try It Yourself
-A jupyter notebook with a minimal working example (and options to use your own data) can be found in [LStein_demo_colab.ipynb](./LStein_demo/LStein_demo_colab.ipynb).
+A jupyter notebook with a minimal working example (and options to use your own data) can be found in [LStein_demo_colab.ipynb](./demo/LStein_demo_colab.ipynb).
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/TheRedElement/LStein/blob/main/LStein_demo/LStein_demo_colab.ipynb) to try it out without local installations.
 
 ## Reference
 If you use this code in your work please use this entry in your bibliography (for now):
 
 ```latex
-@software{PY_Steinwender2020_lstein,
+@software{PY_Steinwender2025_lstein,
 	author    = {{Steinwender}, Lukas},
 	title     = {LStein: Linking Series to envision information neatly},
 	month     = Jul,
@@ -31,7 +31,7 @@ If you use this code in your work please use this entry in your bibliography (fo
 ```
 
 ## Data For Testing
-Data used for [demos](./LStein_demo/LStein_demo.ipynb) and [testing](./LStein_tests/) can be found in [data/](./data/).
+Data used for [demos](./demo/LStein_demo.ipynb) and [testing](./test) can be found in [data/](./data/).
 Each dataset is a `.csv` file with the following columns:
 
 | Column | Description |
@@ -84,7 +84,7 @@ Cons:
 
 
 ## TODO
-* [testing](./LStein_tests/)
+* [testing](./test)
 
 ## Known Bugs
 * `y_projection_method="theta"` goes haywire for huge x-values (for sure $\ge10000$)

@@ -7,9 +7,8 @@ from matplotlib import colors as mcolors
 import numpy as np
 import polars as pl
 import re
-import sys
 
-from LStein import LSteinCanvas, utils as lsu, makedata as md
+from lstein import LSteinCanvas, utils as lsu, makedata as md
 
 importlib.reload(LSteinCanvas)
 plt.style.use("dark_background")

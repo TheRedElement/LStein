@@ -8,7 +8,7 @@ import numpy as np
 import polars as pl
 import re
 
-from LStein import LSteinCanvas, utils as lsu, makedata as md
+from lstein import LSteinCanvas, utils as lsu, makedata as md
 
 importlib.reload(LSteinCanvas)
 importlib.reload(md)

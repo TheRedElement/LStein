@@ -1,57 +1,40 @@
 [project]
 name = "LStein"
-description = "Linking Series to envision information neatly. Visualisazion by projecting 2.5D onto 2D."
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
 authors = [
     {name = "Lukas Steinwender"}
+]
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.10.5",
+    "numpy>=2.3.2",
 ]
 maintainers = [
     {name = "Lukas Steinwender"}
 ]
-requires-python = ">=3.11"
-dynamic = [ "readme", "classifiers" , "version", ]           #set stuff dynamically
 license = {file = "LICENSE"}
-dependencies = [
-    "matplotlib (==3.10.3)",
-    "numpy (==2.2.6)",
-]
 keywords = [ "visualization", "projection", ]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
 
+[build-system]
+requires = ["uv_build>=0.8.13,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.30.1",
+    "polars>=1.32.3",
+]
+
+#custom stuff
 [project.urls]
 Homepage = "https://github.com/TheRedElement/LStein"
 Repository = "https://github.com/TheRedElement/LStein"
 Issues = "https://github.com/TheRedElement/LStein/issues"
 
 [project.scripts]
-
-[tool.pytest.ini_options]
-minversion = "8.0"
-addopts = "-ra -q"
-testpaths = [ "src_py_tests",]
-
-[tool.poetry]
-packages = [
-    {include = "LStein", from = "."}
-]
-readme = [
-    "README.md",
-]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-]
-version = "0.1.0"                                           #base version #used by `poetry-dynamic-versioning` to infer project version
-
-[tool.poetry.group.dev.dependencies]
-ipykernel = "^6.30.1"
-polars = "^1.32.3"
-
-[tool.poetry.requires-plugins]
-poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
-
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
