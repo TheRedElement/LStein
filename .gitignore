@@ -5,6 +5,7 @@
 .vscode
 gfx/*.png
 gfx/*.pdf
+poetry.lock
 
 ##ignore
 .temp/
