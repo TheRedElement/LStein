@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple
 
-# from .LSteinCanvas import LSteinCanvas   #no import because leads to curcular import
-from .utils import minmaxscale, polar2carth, carth2polar
+# from .LSteinCanvas import LSteinCanvas   #no import because leads to circular import
+from ..utils import minmaxscale, polar2carth, carth2polar
 
 
 #%%classes
@@ -519,8 +519,7 @@ class LSteinPanel:
         **kwargs,
         ):
         """
-            - function to plot a series in the panel
-            - similar to `ax.plot()`
+            - method to add a series to the panel for plotting
 
             Parameters
             ----------
@@ -545,10 +544,6 @@ class LSteinPanel:
 
             Returns
             -------
-                - `line`
-                    - `List[plt.Line2D]`
-                    - list of created lines
-                    - output from `ax.plot()`
 
             Comments
             --------        
