@@ -1,6 +1,5 @@
 #%%imports
 import matplotlib.pyplot as plt
-from matplotlib.collections import PathCollection
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple
 
@@ -154,6 +153,7 @@ class LSteinPanel:
         self.ylims = (self.yticks[0][0], self.yticks[0][-1])
         self.ylimrange = np.max(self.yticks[0]) - np.min(self.yticks[0])
         self.panel_drawn = False
+        self.dataseries = []  #init list of dataseries to plot (List[Dict[str,Any]])
 
         return
 
@@ -266,68 +266,6 @@ class LSteinPanel:
         yticklabs = self.yticks[1]
 
         return ytickpos_th, yticklabs
-
-    def draw(self,
-        ax:plt.Axes=None,
-        ):
-        """
-            - method to draw the panel
-                - just outlines, no data-series
-
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`, optional
-                    - axis to draw into
-                    - the default is `None`
-                        - will be set to `self.LSC.ax` (axis of parent)
-
-            Raises
-            ------
-
-            Returns
-            -------
-            
-            Comments
-            --------
-        """
-
-        #default parameters
-        if ax is None: ax = self.LSC.ax
-
-        #get panel boundaries
-        theta_offset, theta_lb, theta_ub = self.get_thetabounds()
-        r_lb, r_ub = self.get_rbounds()
-        r_bounds = np.array([r_lb, r_ub])
-
-        #get yticks
-        ytickpos_th, yticklabs = self.get_yticks(theta_lb, theta_ub)
-
-        #convert to carthesian for plotting
-        x_lb, y_lb  = polar2carth(r_bounds, theta_lb)
-        x_ub, y_ub  = polar2carth(r_bounds, theta_ub)
-        x_bounds = np.array([x_lb,x_ub])
-        y_bounds = np.array([y_lb,y_ub])
-
-        pad = self.yticklabelkwargs.pop("pad")   #padding for yticklabels
-        r_, th_ = np.meshgrid(r_bounds, ytickpos_th)
-        ytickpos_x, ytickpos_y              = polar2carth(r_, th_)
-        yticklabelpos_x, yticklabelpos_y    = polar2carth((1+pad)*r_ub, ytickpos_th)
-
-        # ytickpos_x, ytickpos_y = ytickpos_x[::-1], ytickpos_y[::-1]
-        # yticklabelpos_x, yticklabelpos_y = yticklabelpos_x[::-1], yticklabelpos_y[::-1]
-
-        if self.show_yticks:
-            ax.plot(ytickpos_x.T, ytickpos_y.T, **self.ytickkwargs)
-            for i in range(len(ytickpos_th)):
-                ax.annotate(yticklabs[i], xy=(yticklabelpos_x[i],yticklabelpos_y[i]), annotation_clip=False, **self.yticklabelkwargs)
-        if self.show_panelbounds: ax.plot(x_bounds.T, y_bounds.T, **self.panelboundskwargs)
-
-        #update switch denoting that panel has been drawn
-        self.panel_drawn = True
-
-        return
-    
 
     #dataseries methods
     def apply_axis_limits(self,
@@ -577,9 +515,9 @@ class LSteinPanel:
     #plotting methods
     def plot(self,
         x:np.ndarray, y:np.ndarray,
-        ax:plt.Axes=None,
+        seriestype:Literal["plot","scatter"]="plot",
         **kwargs,
-        ) -> List[plt.Line2D]:
+        ):
         """
             - function to plot a series in the panel
             - similar to `ax.plot()`
@@ -616,83 +554,17 @@ class LSteinPanel:
             --------        
         """
 
-        #default parameters
-        if ax is None: ax = self.LSC.ax
-
-        #draw canvas, panel if not done already
-        if not self.LSC.canvas_drawn: self.LSC.draw()
-        if not self.panel_drawn: self.draw()
-
         #apply axis limits
         x_cut, y_cut, kwargs = self.apply_axis_limits(x, y, **kwargs)
 
         #project x and y
         x_proj, y_proj = self.project_xy(x_cut, y_cut, self.y_projection_method)
 
-        #plotting
-        line = ax.plot(x_proj, y_proj, **kwargs)
-
-        # #NOTE: temp
-        # maxidx = np.argmax(y_cut)
-        # ax.scatter(x_proj[maxidx], y_proj[maxidx])
-
-        return line
-
-    def scatter(self,
-        x:np.ndarray, y:np.ndarray,
-        ax:plt.Axes=None,
-        **kwargs,
-        ) -> PathCollection:
-        """
-            - function to plot a series in the panel
-            - similar to `ax.scatter()`
-
-            Parameters
-            ----------
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series
-                    - has to have same length as `y`
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series
-                    - has to have same length as `x`
-                - `ax`
-                    - `plt.Axes`, optional
-                    - axis to draw into
-                    - the default is `None`
-                        - will be set to `self.LSC.ax` (axis of parent)
-                -`**kwargs`
-                    - kwargs to pass to `ax.scatter()`
-                        
-            Raises
-            ------
-
-            Returns
-            -------
-                - `sctr`
-                    - `plt.PathCollection`
-                    - list of created datapoints
-                    - output from `ax.scatter()`
-
-            Comments
-            --------        
-        """
-        #default parameters
-        if ax is None: ax = self.LSC.ax
-
-        #draw canvas, panel if not done already
-        if not self.LSC.canvas_drawn: self.LSC.draw()
-        if not self.panel_drawn: self.draw()
-
-        #apply axis limits
-        x_cut, y_cut, kwargs = self.apply_axis_limits(x, y, **kwargs)
-
-        #project x and y
-        x_proj, y_proj = self.project_xy(x_cut, y_cut, self.y_projection_method)
-
-        #plotting
-        sctr = ax.scatter(x_proj, y_proj, **kwargs)
-
-        return sctr
+        self.dataseries.append(dict(
+            x=x_proj,
+            y=y_proj,
+            seriestype=seriestype,
+            kwargs=kwargs,
+        ))
+        return
 
