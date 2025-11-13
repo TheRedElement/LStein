@@ -522,7 +522,7 @@ class LSteinPlotly:
     def show(self,
         fig:go.Figure,
         row:int, col:int,
-        ):
+        ) -> go.Figure:
         """
             - method to display `self.LSC` within a plotly figure
             - will
@@ -585,4 +585,4 @@ class LSteinPlotly:
                     continue
 
                 func(fig, row, col, ds["x"], ds["y"], **ds["kwargs"])
-        return
+        return fig
