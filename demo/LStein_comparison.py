@@ -8,9 +8,9 @@ import numpy as np
 import polars as pl
 import re
 
-from lstein import LSteinCanvas, utils as lsu, makedata as md
+from lstein import lstein, utils as lsu, makedata as md
 
-importlib.reload(LSteinCanvas)
+importlib.reload(lstein)
 plt.style.use("dark_background")
 
 #%%definitions
@@ -43,12 +43,7 @@ def plot_lstein(ax=None, save=False):
         - function to plot LStein
     """
     
-    if ax is None:
-        fig = plt.figure(figsize=(5,9))
-        fig.suptitle(f"{otype} ({survey})")
-        ax = fig.add_subplot(111)
-
-    LSC = LSteinCanvas.LSteinCanvas(ax,
+    LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=(-np.pi/2,np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,np.pi/2-panelsize/2),
         xlimdeadzone=0.3,
@@ -58,22 +53,29 @@ def plot_lstein(ax=None, save=False):
         xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(-3.5,0)),
         ylabelkwargs=dict(rotation=0)
     )
-    LSC.scatter(theta_raw, x_raw, y_raw,
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter",
         panel_kwargs=[dict(
             y_projection_method="theta",
             panelsize=panelsize,
             show_panelbounds=True, show_yticks=True
         ) for _ in theta_raw],
-        sctr_kwargs=[dict(
+        series_kwargs=[dict(
             c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
         ) for i in range(len(theta_raw))],
     )
     LSC.plot(theta_pro, x_pro, y_pro,
-        plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
+        series_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
     )
     LSC.plot(theta_pro, x_pro, y_pro,
-        plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
+        series_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
     )
+
+    if ax is None:
+        fig = plt.figure(figsize=(5,9))
+        fig.suptitle(f"{otype} ({survey})")
+        ax = fig.add_subplot(111)
+
+    lstein.LSteinMPL(LSC).show(ax)
     # if legend: ax.legend()
     ax.legend()
     
@@ -89,12 +91,7 @@ def plot_lstein_talk(ax=None, save=False):
         - function to plot LStein (layout for talks)
     """
 
-    if ax is None:
-        fig = plt.figure(figsize=(5,9))
-        fig.suptitle(f"{otype_mapping[otype]} ({survey_mapping[survey]})")
-        ax = fig.add_subplot(111)
-
-    LSC = LSteinCanvas.LSteinCanvas(ax,
+    LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=(3*np.pi/2,np.pi/2), thetaplotlims=(3*np.pi/2-panelsize/2,np.pi/2+panelsize/2),
         xlimdeadzone=0.3,
@@ -104,22 +101,29 @@ def plot_lstein_talk(ax=None, save=False):
         xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.5,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2.5,0)),
         ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1,-1))
     )
-    LSC.scatter(theta_raw, x_raw, y_raw,
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter",
         panel_kwargs=[dict(
             y_projection_method="theta",
             panelsize=panelsize,
             show_panelbounds=True, show_yticks=True
         ) for _ in theta_raw],
-        sctr_kwargs=[dict(
+        series_kwargs=[dict(
             c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
         ) for i in range(len(theta_raw))],
     )
     LSC.plot(theta_pro, x_pro, y_pro,
-        plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
+        series_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
     )
     LSC.plot(theta_pro, x_pro, y_pro,
-        plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
+        series_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
     )
+
+    if ax is None:
+        fig = plt.figure(figsize=(5,9))
+        fig.suptitle(f"{otype_mapping[otype]} ({survey_mapping[survey]})")
+        ax = fig.add_subplot(111)
+
+    lstein.LSteinMPL(LSC).show(ax)
     ax.legend(
         ncol=2,
         # columnspacing=0.5, handletextpad=0.3, borderpad=0.0, labelspacing=0.1,
@@ -140,12 +144,7 @@ def plot_lstein_poster(ax=None, save=False):
         - function to plot LStein (layout for poster)
     """
 
-    if ax is None:
-        fig = plt.figure(figsize=(8,5))
-        ax = fig.add_subplot(111)
-        ax.set_title(f"{otype_mapping[otype]} ({survey_mapping[survey]})")
-
-    LSC = LSteinCanvas.LSteinCanvas(ax,
+    LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         xlimdeadzone=0.3,
         thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
@@ -166,22 +165,29 @@ def plot_lstein_poster(ax=None, save=False):
         # xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,0)), xlabelkwargs=dict(rotation=-90,  textcoords="offset fontsize", xytext=(2,0)),
         # ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0,-1))
     )
-    LSC.scatter(theta_raw, x_raw, y_raw,
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter",
         panel_kwargs=[dict(
             y_projection_method="theta",
             panelsize=panelsize,
             show_panelbounds=True, show_yticks=True
         ) for _ in theta_raw],
-        sctr_kwargs=[dict(
+        series_kwargs=[dict(
             c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
         ) for i in range(len(theta_raw))],
     )
     LSC.plot(theta_pro, x_pro, y_pro,
-        plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
+        series_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
     )
     LSC.plot(theta_pro, x_pro, y_pro,
-        plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
+        series_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
     )
+
+    if ax is None:
+        fig = plt.figure(figsize=(8,5))
+        ax = fig.add_subplot(111)
+        ax.set_title(f"{otype_mapping[otype]} ({survey_mapping[survey]})")
+
+    lstein.LSteinMPL(LSC).show(ax)
     # if legend: ax.legend()
     # ax.legend(loc="upper left", bbox_to_anchor=(0.88, 1.05), framealpha=0.2)
     # ax.legend(loc="upper left", bbox_to_anchor=(-.06, 1.05), framealpha=0.2)

@@ -8,9 +8,9 @@ import numpy as np
 import polars as pl
 import re
 
-from lstein import LSteinCanvas, utils as lsu, makedata as md
+from lstein import lstein, utils as lsu, makedata as md
 
-importlib.reload(LSteinCanvas)
+importlib.reload(lstein)
 importlib.reload(md)
 
 theme = "dark"
@@ -110,11 +110,8 @@ colors = lsu.get_colors(theta_raw,
 
 #%%plotting
 #LStein
-fig = plt.figure(figsize=(14,9))
-ax = fig.add_subplot(121)
-ax.set_title(r"$\mathbf{L}\mathrm{inking~}\mathbf{S}\mathrm{eries~}\mathbf{t}\mathrm{o~}\mathbf{e}\mathrm{nvision ~}\mathbf{i}\mathrm{nformation~}\mathbf{n}\mathrm{eatly~}$", fontsize=19)
 thetalab = "LStein"
-LSC = LSteinCanvas.LSteinCanvas(ax,
+LSC = lstein.LSteinCanvas(
     thetaticks, xticks, yticks,
     xlimdeadzone=0.3,
     thetalabel=thetalab, 
@@ -126,23 +123,28 @@ LSC = LSteinCanvas.LSteinCanvas(ax,
     xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-1,-1)), xlabelkwargs=dict(rotation=0,  textcoords="offset fontsize", xytext=(-8,-2.5)),
     ylabelkwargs=dict(rotation=90, textcoords="offset fontsize", xytext=(0.5,-4))
 )
-LSC.scatter(theta_raw, x_raw, y_raw,
+LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter",
     panel_kwargs=[dict(
         y_projection_method="theta",
         panelsize=panelsize,
         show_panelbounds=True, show_yticks=False
     ) for _ in theta_raw],
-    sctr_kwargs=[dict(
+    series_kwargs=[dict(
         c=mcolors.to_hex(colors[i]), label=pb_mappings[theta_raw[i]][0],
     ) for i in range(len(theta_raw))],
 )
 LSC.plot(theta_pro, x_pro, y_pro,
-    plot_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
+    series_kwargs=[dict(lw=3, c="w") for _ in theta_pro]
 )
 LSC.plot(theta_pro, x_pro, y_pro,
-    plot_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
+    series_kwargs=[dict(c=mcolors.to_hex(colors[i])) for i in range(len(theta_pro))],
 )
 
+fig = plt.figure(figsize=(14,9))
+ax = fig.add_subplot(121)
+ax.set_title(r"$\mathbf{L}\mathrm{inking~}\mathbf{S}\mathrm{eries~}\mathbf{t}\mathrm{o~}\mathbf{e}\mathrm{nvision ~}\mathbf{i}\mathrm{nformation~}\mathbf{n}\mathrm{eatly~}$", fontsize=19)
+
+lstein.LSteinMPL(LSC).show(ax)
 
 fig.tight_layout()
 fig.savefig(
