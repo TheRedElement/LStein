@@ -127,7 +127,7 @@ class LSteinPanel:
         
         self.theta              = theta
         
-        self.yticks             = yticks
+        self.yticks             = (np.array(yticks[0]),yticks[1])
         
         self.panelsize          = panelsize
 

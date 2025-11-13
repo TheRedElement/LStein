@@ -671,8 +671,8 @@ class LSteinCanvas:
         ):
 
         self.thetaticks     = (thetaticks, thetaticks) if isinstance(thetaticks, (list, np.ndarray)) else thetaticks
-        self.xticks         = (xticks, xticks) if isinstance(xticks, (list, np.ndarray)) else xticks
-        self.yticks         = (yticks, yticks) if isinstance(yticks, (list, np.ndarray)) else yticks
+        self.xticks         = (np.array(xticks), xticks) if isinstance(xticks, (list, np.ndarray)) else xticks
+        self.yticks         = (np.array(yticks), yticks) if isinstance(yticks, (list, np.ndarray)) else yticks
         
         self.thetaguidelims = (0,2*np.pi) if thetaguidelims is None else thetaguidelims
         self.thetaplotlims  = self.thetaguidelims if thetaplotlims is None else thetaplotlims

@@ -206,6 +206,10 @@ def get_colors(
                 - some instance of a `matplotlib.colors` Norm
                 - normalization to use when mapping `x` to `cmap`
                 - the default is `mcolors.Normalize`
+            - `as_hex`
+                - `bool`, optional
+                - whether to output a list of hex strings instead of an array of rgb arrays
+                - the default is `False`
             - `**kwargs`
                 - kwargs to to pass to `norm()`
 
@@ -217,8 +221,8 @@ def get_colors(
         -------
             - `colors`
                 - `np.ndarray`
-                - has shape `(x.shape[0],3)`
-                    - one rgb-tuple for each value in `x`
+                - has length `x.shape[0]`
+                    - one hex-value for each value in `x`
 
         Dependencies
         ------------
@@ -237,5 +241,6 @@ def get_colors(
     norm = norm(**kwargs)
     
     colors = cmap(norm(x))
+    colors = [mcolors.rgb2hex(c) for c in colors]
 
     return colors

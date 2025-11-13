@@ -387,7 +387,9 @@ class LSteinPlotly:
 
     #plotting methods
     def scatter_(self,
-        ax, x:np.ndarray, y:np.ndarray,
+        fig:go.Figure,
+        row:int, col:int,                 
+        x:np.ndarray, y:np.ndarray,
         *args, **kwargs
         ):
         """
@@ -395,9 +397,15 @@ class LSteinPlotly:
 
             Parameters
             ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
+                - `fig`
+                    - `Figure`
+                    - plotly figure to draw into
+                - `row`
+                    - `int`
+                    - row of the panel to plot into
+                - `col`
+                    - `int`
+                    - column of the panel to plot into
                 - `x`
                     - `np.ndarray`
                     - x-values of the series
@@ -407,7 +415,7 @@ class LSteinPlotly:
                     - y-values of the series
                     - has to have same length as `x`
                 -`kwargs`
-                    - kwargs to pass to `ax.scatter()`
+                    - kwargs to pass to `go.Scatter()`
                         
             Raises
             ------
@@ -417,13 +425,21 @@ class LSteinPlotly:
 
             Comments
             --------
-                - only to be called from within `LSteinMPL.show()`
+                - only to be called from within `LSteinPlotly.show()`
         """
-        ax.scatter(x, y, **kwargs)
+        fig.add_trace(
+            go.Scatter(x=x, y=y,
+                mode="markers",
+                **kwargs,    
+            ),
+            row, col,
+        )
         return
 
     def plot_(self,
-        ax, x:np.ndarray, y:np.ndarray,
+        fig:go.Figure,
+        row:int, col:int,                  
+        x:np.ndarray, y:np.ndarray,
         *args, **kwargs
         ):
         """
@@ -431,9 +447,15 @@ class LSteinPlotly:
 
             Parameters
             ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
+                - `fig`
+                    - `Figure`
+                    - plotly figure to draw into
+                - `row`
+                    - `int`
+                    - row of the panel to plot into
+                - `col`
+                    - `int`
+                    - column of the panel to plot into
                 - `x`
                     - `np.ndarray`
                     - x-values of the series
@@ -442,8 +464,8 @@ class LSteinPlotly:
                     - `np.ndarray`
                     - y-values of the series
                     - has to have same length as `x`
-                - `kwargs`
-                    - kwargs to pass to `ax.plot()`
+                -`kwargs`
+                    - kwargs to pass to `go.Scatter()`
                         
             Raises
             ------
@@ -453,18 +475,24 @@ class LSteinPlotly:
 
             Comments
             --------
-                - only to be called from within `LSteinMPL.show()`
+                - only to be called from within `LSteinPlotly.show()`
         """    
-        ax.plot(x, y, **kwargs)
+        fig.add_trace(
+            go.Scatter(x=x, y=y,
+                mode="lines",
+                **kwargs,    
+            ),
+            row, col,
+        )
         return
 
     #combined
     def show(self,
-        fig, row:int, col:int,
+        fig:go.Figure,
+        row:int, col:int,
         ):
         """
-            - method to display `self.LSC` within a matplotlib figure
-            - similar to `plt.show()`
+            - method to display `self.LSC` within a plotly figure
             - will
                 - draw the canvas
                 - add each panel
@@ -472,29 +500,31 @@ class LSteinPlotly:
 
             Parameters
             ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
+                - `fig`
+                    - `Figure`
+                    - plotly figure to draw into
+                - `row`
+                    - `int`
+                    - row of the panel to plot into
+                - `col`
+                    - `int`
+                    - column of the panel to plot into
             
             Raises
             ------
 
             Returns
             -------
-                - `ax`
-                    - `plt.Axes`
-                    - `ax` with the respective elements added
+                - `fig`
+                    - `go.Figure`
+                    - `fig` with the respective elements added
 
             Comments
             --------
         """
 
 
-        #disable some default settings)
-        fig.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",  # transparent plot area
-            # paper_bgcolor="rgba(0,0,0,0)",  # transparent outer paper
-        )
+        #disable some default settings
         fig.update_yaxes(row=row, col=col, scaleratio=1, scaleanchor="x", visible=False)
         fig.update_xaxes(row=row, col=col, scaleratio=1, scaleanchor="y", visible=False)
 
@@ -513,14 +543,14 @@ class LSteinPlotly:
                 self.add_yaxis(LSP, fig, row, col)
                 LSP.panel_drawn = True
 
-        #     #plot all dataseries
-        #     for ds in LSP.dataseries:
+            #plot all dataseries
+            for ds in LSP.dataseries:
 
-        #         if ds["seriestype"] == "scatter": func = self.scatter_
-        #         elif ds["seriestype"] == "plot":  func = self.plot_
-        #         else:
-        #             logger.warning(f"seriestype fof {ds['seriestype']} is not supported. try one of `['scatter','plot']`")
-        #             continue
+                if ds["seriestype"] == "scatter": func = self.scatter_
+                elif ds["seriestype"] == "plot":  func = self.plot_
+                else:
+                    logger.warning(f"seriestype of {ds['seriestype']} is not supported. try one of `['scatter','plot']`")
+                    continue
 
-        #         func(ax, ds["x"], ds["y"], **ds["kwargs"])
+                func(fig, row, col, ds["x"], ds["y"], **ds["kwargs"])
         return
