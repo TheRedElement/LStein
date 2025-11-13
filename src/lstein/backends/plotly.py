@@ -3,8 +3,9 @@ import logging
 import numpy as np
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-from ..utils import polar2carth
+from typing import Dict
 
+from ..utils import polar2carth
 from ..base.LSteinCanvas import LSteinCanvas
 from ..base.LSteinPanel import LSteinPanel
 
@@ -74,63 +75,78 @@ class LSteinPlotly:
         c2plotly = {"k":"#000000", "black":"#000000", "w":"#ffffff", "tab:grey":"#7f7f7f"}
         va2plotly = {"center":"middle"}
 
-        #thetatickkwargs
-        c, ls, lw = (self.LSC.thetatickkwargs.pop(k) for k in ["c", "ls", "lw"])
-        if ls in ls2plotly.keys(): ls = ls2plotly[ls]
-        if c in c2plotly.keys(): c = c2plotly[c]
-        if "line" not in self.LSC.thetatickkwargs.keys(): self.LSC.thetatickkwargs["line"] = dict(color=c, dash=ls, width=lw,)
-        #thetaticklabelkwargs
-        c, ha, va = (self.LSC.thetaticklabelkwargs.pop(k) for k in ["c", "ha", "va"])
-        if c in c2plotly.keys(): c = c2plotly[c]
-        if va in va2plotly.keys(): va = va2plotly[va]
-        if "font" not in self.LSC.thetaticklabelkwargs.keys(): self.LSC.thetaticklabelkwargs["font"] = dict(color=c,)
-        if "xanchor" not in self.LSC.thetaticklabelkwargs.keys(): self.LSC.thetaticklabelkwargs["xanchor"] = ha
-        if "yanchor" not in self.LSC.thetaticklabelkwargs.keys(): self.LSC.thetaticklabelkwargs["yanchor"] = va
-        #thetalabelkwargs
-        c, ha, va = (self.LSC.thetalabelkwargs.pop(k) for k in ["c", "ha", "va"])
-        if c in c2plotly.keys(): c = c2plotly[c]
-        if va in va2plotly.keys(): va = va2plotly[va]
-        if "font" not in self.LSC.thetalabelkwargs.keys(): self.LSC.thetalabelkwargs["font"] = dict(color=c,)
-        if "xanchor" not in self.LSC.thetalabelkwargs.keys(): self.LSC.thetalabelkwargs["xanchor"] = ha
-        if "yanchor" not in self.LSC.thetalabelkwargs.keys(): self.LSC.thetalabelkwargs["yanchor"] = va
-        #xtickkwargs
-        c, ls, lw = (self.LSC.xtickkwargs.pop(k) for k in ["c", "ls", "lw"])
-        if ls in ls2plotly.keys(): ls = ls2plotly[ls]
-        if "line" not in self.LSC.xtickkwargs.keys(): self.LSC.xtickkwargs["line"] = dict(color=c, dash=ls, width=lw,)
-        #xticklabelkwargs
-        c, xytext, textcoords = (self.LSC.xticklabelkwargs.pop(k) for k in ["c", "xytext", "textcoords"])
-        if c in c2plotly.keys(): c = c2plotly[c]
-        if "font" not in self.LSC.xticklabelkwargs.keys(): self.LSC.xticklabelkwargs["font"] = dict(color=c,)
-        if "xshift" not in self.LSC.xticklabelkwargs.keys(): self.LSC.xticklabelkwargs["xshift"] = xytext[0]    #will be interpreted as pixels!
-        if "yshift" not in self.LSC.xticklabelkwargs.keys(): self.LSC.xticklabelkwargs["yshift"] = xytext[1]    #will be interpreted as pixels!
-        #xlabelkwargs
-        c, xytext, textcoords = (self.LSC.xlabelkwargs.pop(k) for k in ["c", "xytext", "textcoords"])
-        if c in c2plotly.keys(): c = c2plotly[c]
-        if "font" not in self.LSC.xlabelkwargs.keys(): self.LSC.xlabelkwargs["font"] = dict(color=c,)
-        if "xshift" not in self.LSC.xlabelkwargs.keys(): self.LSC.xlabelkwargs["xshift"] = xytext[0]    #will be interpreted as pixels!
-        if "yshift" not in self.LSC.xlabelkwargs.keys(): self.LSC.xlabelkwargs["yshift"] = xytext[1]    #will be interpreted as pixels!
-        #ylabelkwargs
-        c, = (self.LSC.ylabelkwargs.pop(k) for k in ["c"])
-        if c in c2plotly.keys(): c = c2plotly[c]
-        if "font" not in self.LSC.ylabelkwargs.keys(): self.LSC.ylabelkwargs["font"] = dict(color=c,)
+        #local copies of kwargs (to ensure that `LSC` and `LSP` can be called multiple times without changing behavior)
+        self.thetatickkwargs = self.LSC.thetatickkwargs.copy()  #local copy (to ensure that `LSC` can be called multiple times without changing behavior)
+        self.thetaticklabelkwargs = self.LSC.thetaticklabelkwargs.copy()
+        self.thetalabelkwargs = self.LSC.thetalabelkwargs.copy()
+        self.xtickkwargs = self.LSC.xtickkwargs.copy()
+        self.xticklabelkwargs = self.LSC.xticklabelkwargs.copy()
+        self.xlabelkwargs = self.LSC.xlabelkwargs.copy()
+        self.ylabelkwargs = self.LSC.ylabelkwargs.copy()
+        self.panelkwargs = [dict(   #List[Dict[Dict[str,Any]]]]
+            ytickkwargs=LSP.ytickkwargs.copy(),
+            yticklabelkwargs=LSP.yticklabelkwargs.copy(),
+            panelboundskwargs=LSP.panelboundskwargs.copy(),
+        ) for LSP in self.LSC.Panels]
 
-        for LSP in self.LSC.Panels:
-            #ytickkwargs
-            c, ls, lw = (LSP.ytickkwargs.pop(k) for k in ["c", "ls", "lw"])
+        #modifications to local copies to make suitable for backend in use
+        ##thetatickkwargs
+        c, ls, lw = (self.thetatickkwargs.pop(k) for k in ["c", "ls", "lw"])
+        if ls in ls2plotly.keys(): ls = ls2plotly[ls]
+        if c in c2plotly.keys(): c = c2plotly[c]
+        if "line" not in self.thetatickkwargs.keys(): self.thetatickkwargs["line"] = dict(color=c, dash=ls, width=lw,)
+        ##thetaticklabelkwargs
+        c, ha, va = (self.thetaticklabelkwargs.pop(k) for k in ["c", "ha", "va"])
+        if c in c2plotly.keys(): c = c2plotly[c]
+        if va in va2plotly.keys(): va = va2plotly[va]
+        if "font" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["font"] = dict(color=c,)
+        if "xanchor" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["xanchor"] = ha
+        if "yanchor" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["yanchor"] = va
+        ##thetalabelkwargs
+        c, ha, va = (self.thetalabelkwargs.pop(k) for k in ["c", "ha", "va"])
+        if c in c2plotly.keys(): c = c2plotly[c]
+        if va in va2plotly.keys(): va = va2plotly[va]
+        if "font" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["font"] = dict(color=c,)
+        if "xanchor" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["xanchor"] = ha
+        if "yanchor" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["yanchor"] = va
+        ##xtickkwargs
+        c, ls, lw = (self.xtickkwargs.pop(k) for k in ["c", "ls", "lw"])
+        if ls in ls2plotly.keys(): ls = ls2plotly[ls]
+        if "line" not in self.xtickkwargs.keys(): self.xtickkwargs["line"] = dict(color=c, dash=ls, width=lw,)
+        ##xticklabelkwargs
+        c, xytext, textcoords = (self.xticklabelkwargs.pop(k) for k in ["c", "xytext", "textcoords"])
+        if c in c2plotly.keys(): c = c2plotly[c]
+        if "font" not in self.xticklabelkwargs.keys(): self.xticklabelkwargs["font"] = dict(color=c,)
+        if "xshift" not in self.xticklabelkwargs.keys(): self.xticklabelkwargs["xshift"] = xytext[0]    #will be interpreted as pixels!
+        if "yshift" not in self.xticklabelkwargs.keys(): self.xticklabelkwargs["yshift"] = xytext[1]    #will be interpreted as pixels!
+        ##xlabelkwargs
+        c, xytext, textcoords = (self.xlabelkwargs.pop(k) for k in ["c", "xytext", "textcoords"])
+        if c in c2plotly.keys(): c = c2plotly[c]
+        if "font" not in self.xlabelkwargs.keys(): self.xlabelkwargs["font"] = dict(color=c,)
+        if "xshift" not in self.xlabelkwargs.keys(): self.xlabelkwargs["xshift"] = xytext[0]    #will be interpreted as pixels!
+        if "yshift" not in self.xlabelkwargs.keys(): self.xlabelkwargs["yshift"] = xytext[1]    #will be interpreted as pixels!
+        ##ylabelkwargs
+        c, = (self.ylabelkwargs.pop(k) for k in ["c"])
+        if c in c2plotly.keys(): c = c2plotly[c]
+        if "font" not in self.ylabelkwargs.keys(): self.ylabelkwargs["font"] = dict(color=c,)
+
+        for pkwargs in self.panelkwargs:
+            ##ytickkwargs
+            c, ls, lw = (pkwargs["ytickkwargs"].pop(k) for k in ["c", "ls", "lw"])
             if ls in ls2plotly.keys(): ls = ls2plotly[ls]
             if c in c2plotly.keys(): c = c2plotly[c]
-            if "line" not in LSP.ytickkwargs.keys(): LSP.ytickkwargs["line"] = dict(color=c, dash=ls, width=lw,)
-            #yticklabelkwargs
-            c, ha, va = (LSP.yticklabelkwargs.pop(k) for k in ["c", "ha", "va"])
+            if "line" not in pkwargs["ytickkwargs"].keys(): pkwargs["ytickkwargs"]["line"] = dict(color=c, dash=ls, width=lw,)
+            ##yticklabelkwargs
+            c, ha, va = (pkwargs["yticklabelkwargs"].pop(k) for k in ["c", "ha", "va"])
             if c in c2plotly.keys(): c = c2plotly[c]
             if va in va2plotly.keys(): va = va2plotly[va]
-            if "font" not in LSP.yticklabelkwargs.keys(): LSP.yticklabelkwargs["font"] = dict(color=c,)
-            if "xanchor" not in LSP.yticklabelkwargs.keys(): LSP.yticklabelkwargs["xanchor"] = ha
-            if "yanchor" not in LSP.yticklabelkwargs.keys(): LSP.yticklabelkwargs["yanchor"] = va
-            #panelboundskwargs
-            c, = (LSP.panelboundskwargs.pop(k) for k in ["c"])
+            if "font" not in pkwargs["yticklabelkwargs"].keys(): pkwargs["yticklabelkwargs"]["font"] = dict(color=c,)
+            if "xanchor" not in pkwargs["yticklabelkwargs"].keys(): pkwargs["yticklabelkwargs"]["xanchor"] = ha
+            if "yanchor" not in pkwargs["yticklabelkwargs"].keys(): pkwargs["yticklabelkwargs"]["yanchor"] = va
+            ##panelboundskwargs
+            c, = (pkwargs["panelboundskwargs"].pop(k) for k in ["c"])
             if c in c2plotly.keys(): c = c2plotly[c]
-            if "line" not in LSP.panelboundskwargs.keys(): LSP.panelboundskwargs["line"] = dict(color=c, dash="solid")
+            if "line" not in pkwargs["panelboundskwargs"].keys(): pkwargs["panelboundskwargs"]["line"] = dict(color=c, dash="solid")
         return
 
     #canvas
@@ -174,7 +190,7 @@ class LSteinPlotly:
             fig.add_trace(
                 go.Scatter(x=circles_x[i], y=circles_y[i],
                     showlegend=False,
-                    **self.LSC.xtickkwargs,    
+                    **self.xtickkwargs,    
                 ),
                 row, col,
             )
@@ -182,13 +198,13 @@ class LSteinPlotly:
             fig.add_annotation(x=xtickpos_x[i], y=xtickpos_y[i], text=f"{xticklabs[i]}",
                 row=row, col=col,
                 showarrow=False,
-                **self.LSC.xticklabelkwargs
+                **self.xticklabelkwargs
             )
         ##axis label
         fig.add_annotation(x=xlabpos_x, y=xlabpos_y, text=self.LSC.xlabel,
             row=row, col=col,
             showarrow=False,
-            **self.LSC.xlabelkwargs
+            **self.xlabelkwargs
         )
 
         return
@@ -228,26 +244,28 @@ class LSteinPlotly:
         x_arrow, y_arrow, = self.LSC.compute_thetaaxis()
 
         #plotting
+        ##remove irrelevant kwargs
+        thetaticklabelkwargs = {k:v for (k,v) in self.thetaticklabelkwargs.items() if k not in ["pad"]}
         for i in range(len(self.LSC.thetaticks[0])):
             ##ticks
             fig.add_trace(
                 go.Scatter(x=[thetatickpos_xi[i],thetatickpos_xo[i]], y=[thetatickpos_yi[i],thetatickpos_yo[i]],
                     showlegend=False,
                     mode="lines",
-                    **self.LSC.thetatickkwargs,
+                    **self.thetatickkwargs,
                 ),
                 row, col,
             )
             ##ticklabels
             fig.add_annotation(x=thetaticklabelpos_x[i], y=thetaticklabelpos_y[i], text=f"{thetaticklabs[i]}",
                 showarrow=False,
-                **self.LSC.thetaticklabelkwargs
+                **thetaticklabelkwargs
             )
 
         ##axis label
         fig.add_annotation(x=th_label_x, y=th_label_y, text=self.LSC.thetalabel,
             showarrow=False,
-            **self.LSC.thetalabelkwargs,
+            **self.thetalabelkwargs,
         )
 
         ##indicator
@@ -256,7 +274,7 @@ class LSteinPlotly:
         fig.add_annotation(x=x_arrow[-1], y=y_arrow[-1],
             text="►",
             textangle=np.arctan2(dx, dy)/np.pi*180 - 90,
-            font=dict(color=self.LSC.thetatickkwargs["line"]["color"]),
+            font=dict(color=self.thetatickkwargs["line"]["color"]),
             xanchor="center",
             yanchor="middle",
             showarrow=False,
@@ -294,18 +312,20 @@ class LSteinPlotly:
         #get quantities
         ylabpos_x, ylabpos_y = self.LSC.compute_ylabel()
         #plotting
+        ##remove irrelevant kwargs
+        ylabelkwargs = {k:v for (k,v) in self.ylabelkwargs.items() if k not in ["pad"]}
         ##axis label
         fig.add_annotation(x=ylabpos_x, y=ylabpos_y, text=self.LSC.ylabel,
             row=row, col=col,
             showarrow=False,
-            **self.LSC.ylabelkwargs
+            **ylabelkwargs
         )
-        # ax.annotate(self.LSC.ylabel, xy=(ylabpos_x, ylabpos_y), annotation_clip=False, **self.LSC.ylabelkwargs)
         return
 
     #panels
     def add_yaxis(self,
         LSP:LSteinPanel,
+        pkwargs:Dict[str,Dict],
         fig:go.Figure,
         row:int, col:int,        
         ):
@@ -346,7 +366,7 @@ class LSteinPlotly:
         x_bounds = np.array([x_lb,x_ub])
         y_bounds = np.array([y_lb,y_ub])
 
-        pad = LSP.yticklabelkwargs.pop("pad")   #padding for yticklabels
+        pad = LSP.yticklabelkwargs["pad"]       #padding for yticklabels
         r_, th_ = np.meshgrid(r_bounds, ytickpos_th)
         ytickpos_x, ytickpos_y              = polar2carth(r_, th_)
         yticklabelpos_x, yticklabelpos_y    = polar2carth((1+pad)*r_ub, ytickpos_th)
@@ -355,6 +375,8 @@ class LSteinPlotly:
         # yticklabelpos_x, yticklabelpos_y = yticklabelpos_x[::-1], yticklabelpos_y[::-1]
 
         #plotting
+        ##remove irrelevant kwargs
+        yticklabelkwargs = {k:v for (k,v) in pkwargs["yticklabelkwargs"].items() if k not in ["pad"]}
         if LSP.show_yticks:
             for i in range(len(ytickpos_th)):
                 ##ticks
@@ -362,14 +384,14 @@ class LSteinPlotly:
                     go.Scatter(x=ytickpos_x[i], y=ytickpos_y[i],
                         showlegend=False,
                         mode="lines",
-                        **LSP.ytickkwargs,
+                        **pkwargs["ytickkwargs"],
                     ),
                     row, col,
                 )
                 ##ticklabels
                 fig.add_annotation(x=yticklabelpos_x[i], y=yticklabelpos_y[i], text=f"{yticklabs[i]}",
                     showarrow=False,
-                    **LSP.yticklabelkwargs
+                    **yticklabelkwargs
                 )
         ##panel boundaries
         if LSP.show_panelbounds:
@@ -378,7 +400,7 @@ class LSteinPlotly:
                     go.Scatter(x=xb, y=yb,
                         showlegend=False,
                         mode="lines",
-                        **LSP.panelboundskwargs,
+                        **pkwargs["panelboundskwargs"],
                     ),
                     row, col,
                 )
@@ -427,6 +449,11 @@ class LSteinPlotly:
             --------
                 - only to be called from within `LSteinPlotly.show()`
         """
+        #translate kwargs
+        c, = (kwargs.pop(k) for k in ["c"])
+        if "marker" not in kwargs.keys(): kwargs["marker"] = dict(color=c)
+        
+        #plot series
         fig.add_trace(
             go.Scatter(x=x, y=y,
                 mode="markers",
@@ -477,6 +504,11 @@ class LSteinPlotly:
             --------
                 - only to be called from within `LSteinPlotly.show()`
         """    
+        #translate kwargs
+        c, = (kwargs.pop(k) for k in ["c"])
+        if "line" not in kwargs.keys(): kwargs["line"] = dict(color=c)
+        
+        #plot series        
         fig.add_trace(
             go.Scatter(x=x, y=y,
                 mode="lines",
@@ -537,10 +569,10 @@ class LSteinPlotly:
         self.LSC.canvas_drawn = True
 
         #draw panels
-        for LSP in self.LSC.Panels:
+        for LSP, pkwargs in zip(self.LSC.Panels, self.panelkwargs):
             #draw panel if not drawn already
             if not LSP.panel_drawn:
-                self.add_yaxis(LSP, fig, row, col)
+                self.add_yaxis(LSP, pkwargs, fig, row, col)
                 LSP.panel_drawn = True
 
             #plot all dataseries

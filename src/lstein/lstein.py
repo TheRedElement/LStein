@@ -15,6 +15,7 @@ from .backends.plotly import LSteinPlotly
 def draw(
     LSC:LSteinCanvas,
     backend:Literal["matplotlib","plotly"]="matplotlib",
+    reset:bool=True,
     **kwargs
     ) -> Any:
     """
@@ -29,8 +30,16 @@ def draw(
                 - `Literal["matplotlib"]`, optional
                 - backend to use for plotting
                 - the default is "matplotlib"
+            - `reset`
+                - `bool`, optional
+                - whether to clear all flags
+                - ensures that
+                    - canvas is drawn (again)
+                    - panels are drawn (again)
             - `kwargs`
                 - kwargs to be passed to figure instantiation methods of `backend`
+                    - `"matplotlib"`: `plt.subplots()`
+                    - `"plotly"`: `make_subplots()`
         
         Raises
         ------
@@ -54,6 +63,11 @@ def draw(
     backends = ["matplotlib", "plotly"]
     assert backend in backends, f"`backend` has to be one of {backends} but is {backend}"
 
+    if reset:   #reset draw flags
+        LSC.canvas_drawn = False
+        for LSP in LSC.Panels: LSP.panel_drawn = False
+
+    #plotting
     if backend == "matplotlib":
         fig, ax = plt.subplots(1,1, **kwargs)
         LSteinMPL(LSC).show(ax)
@@ -62,6 +76,7 @@ def draw(
         fig = make_subplots(
             rows=1, cols=1,
             column_widths=[1.0], row_heights=[1.0],
+            **kwargs,
         )
         LSteinPlotly(LSC).show(fig, 1, 1)
         return fig

@@ -111,9 +111,11 @@ class LSteinMPL:
         x_arrow, y_arrow, = self.LSC.compute_thetaaxis()
 
         #plotting
+        ##remove irrelevant kwargs
+        thetaticklabelkwargs = {k:v for (k,v) in self.LSC.thetaticklabelkwargs.items() if k not in ["pad"]}
         ax.plot(np.array([thetatickpos_xi, thetatickpos_xo]), np.array([thetatickpos_yi, thetatickpos_yo]), **self.LSC.thetatickkwargs)
         for i in range(len(self.LSC.thetaticks[0])):    #ticklabels
-            ax.annotate(f"{thetaticklabs[i]}", xy=(thetaticklabelpos_x[i], thetaticklabelpos_y[i]), annotation_clip=False, **self.LSC.thetaticklabelkwargs)
+            ax.annotate(f"{thetaticklabs[i]}", xy=(thetaticklabelpos_x[i], thetaticklabelpos_y[i]), annotation_clip=False, **thetaticklabelkwargs)
         line, = ax.plot(x_arrow[:-1], y_arrow[:-1], **self.LSC.thetatickkwargs)
         ax.annotate("",
             xy=(x_arrow[-1],y_arrow[-1]),
@@ -153,7 +155,9 @@ class LSteinMPL:
         #get quantities
         ylabpos_x, ylabpos_y = self.LSC.compute_ylabel()
         #plotting
-        ax.annotate(self.LSC.ylabel, xy=(ylabpos_x, ylabpos_y), annotation_clip=False, **self.LSC.ylabelkwargs)
+        ##remove irrelevant kwargs
+        ylabelkwargs = {k:v for (k,v) in self.LSC.ylabelkwargs.items() if k not in ["pad"]}
+        ax.annotate(self.LSC.ylabel, xy=(ylabpos_x, ylabpos_y), annotation_clip=False, **ylabelkwargs)
         return
 
     #panels
@@ -195,7 +199,7 @@ class LSteinMPL:
         x_bounds = np.array([x_lb,x_ub])
         y_bounds = np.array([y_lb,y_ub])
 
-        pad = LSP.yticklabelkwargs.pop("pad")   #padding for yticklabels
+        pad = LSP.yticklabelkwargs["pad"]   #padding for yticklabels
         r_, th_ = np.meshgrid(r_bounds, ytickpos_th)
         ytickpos_x, ytickpos_y              = polar2carth(r_, th_)
         yticklabelpos_x, yticklabelpos_y    = polar2carth((1+pad)*r_ub, ytickpos_th)
@@ -204,10 +208,12 @@ class LSteinMPL:
         # yticklabelpos_x, yticklabelpos_y = yticklabelpos_x[::-1], yticklabelpos_y[::-1]
 
         #plotting
+        ##remove irrelevant kwargs
+        yticklabelkwargs = {k:v for (k,v) in LSP.yticklabelkwargs.items() if k not in ["pad"]}
         if LSP.show_yticks:
             ax.plot(ytickpos_x.T, ytickpos_y.T, **LSP.ytickkwargs)
             for i in range(len(ytickpos_th)):
-                ax.annotate(yticklabs[i], xy=(yticklabelpos_x[i],yticklabelpos_y[i]), annotation_clip=False, **LSP.yticklabelkwargs)
+                ax.annotate(yticklabs[i], xy=(yticklabelpos_x[i],yticklabelpos_y[i]), annotation_clip=False, **yticklabelkwargs)
         if LSP.show_panelbounds: ax.plot(x_bounds.T, y_bounds.T, **LSP.panelboundskwargs)
 
         return

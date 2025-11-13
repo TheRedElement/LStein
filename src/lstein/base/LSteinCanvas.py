@@ -864,7 +864,7 @@ class LSteinCanvas:
 
         #compute axis parameters
         lsthax = LSteinThetaAxis()
-        th_pad = 1-self.thetaticklabelkwargs.pop("pad")     #get padding (scales position)
+        th_pad = 1-self.thetaticklabelkwargs["pad"]     #get padding (scales position)
 
         thetatickpos_ri, thetatickpos_ro, thetatickpos_th, \
             thetatickpos_xi, thetatickpos_yi, \
@@ -930,7 +930,7 @@ class LSteinCanvas:
 
         #compute axis parameters
         lsyax = LSteinYAxis()
-        pad = self.ylabelkwargs.pop("pad")
+        pad = self.ylabelkwargs["pad"]
         ylabpos_x, ylabpos_y = lsyax.compute_labs(
             thetaticks=self.thetaticks,
             thetaplotlims=self.thetaplotlims,
