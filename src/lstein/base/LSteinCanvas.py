@@ -1200,3 +1200,27 @@ class LSteinCanvas:
             LSP.plot(X[i], Y[i], seriestype=seriestype[i], **series_kwargs[i])
             
         return
+
+    def reset(self,
+        ):
+        """
+            - method to reset all flags related to plotting
+            - ensures that upon a new call
+                - canvas is drawn (again)
+                - panels are drawn (again)
+
+            Parameters
+            ----------
+
+            Raises
+            ------
+
+            Returns
+            -------
+
+            Comments
+            --------
+        """
+        self.canvas_drawn = False
+        for LSP in self.Panels: LSP.panel_drawn = False
+        return

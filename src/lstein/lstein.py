@@ -63,9 +63,8 @@ def draw(
     backends = ["matplotlib", "plotly"]
     assert backend in backends, f"`backend` has to be one of {backends} but is {backend}"
 
-    if reset:   #reset draw flags
-        LSC.canvas_drawn = False
-        for LSP in LSC.Panels: LSP.panel_drawn = False
+    #reset draw flags
+    if reset: LSC.reset()
 
     #plotting
     if backend == "matplotlib":
@@ -78,6 +77,6 @@ def draw(
             column_widths=[1.0], row_heights=[1.0],
             **kwargs,
         )
-        LSteinPlotly(LSC).show(fig, 1, 1)
+        fig = LSteinPlotly(LSC).show(fig, 1, 1)
         return fig
     

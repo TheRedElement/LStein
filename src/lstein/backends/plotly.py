@@ -190,6 +190,8 @@ class LSteinPlotly:
             fig.add_trace(
                 go.Scatter(x=circles_x[i], y=circles_y[i],
                     showlegend=False,
+                    hovertemplate=f"<b>x:</b>{xticklabs[i]}<br>" +
+                                "<extra></extra>",  #hide defaults
                     **self.xtickkwargs,    
                 ),
                 row, col,
