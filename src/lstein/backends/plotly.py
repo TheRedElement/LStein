@@ -22,6 +22,9 @@ class LSteinPlotly:
                 - `LSteinCanvas`
                 - canvas to display
 
+        Infered Attributes
+        ------------------
+
         Methods
         -------
             - `add_xaxis()`
@@ -190,8 +193,10 @@ class LSteinPlotly:
             fig.add_trace(
                 go.Scatter(x=circles_x[i], y=circles_y[i],
                     showlegend=False,
-                    hovertemplate=f"<b>x:</b>{xticklabs[i]}<br>" +
-                                "<extra></extra>",  #hide defaults
+                    hovertemplate=(
+                        f"<b>x:</b>{xticklabs[i]}<br>"
+                        "<extra></extra>"               #hide defaults
+                    ),
                     **self.xtickkwargs,    
                 ),
                 row, col,
@@ -386,6 +391,10 @@ class LSteinPlotly:
                     go.Scatter(x=ytickpos_x[i], y=ytickpos_y[i],
                         showlegend=False,
                         mode="lines",
+                        hovertemplate=(
+                            f"<b>y:</b>{yticklabs[i]}<br>"
+                            "<extra></extra>"               #hide defaults
+                        ),                        
                         **pkwargs["ytickkwargs"],
                     ),
                     row, col,
@@ -579,6 +588,14 @@ class LSteinPlotly:
 
             #plot all dataseries
             for ds in LSP.dataseries:
+                
+                #define hovertemplate and custom data
+                customdata=np.stack([[LSP.theta]*len(ds["x_cut"]), ds["x_cut"], ds["y_cut"]], axis=-1)
+                hovertemplate = (
+                    "<b>theta</b>: %{customdata[0]}<br>"
+                    "<b>x</b>: %{customdata[1]}<br>"
+                    "<b>y</b>: %{customdata[2]}<br>"
+                )
 
                 if ds["seriestype"] == "scatter": func = self.scatter_
                 elif ds["seriestype"] == "plot":  func = self.plot_
@@ -586,5 +603,9 @@ class LSteinPlotly:
                     logger.warning(f"seriestype of {ds['seriestype']} is not supported. try one of `['scatter','plot']`")
                     continue
 
-                func(fig, row, col, ds["x"], ds["y"], **ds["kwargs"])
+                func(fig, row, col,
+                    ds["x"], ds["y"],
+                    customdata=customdata, hovertemplate=hovertemplate,
+                    **ds["kwargs"]
+                )
         return fig

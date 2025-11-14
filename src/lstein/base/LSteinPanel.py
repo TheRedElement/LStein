@@ -87,6 +87,30 @@ class LSteinPanel:
                 - `bool`
                 - flag denoting if the panel has been drawn alrady
                 - to prevent drawing the panel several times when plotting
+            - `dataseries`
+                - `List[Dict[str,Any]]`
+                - dataseries to be used for plotting
+                - contains
+                    - `x`
+                        - `np.ndarray`
+                        - transformed (projected) dataseries in carthesian coordinates
+                        - ready to be plotted
+                    - `y`
+                        - `np.ndarray`
+                        - transformed (projected) dataseries in carthesian coordinates
+                        - ready to be plotted
+                    - `x_cut`
+                        - `np.ndarray`
+                        - original dataseries with axis-limits applied
+                    - `y_cut`
+                        - `np.ndarray`
+                        - original dataseries with axis-limits applied
+                    - `seriestype`
+                        - `Literal["scatter","plot"]`
+                        - kind of the series to be displayed
+                        - used for implementation of plotting functions in backends
+                    - `kwargs`
+                        - kwargs to be passed to the respective plotting function in the backend
         
         Methods
         -------
@@ -558,6 +582,8 @@ class LSteinPanel:
         self.dataseries.append(dict(
             x=x_proj,
             y=y_proj,
+            x_cut=x_cut,
+            y_cut=y_cut,
             seriestype=seriestype,
             kwargs=kwargs,
         ))
