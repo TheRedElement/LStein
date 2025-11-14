@@ -31,6 +31,7 @@ dev = [
     "ipykernel>=6.30.1",
     "nbformat>=5.10.4",
     "polars>=1.32.3",
+    "pytest>=9.0.1",
 ]
 
 #custom stuff
