@@ -40,6 +40,8 @@ def carth2polar(
 
         Comments
         --------
+            - note the addition of `np.pi`
+                - ensures positive angles
     """
     
     r = np.sqrt(x**2 + y**2)
