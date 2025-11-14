@@ -16,6 +16,10 @@ pip3 install git+https://github.com/TheRedElement/LStein.git
 A jupyter notebook with a minimal working example (and options to use your own data) can be found in [LStein_demo_colab.ipynb](./demo/LStein_demo_colab.ipynb).
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/TheRedElement/LStein/blob/main/LStein_demo/LStein_demo_colab.ipynb) to try it out without local installations.
 
+Further examples of how to use `LStein` can be found in [LStein_demo.ipynb](./demo/LStein_demo.ipynb).
+
+The currently support backends are demonstrated in [backends_demo.ipynb](./demo/backends_demo.ipynb).
+
 ## Reference
 If you use this code in your work please use this entry in your bibliography (for now):
 
