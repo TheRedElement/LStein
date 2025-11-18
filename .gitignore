@@ -6,6 +6,7 @@
 gfx/*.png
 gfx/*.pdf
 poetry.lock
+report/gfx
 
 ##ignore
 .temp/
