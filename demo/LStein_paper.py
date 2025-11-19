@@ -289,6 +289,54 @@ def plot_projection_methods(
     
     if SAVE: fig.savefig(f"../report/gfx/projectionmethods_{context}.png")
     return fig
+
+def plot_hypsearch():
+    df = (pl.read_csv("../data/autoencoder_hypsearch.csv")
+        .with_columns(
+            pl.col("hyperparameters").cast(pl.Categorical).to_physical().alias("hyperparam combination")
+        )
+        .select(
+            pl.col("hyperparam combination"),
+            pl.exclude("hyperparameters", "hyperparam combination"),
+            pl.col("hyperparameters"),
+        )
+        .filter(
+            pl.col("hyperparam combination") < 3
+        )
+    )
+    
+    dfs = df.partition_by(df.columns[0], maintain_order=True)
+
+    y1idx = 2
+    y2idx = 3
+    theta       = [d[0,0] for d in dfs]
+    X           = [d[:,1].to_numpy().flatten() for d in dfs]
+    Y           = [d[:,y1idx].to_numpy().flatten() for d in dfs]
+    Y2          = [d[:,y2idx].to_numpy().flatten() for d in dfs]
+
+    thetalabs   = [d[0,-1] for d in dfs]
+
+    thetaticks  = np.round(np.linspace(df[:,0].min(), df[:,0].max(), 5), decimals=0).astype(int)
+    xticks      = np.round(np.linspace(df[:,1].min(), df[:,1].max(), 5), decimals=0).astype(int)
+    yticks      = np.round(np.linspace(df[:,y1idx].min(), df[:,y1idx].max(), 5), decimals=0).astype(int)
+
+
+    panelsize = 0.7
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(0,2*np.pi/2), thetaplotlims=(0+panelsize/2,2*np.pi/2-panelsize/2), panelsize=panelsize,
+        thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+    )
+    LSC.plot(theta, X, Y, series_kwargs=[dict(label=f"{theta[i]}: {thetalabs[i]}") for i in range(len(theta))])
+    LSC.plot(theta, X, Y2, series_kwargs=dict(ls="--"))
+
+    fig = lstein.draw(LSC, figsize=(9,9))
+    fig.tight_layout()
+    fig.show()
+    fig.legend(bbox_to_anchor=(1.0,0.78), fontsize=8)
+
+    
+    return
 #%%main
 def main():
     #declare as global so no arguments have to be passed to nested functions
@@ -314,15 +362,16 @@ def main():
     colors = get_stats(theta_raw, x_raw, y_raw, fname)
 
     #plots
-    plot_lstein()
-    plot_scatter_onepanel()
-    plot_scatter_onepanel_offset()
-    plot_scatter_multipanel()
-    plot_scatter_multipanel_group()
-    plot_heatmap()
-    plot_3dsurface()
-    plot_projection_methods(context="theta")
-    plot_projection_methods(context="y")
+    # plot_lstein()
+    # plot_scatter_onepanel()
+    # plot_scatter_onepanel_offset()
+    # plot_scatter_multipanel()
+    # plot_scatter_multipanel_group()
+    # plot_heatmap()
+    # plot_3dsurface()
+    # plot_projection_methods(context="theta")
+    # plot_projection_methods(context="y")
+    plot_hypsearch()
 
     plt.show()
     return

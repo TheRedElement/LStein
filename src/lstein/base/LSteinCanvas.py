@@ -542,6 +542,13 @@ class LSteinCanvas:
                     - have space for labelling
                 - the default is `0.3`
                     - 30% of the radial direction is left empty
+            - `panelsize`
+                - `float`, optional
+                    - global default of (angular) space any created panel will occupy
+                    - in radians
+                    - can be overridden by calling `self.add_panel()`
+                    - the entire canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
+                    - the default is `np.pi/8`
             - `thetalabel`
                 - `str`, optional
                 - label of the theta-axis
@@ -662,7 +669,7 @@ class LSteinCanvas:
     """
     def __init__(self,
         thetaticks:Union[Tuple[List[float],List[Any]],List[float]], xticks:Union[Tuple[List[float],List[Any]],List[float]], yticks:Union[Tuple[List[float],List[Any]],List[float]],
-        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3,
+        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, panelsize:float=np.pi/8,
         thetalabel:str=None, xlabel:str=None, ylabel:str=None,
         thetaarrowpos_th:float=None, ylabpos_th:float=None,
         thetatickkwargs:dict=None, thetaticklabelkwargs:dict=None, thetalabelkwargs:dict=None,
@@ -677,6 +684,7 @@ class LSteinCanvas:
         self.thetaguidelims = (0,2*np.pi) if thetaguidelims is None else thetaguidelims
         self.thetaplotlims  = self.thetaguidelims if thetaplotlims is None else thetaplotlims
         self.xlimdeadzone   = xlimdeadzone
+        self.panelsize      = panelsize
 
         self.thetalabel     = "" if thetalabel is None else thetalabel
         self.xlabel         = "" if xlabel is None else xlabel
@@ -945,7 +953,7 @@ class LSteinCanvas:
     def add_panel(self,
         theta:float,
         yticks:Union[Tuple[List[float],List[Any]],List[float]]=None,
-        panelsize:float=np.pi/8,
+        panelsize:float=None,
         show_panelbounds:bool=False, show_yticks:bool=True,
         y_projection_method:Literal["y","theta"]="theta",
         ytickkwargs:dict=None,
@@ -983,7 +991,9 @@ class LSteinCanvas:
                     - (angular) space the created panel will occupy
                     - in radians
                     - the entire canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
-                    - the default is `np.pi/8`
+                    - overrides `self.panelsize`
+                    - the default is `None`
+                        - will fall back to `self.panelsize`
                 - `show_panelbounds`
                     - `bool`, optional
                     - whether to show bounds of the individual panels when rendering
@@ -1036,7 +1046,7 @@ class LSteinCanvas:
             yticks = self.yticks
         else:
             yticks = yticks
-
+        if panelsize is None: panelsize = self.panelsize
 
         LSP = LSteinPanel(self,
             theta=theta,
