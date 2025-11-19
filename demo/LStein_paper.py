@@ -1,6 +1,7 @@
 #%%imports
 import glob
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import numpy as np
 import polars as pl
 import re
@@ -10,6 +11,8 @@ from lstein import lstein, utils as lsu, makedata as md, paper_plots as pp
 
 plt.rcParams["savefig.bbox"] = "tight"
 plt.rcParams["savefig.transparent"] = True
+plt.rcParams["text.usetex"] = True
+
 
 #%%constants
 SURVEY_MAPPING:dict = {"elasticc":"ELAsTiCC", "des":"DES"}
@@ -340,8 +343,161 @@ def plot_hypsearch():
     fig.tight_layout()
     fig.legend(bbox_to_anchor=(1.0,0.95), fontsize=8)
     if SAVE: fig.savefig(f"../report/gfx/hypsearch.png")
-
     
+    return
+
+def plot_snn():
+    import brian2
+    import brian2.numpy_ as np_
+    from brian2 import NeuronGroup, Network
+    from brian2 import TimedArray
+    from brian2 import StateMonitor, SpikeMonitor
+    from brian2 import Gohm, ms, mV, pA, pF, second
+
+    #simulation
+    ##neuron params
+    n_neurons   = 3
+    u_rest      = -65*mV
+    # u_rest      = 0*mV
+    u_reset     = -75*mV
+    u_th        = -50*mV #(=theta)
+    C_m         = 750*pF
+    R_m         = 0.02*Gohm
+    tau_m       = R_m*C_m
+    a0          = 3e-1*(1/mV)   #qif specific
+    u_c         = -50*mV        #qif specific
+    Delta_T     = 3*mV          #eif specific
+    theta_rh    = -50*mV        #eif specific
+    delta_abs   = 0*ms  #refractory period
+
+    ##simulation specs
+    t_sim = .2 * second
+    dt = .1 * ms
+    
+    ##config brian2
+    brian2.defaultclock.dt = dt
+
+    ##neuron inputs
+    t_in = np_.arange(0, t_sim, dt)
+    I_in = TimedArray(np_.linspace([800]*len(t_in), 1000, n_neurons).T * pA, dt=dt)
+
+    ##init network
+    brian2.start_scope()
+    net1 = Network()
+    
+    ##setup neurons
+    def get_lif():
+        eqs = dict(
+            model=(
+                'du/dt = -(u-u_rest)/tau_m + (R_m*I)/tau_m : volt (unless refractory)\n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+    def get_eif():
+        eqs = dict(
+            model=(
+                'du/dt = (-(u-u_rest)/tau_m) + Delta_T * exp((u - theta_rh)/Delta_T)/tau_m'
+                ' + R_m*I/tau_m'
+                '\n'
+                '   : volt (unless refractory) \n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+    def get_qif():
+        eqs = dict(
+            model=(
+                'du/dt = (a0*(u-u_rest)*(u-u_c)/tau_m)'
+                ' + R_m*I/tau_m'
+                '\n'
+                '   : volt (unless refractory) \n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+
+    G_lif, state_mon_lif = get_lif()
+    G_eif, state_mon_eif = get_eif()
+    G_qif, state_mon_qif = get_qif()
+    net1.add([
+        G_lif, state_mon_lif,
+        G_eif, state_mon_eif,
+        G_qif, state_mon_qif,
+    ])
+
+    ##simulate
+    net1.run(t_sim)
+
+    #plotting
+    ##traditional
+    fig, axs = plt.subplots(1,1, subplot_kw=dict(xlabel="Time [ms]"))
+    axs.set_ylabel("$u_\mathrm{membrane}$ [mV]")
+    colors = lsu.get_colors(np.unique(state_mon_lif.I))
+    sm = plt.cm.ScalarMappable(mcolors.Normalize(vmin=state_mon_lif.I.min()/pA, vmax=state_mon_lif.I.max()/pA))
+    for n in range(n_neurons):
+        axs.plot(state_mon_lif.t/ms, state_mon_lif.u[n]/mV, color=colors[n], ls="-", label=f"LIF"*(n == 0))
+        axs.plot(state_mon_eif.t/ms, state_mon_eif.u[n]/mV, color=colors[n], ls="--", label=f"EIF"*(n == 0))
+        axs.plot(state_mon_qif.t/ms, state_mon_qif.u[n]/mV, color=colors[n], ls="-.", label=f"QIF"*(n == 0))
+    cbar = fig.colorbar(sm, ax=axs)
+    cbar.set_label("$I_\mathrm{ext}$ [pA]")
+    axs.legend()
+    fig.tight_layout()
+
+    ##lstein
+    theta = np.concat([
+        np.unique(state_mon_lif.I/pA),
+        np.unique(state_mon_eif.I/pA),
+        np.unique(state_mon_qif.I/pA)
+    ])
+    x = np.concat([
+        [state_mon_lif.t/ms]*n_neurons,
+        [state_mon_eif.t/ms]*n_neurons,
+        [state_mon_qif.t/ms]*n_neurons,
+    ])
+    y = np.concat([
+        state_mon_lif.u/mV,
+        state_mon_eif.u/mV,
+        state_mon_qif.u/mV,
+    ])
+    thetaticks  = np.round(np.linspace(theta.min(), theta.max(), 5), decimals=0).astype(int)
+    xticks      = np.round(np.linspace(x.min(), x.max(), 5), decimals=0).astype(int)
+    yticks      = np.round(np.linspace(y.min(), y.max(), 5), decimals=0).astype(int)
+    colors = np.repeat(np.array(lsu.get_colors(np.arange(n_neurons))).reshape(-1,1), len(np.unique(theta)))     #one color per NEURON TYPE
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(0,np.pi/2), thetaplotlims=(0+panelsize/2,np.pi/2-panelsize/2), panelsize=panelsize,
+        thetalabel="$I_\mathrm{ext}$ [pA]", xlabel="Time [ms]", ylabel="$u_\mathrm{membrane}$ [mV]",
+        thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(2,1)),
+        xlabelkwargs=None,
+        ylabelkwargs=dict(rotation=-82, textcoords="offset fontsize", xytext=(0,-3))
+    )
+
+    LSC.plot(theta, x, y, seriestype="plot", series_kwargs=[dict(c=colors[i], label=[f"LIF","","", f"EIF","","", f"QIF","",""][i]) for i in range(len(theta))])
+
+    fig = lstein.draw(LSC,)
+    fig.legend(loc="upper right", bbox_to_anchor=(0.9, 0.9))
+    fig.tight_layout()
+    if SAVE: fig.savefig(f"../report/gfx/snn.png")
+
     return
 #%%main
 def main():
@@ -377,7 +533,8 @@ def main():
     # plot_3dsurface()
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
-    plot_hypsearch()
+    # plot_hypsearch()
+    plot_snn()
 
     plt.show()
     return
