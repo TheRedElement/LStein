@@ -291,9 +291,10 @@ def plot_projection_methods(
     return fig
 
 def plot_hypsearch():
-    df = (pl.read_csv("../data/autoencoder_hypsearch.csv")
+    df = pl.read_csv("../data/autoencoder_hypsearch.csv")
+    df = (df
         .with_columns(
-            pl.col("hyperparameters").cast(pl.Categorical).to_physical().alias("hyperparam combination")
+            pl.col("hyperparameters").cast(pl.Enum(sorted(df["hyperparameters"].unique()))).to_physical().alias("hyperparam combination")
         )
         .select(
             pl.col("hyperparam combination"),
@@ -301,39 +302,44 @@ def plot_hypsearch():
             pl.col("hyperparameters"),
         )
         .filter(
-            pl.col("hyperparam combination") < 3
+            pl.col("hyperparam combination") < 6
         )
+        .sort(pl.col("hyperparam combination"))
     )
     
     dfs = df.partition_by(df.columns[0], maintain_order=True)
 
     y1idx = 2
     y2idx = 3
-    theta       = [d[0,0] for d in dfs]
-    X           = [d[:,1].to_numpy().flatten() for d in dfs]
-    Y           = [d[:,y1idx].to_numpy().flatten() for d in dfs]
-    Y2          = [d[:,y2idx].to_numpy().flatten() for d in dfs]
-
+    theta       = np.array([d[0,0] for d in dfs])
+    X           = np.array([d[:,1].to_numpy().flatten() for d in dfs])
+    Y           = np.array([d[:,y1idx].to_numpy().flatten() for d in dfs])
+    Y2          = np.array([d[:,y2idx].to_numpy().flatten() for d in dfs])
     thetalabs   = [d[0,-1] for d in dfs]
 
     thetaticks  = np.round(np.linspace(df[:,0].min(), df[:,0].max(), 5), decimals=0).astype(int)
     xticks      = np.round(np.linspace(df[:,1].min(), df[:,1].max(), 5), decimals=0).astype(int)
     yticks      = np.round(np.linspace(df[:,y1idx].min(), df[:,y1idx].max(), 5), decimals=0).astype(int)
 
-
-    panelsize = 0.7
+    colors = lsu.get_colors(theta)
+    panelsize = np.pi/12
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
-        thetaguidelims=(0,2*np.pi/2), thetaplotlims=(0+panelsize/2,2*np.pi/2-panelsize/2), panelsize=panelsize,
+        thetaguidelims=(0,np.pi/2), thetaplotlims=(0+panelsize/2,np.pi/2-panelsize/2), panelsize=panelsize,
         thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
     )
-    LSC.plot(theta, X, Y, series_kwargs=[dict(label=f"{theta[i]}: {thetalabs[i]}") for i in range(len(theta))])
-    LSC.plot(theta, X, Y2, series_kwargs=dict(ls="--"))
+    for i in range(len(theta)):
+        LSP = LSC.add_panel(
+            theta[i], yticks=np.unique(np.linspace(np.floor(Y[i].min()), np.ceil(Y[i].max()), 5).astype(int)),
+            panelsize=panelsize
+        )
+        LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+        LSP.plot(X[i], Y2[i], c=colors[i],  ls="--")
 
     fig = lstein.draw(LSC, figsize=(9,9))
     fig.tight_layout()
-    fig.show()
-    fig.legend(bbox_to_anchor=(1.0,0.78), fontsize=8)
+    fig.legend(bbox_to_anchor=(1.0,0.95), fontsize=8)
+    if SAVE: fig.savefig(f"../report/gfx/hypsearch.png")
 
     
     return
