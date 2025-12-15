@@ -106,7 +106,7 @@ class LSteinPanel:
                         - `np.ndarray`
                         - original dataseries with axis-limits applied
                     - `seriestype`
-                        - `Literal["scatter","plot"]`
+                        - `Literal["scatter","line"]`
                         - kind of the series to be displayed
                         - used for implementation of plotting functions in backends
                     - `kwargs`
@@ -539,7 +539,7 @@ class LSteinPanel:
     #plotting methods
     def plot(self,
         x:np.ndarray, y:np.ndarray,
-        seriestype:Literal["plot","scatter"]="plot",
+        seriestype:Literal["line","scatter"]="line",
         **kwargs,
         ):
         """

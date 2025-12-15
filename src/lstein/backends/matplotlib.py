@@ -343,7 +343,7 @@ class LSteinMPL:
             for ds in LSP.dataseries:
 
                 if ds["seriestype"] == "scatter": func = self.scatter_
-                elif ds["seriestype"] == "plot":  func = self.plot_
+                elif ds["seriestype"] == "line":  func = self.plot_
                 else:
                     logger.warning(f"seriestype fof {ds['seriestype']} is not supported. try one of `['scatter','plot']`")
                     continue

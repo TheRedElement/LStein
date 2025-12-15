@@ -1123,7 +1123,7 @@ class LSteinCanvas:
     #convenience methods
     def plot(self,
         theta:np.ndarray, X:List[np.ndarray], Y:List[np.ndarray],
-        seriestype:Union[List[str],Literal["plot","scatter"]]="plot",
+        seriestype:Union[List[str],Literal["line","scatter"]]="line",
         panel_kwargs:Union[List[Dict],Dict]=None,
         series_kwargs:Union[List[Dict],Dict]=None,
         ):

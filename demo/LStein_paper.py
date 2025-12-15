@@ -1,4 +1,10 @@
 #%%imports
+import brian2
+import brian2.numpy_ as np_
+from brian2 import NeuronGroup, Network
+from brian2 import TimedArray
+from brian2 import StateMonitor, SpikeMonitor
+from brian2 import Gohm, ms, mV, pA, pF, second
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -88,7 +94,7 @@ def get_data(fidx:int):
     x_pro = [df[:,1].to_numpy().astype(np.float64) for df in df_pro_p]
     x_pro = [xi - xmin2zero*np.nanmin(xi) for xi in x_pro]
     y_pro = [df[:,2].to_numpy().astype(np.float64) for df in df_pro_p]
-    y_pro_e = [df[:,3].to_numpy().astype(np.float64) for df in df_raw_p]
+    y_pro_e = [df[:,3].to_numpy().astype(np.float64) for df in df_pro_p]
     
     #artificial, large x-values
     # x_raw = [np.linspace(10000,10010,len(xi)) for xi in x_raw]
@@ -134,8 +140,8 @@ def plot_lstein(
 
     #adding all the series (will initialize panels for you)
     LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(s=3, alpha=0.5))
-    LSC.plot(theta_pro, x_pro, y_pro, seriestype="plot", series_kwargs=dict(lw=3, c="w"))
-    LSC.plot(theta_pro, x_pro, y_pro, seriestype="plot", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=_/theta_pro.max(), ls="-") for _ in theta_pro])
+    LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=3, c="w"))
+    LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=_/theta_pro.max(), ls="-") for _ in theta_pro])
 
     fig = lstein.draw(LSC, figsize=(5,9))
     fig.tight_layout()
@@ -273,11 +279,11 @@ def plot_projection_methods(
 
     #plotting all the series (similar to `plt.plot()`)
     LSC1.plot(theta_raw[::1], x_raw[::1], y_raw[::1], seriestype="scatter", panel_kwargs=dict(y_projection_method="theta"),)
-    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="plot", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(lw=3, c="w"))
-    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="plot", panel_kwargs=dict(y_projection_method="theta"),)
+    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(lw=3, c="w"))
+    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="theta"),)
     LSC2.plot(theta_raw[::1], x_raw[::1], y_raw[::1], seriestype="scatter", panel_kwargs=dict(y_projection_method="y"),)
-    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="plot", panel_kwargs=dict(y_projection_method="y"), series_kwargs=dict(lw=3, c="w"))
-    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="plot", panel_kwargs=dict(y_projection_method="y"),)
+    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="y"), series_kwargs=dict(lw=3, c="w"))
+    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="y"),)
 
     #plotting
     fig = plt.figure(figsize=(9,9))
@@ -347,12 +353,6 @@ def plot_hypsearch():
     return
 
 def plot_snn():
-    import brian2
-    import brian2.numpy_ as np_
-    from brian2 import NeuronGroup, Network
-    from brian2 import TimedArray
-    from brian2 import StateMonitor, SpikeMonitor
-    from brian2 import Gohm, ms, mV, pA, pF, second
 
     #simulation
     ##neuron params
@@ -491,13 +491,42 @@ def plot_snn():
         ylabelkwargs=dict(rotation=-82, textcoords="offset fontsize", xytext=(0,-3))
     )
 
-    LSC.plot(theta, x, y, seriestype="plot", series_kwargs=[dict(c=colors[i], label=[f"LIF","","", f"EIF","","", f"QIF","",""][i]) for i in range(len(theta))])
+    LSC.plot(theta, x, y, seriestype="line", series_kwargs=[dict(c=colors[i], label=[f"LIF","","", f"EIF","","", f"QIF","",""][i]) for i in range(len(theta))])
 
     fig = lstein.draw(LSC,)
     fig.legend(loc="upper right", bbox_to_anchor=(0.9, 0.9))
     fig.tight_layout()
     if SAVE: fig.savefig(f"../report/gfx/snn.png")
 
+    return
+
+def plot_errorband():
+
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(-np.pi/2,2*np.pi/2), thetaplotlims=(-np.pi/2+1.2*panelsize/2,2*np.pi/2-1.2*panelsize/2),
+        xlimdeadzone=0.2, 
+        thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
+        thetaarrowpos_th=None, ylabpos_th=np.min(theta_raw),
+        thetatickkwargs=None, thetaticklabelkwargs=dict(pad=0.3), thetalabelkwargs=dict(rotation=40, textcoords="offset fontsize", xytext=(-1,-1)),
+        xtickkwargs=None, xticklabelkwargs=dict(xytext=(-0.2,0), ha="right", va="center"), xlabelkwargs=dict(rotation=90, textcoords="offset fontsize", xytext=(-3,-0)),
+        ylabelkwargs=dict(textcoords="offset fontsize", xytext=(-0,-2)),
+    )
+
+    #adding all the series (will initialize panels for you)
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(s=3, alpha=0.5))
+    LSC.plot(theta_raw, x_raw, [y-ye for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(ls="--", alpha=0.5))
+    LSC.plot(theta_raw, x_raw, [y+ye for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(ls="--", alpha=0.5))
+    
+    # LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(lw=3, c="w"))
+    # LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(ls="-"))
+    # LSC.plot(theta_pro, x_pro, [y-ye for y, ye in zip(y_pro, y_pro_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(ls="--", alpha=0.5))
+    # LSC.plot(theta_pro, x_pro, [y+ye for y, ye in zip(y_pro, y_pro_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(ls="--", alpha=0.5))
+
+    fig = lstein.draw(LSC, figsize=(5,9))
+    fig.tight_layout()
+
+    if SAVE: fig.savefig("../report/gfx/lstein_errorband.png")
     return
 #%%main
 def main():
@@ -534,7 +563,8 @@ def main():
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
     # plot_hypsearch()
-    plot_snn()
+    # plot_snn()
+    plot_errorband()
 
     plt.show()
     return
