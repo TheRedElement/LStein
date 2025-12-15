@@ -31,7 +31,7 @@ def get_data(fidx:int):
         - function to load some data
     """
 
-    xmin2zero = False   #whether to shift xvalues to start at 0
+    xmin2zero = True   #whether to shift xvalues to start at 0
 
     #passbands
     df_pb = pl.read_csv("../data/passband_specs.csv")
@@ -41,7 +41,6 @@ def get_data(fidx:int):
     #LCs
     fnames = sorted(glob.glob("../data/*_*.csv"))
     fnames = np.append(fnames, ["../data/lc_simulated.py", "../data/sin_simulated.py"])
-    # print(fnames)
     fname = fnames[fidx]
 
     #deal with on-the-fly data generation (pseudo filenames)
@@ -127,7 +126,21 @@ def get_stats(theta_raw, x_raw, y_raw, fname):
     )
 
 def plot_lstein(
+    idx:int=None,
     ):
+
+    if isinstance(idx, int):
+        #load data
+        theta_raw, x_raw, y_raw, y_raw_e, \
+        theta_pro, x_pro, y_pro, y_pro_e, \
+        legend, thetalab, xlab, ylab, fname, \
+            pb_mappings, otype, survey = get_data(idx)    
+
+        unique_thetas, \
+        thetaticks, xticks, yticks, \
+        panelsize, \
+        colors = get_stats(theta_raw, x_raw, y_raw, fname)
+
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=(-np.pi/2,2*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,2*np.pi/2-panelsize/2),
@@ -146,7 +159,7 @@ def plot_lstein(
     fig = lstein.draw(LSC, figsize=(5,9))
     fig.tight_layout()
 
-    if SAVE: fig.savefig("../report/gfx/lstein_lc.png")
+    if SAVE: fig.savefig(f"../report/gfx/lstein_{otype}_{survey}_{idx}.png")
     return
 
 def plot_scatter_onepanel(
@@ -553,7 +566,12 @@ def main():
     colors = get_stats(theta_raw, x_raw, y_raw, fname)
 
     #plots
-    # plot_lstein()
+    # for i in range(42):
+    #     try: plot_lstein(i); plt.close()
+    #     except: pass
+    plot_lstein(idx=7)      #snii
+    plot_lstein(idx=21)     #tde
+    # plot_lstein(idx=7, otype="snii")
     # plot_scatter_onepanel()
     # plot_scatter_onepanel_offset()
     # plot_scatter_multipanel()
@@ -564,7 +582,7 @@ def main():
     # plot_projection_methods(context="y")
     # plot_hypsearch()
     # plot_snn()
-    plot_errorband()
+    # plot_errorband()
 
     plt.show()
     return
