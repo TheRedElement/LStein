@@ -199,8 +199,8 @@ def simulate(
         theta_options = np.arange(10, 40, 0.2)
         theta = np.sort(np.random.choice(theta_options, size=nobjects, replace=False))
     else:
-        x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
         nobjects = len(theta)
+        x = np.sort(np.random.choice(np.linspace(-50,100,res), size=(nobjects,res)), axis=1)
     
     if opt == "lc":
         t_peak = np.linspace(0,40,nobjects) * 0

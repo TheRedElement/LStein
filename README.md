@@ -85,7 +85,6 @@ Cons:
 
 ## TODO
 * [ ] [testing](./test)
-* [ ] add Plotly version
 
 ## Known Bugs
 * `y_projection_method="theta"` goes haywire for huge x-values (for sure $\ge10000$)

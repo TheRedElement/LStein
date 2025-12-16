@@ -123,7 +123,8 @@ def plot_heatmap(
     colors,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
-    ax=None
+    ax=None,
+    cmap=None,
     ):
     """
         - function to plot as a heatmap
@@ -151,9 +152,9 @@ def plot_heatmap(
 
     xx, tt = np.meshgrid(x, th)
 
-    mesh = ax.pcolormesh(xx, tt, yy, vmin=ymin, vmax=ymax)
-    for i in range(len(theta_raw)):
-        ax.scatter(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], c=y_raw[i], vmin=ymin, vmax=ymax, ec="w", label="Raw Data"*(i==0))
+    mesh = ax.pcolormesh(xx, tt, yy, vmin=ymin, vmax=ymax, cmap=cmap)
+    # for i in range(len(theta_raw)):
+    #     ax.scatter(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], c=y_raw[i], vmin=ymin, vmax=ymax, cmap=colors, ec="w", label="Raw Data"*(i==0))
     cbar = fig.colorbar(mesh, ax=ax)
     cbar.set_label(ylab)
 
@@ -165,7 +166,8 @@ def plot_3dsurface(
     colors,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
-    ax=None        
+    ax=None,
+    cmap=None,
     ):
     """
         - function to plot data as 3d surface
@@ -173,8 +175,7 @@ def plot_3dsurface(
     if ax is None:
         fig = plt.figure(figsize=(9,5))
         fig.suptitle(f"{otype} ({survey})")
-        ax = fig.add_subplot(111, xlabel=xlab, ylabel=thetalab,zlabel=ylab, projection="3d")
-
+        ax = fig.add_subplot(111, xlabel=xlab, ylabel=thetalab, zlabel=ylab, projection="3d")
     res = 150
     x_pro_loc = np.array(x_pro.copy())
     y_pro_loc = np.array(y_pro.copy())
@@ -192,13 +193,13 @@ def plot_3dsurface(
 
     xx, tt = np.meshgrid(x, th)
 
-    mesh = ax.plot_surface(xx, tt, yy, cmap="viridis", vmin=ymin, vmax=ymax, alpha=0.9, zorder=0, linewidth=0)
-    for i in range(len(theta_raw)):
-        ax.scatter(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], y_raw[i], c=y_raw[i],
-            vmin=ymin, vmax=ymax,
-            ec="w", label="Raw Data"*(i==0),
-            zorder=4, depthshade=False)
-    cbar = fig.colorbar(mesh, ax=ax)
-    cbar.set_label(ylab)
+    mesh = ax.plot_surface(xx, tt, yy, cmap=cmap, vmin=ymin, vmax=ymax, alpha=0.9, zorder=0, linewidth=0)
+    # for i in range(len(theta_raw)):
+    #     ax.scatter(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], y_raw[i], c=y_raw[i],
+    #         vmin=ymin, vmax=ymax,
+    #         ec="w", label="Raw Data"*(i==0),
+    #         zorder=4, depthshade=False)
+    # cbar = fig.colorbar(mesh, ax=ax)
+    # cbar.set_label(ylab)
 
     return ax
