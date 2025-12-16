@@ -629,6 +629,17 @@ def plot_snn():
 
 def plot_errorband():
 
+    # fig, axs = plt.subplots(1,1)
+    # # axs.errorbar(x_raw[-1], y_raw[-1], yerr=y_raw_e[-1], ls="", marker="o")
+    # axs.scatter(x_raw[-1], y_raw[-1])
+    # axs.plot(x_raw[-1], y_raw[-1]-y_raw_e[-1])
+    # axs.plot(x_raw[-1], y_raw[-1]+y_raw_e[-1])
+    # # axs.plot(x_pro[-1], y_pro[-1])
+    # axs.invert_xaxis()
+    # axs.invert_yaxis()
+    # plt.show()
+
+    yticks=np.linspace(-100, 100, 5).astype(int)
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=(-np.pi/2,2*np.pi/2), thetaplotlims=(-np.pi/2+1.2*panelsize/2,2*np.pi/2-1.2*panelsize/2),
@@ -641,9 +652,10 @@ def plot_errorband():
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="y"), series_kwargs=[dict(s=10, alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
-    LSC.plot(theta_raw, x_raw, [y-np.abs(ye) for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="y"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
-    LSC.plot(theta_raw, x_raw, [y+np.abs(ye) for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="y"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(s=10, alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, [y-np.abs(ye) for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, [y+np.abs(ye) for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
+    # LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="y"), seres_kwargs=[dict(alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
     
     # LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(lw=3, c="w"))
     # LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(ls="-"))
@@ -683,18 +695,18 @@ def main():
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    plot_lstein_snii()
-    plot_lstein_tde()
-    plot_scatter_onepanel()
-    plot_scatter_onepanel_offset()
-    plot_scatter_multipanel()
-    plot_scatter_multipanel_group()
-    plot_heatmap()
-    plot_3dsurface()
-    plot_projection_methods(context="theta")
-    plot_projection_methods(context="y")
-    plot_hypsearch()
-    plot_snn()
+    # plot_lstein_snii()
+    # plot_lstein_tde()
+    # plot_scatter_onepanel()
+    # plot_scatter_onepanel_offset()
+    # plot_scatter_multipanel()
+    # plot_scatter_multipanel_group()
+    # plot_heatmap()
+    # plot_3dsurface()
+    # plot_projection_methods(context="theta")
+    # plot_projection_methods(context="y")
+    # plot_hypsearch()
+    # plot_snn()
     plot_errorband()
 
     plt.show()
