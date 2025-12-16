@@ -6,20 +6,20 @@ import numpy as np
 from typing import Tuple, Union
 
 #%%definitions
-def carth2polar(
+def cart2polar(
     x:float, y:float    
     ) -> Tuple[float, float]:
     """
-        - function to convert carthesian coordinates into polar coordinates
+        - function to convert cartesian coordinates into polar coordinates
 
         Parameters
         ----------
             - `x`
                 - `float`
-                - carthesian x-coordinate
+                - cartesian x-coordinate
             - `y`
                 - `float`
-                - carthesian y-coordinate
+                - cartesian y-coordinate
 
         Raises
         ------
@@ -47,11 +47,11 @@ def carth2polar(
 
     return r, theta
 
-def polar2carth(
+def polar2cart(
     r:float, theta:float
     ) -> Tuple[float, float]:
     """
-        - function to convert polar coordinates into carthesian coordinates
+        - function to convert polar coordinates into cartesian coordinates
 
         Parameters
         ----------
@@ -69,10 +69,10 @@ def polar2carth(
         -------
             - `x`
                 - `float`
-                - carthesian x-coordinate
+                - cartesian x-coordinate
             - `y`
                 - `float`
-                - carthesian y-coordinate
+                - cartesian y-coordinate
 
         Dependencies
         ------------
@@ -214,8 +214,8 @@ def get_colors(
                 - kwargs to to pass to `norm()`
 
 
-        Raies
-        -----
+        Raises
+        ------
 
         Returns
         -------

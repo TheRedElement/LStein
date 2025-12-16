@@ -4,7 +4,7 @@ import numpy as np
 from typing import Any, Dict, List, Literal, Tuple
 
 # from .LSteinCanvas import LSteinCanvas   #no import because leads to circular import
-from ..utils import minmaxscale, polar2carth, carth2polar
+from ..utils import minmaxscale, polar2cart, cart2polar
 
 
 #%%classes
@@ -50,7 +50,7 @@ class LSteinPanel:
                 - whether to show ticks and gridlines for y-values
                 - the default is `True`
             - `y_projection_method`
-                - `Literal["theta","y"]`, optioal
+                - `Literal["theta","y"]`, optional
                 - method to use for the projection
                 - the default is `theta`
                     - uses `LSteinPanel.project_xy_theta()`
@@ -74,8 +74,8 @@ class LSteinPanel:
                 - the default is `None`
                     - will be set to `dict(c=plt.rcParams["axes.edgecolor"])`
 
-        Infered Attributes
-        ------------------
+        Inferred Attributes
+        -------------------
             - `ylims`
                 - `Tuple[float,float]`
                 - axis limits applied to `y`
@@ -85,7 +85,7 @@ class LSteinPanel:
                 - convenience field for relative definitions of plot elements
             - `panel_drawn`
                 - `bool`
-                - flag denoting if the panel has been drawn alrady
+                - flag denoting if the panel has been drawn already
                 - to prevent drawing the panel several times when plotting
             - `dataseries`
                 - `List[Dict[str,Any]]`
@@ -93,11 +93,11 @@ class LSteinPanel:
                 - contains
                     - `x`
                         - `np.ndarray`
-                        - transformed (projected) dataseries in carthesian coordinates
+                        - transformed (projected) dataseries in cartesian coordinates
                         - ready to be plotted
                     - `y`
                         - `np.ndarray`
-                        - transformed (projected) dataseries in carthesian coordinates
+                        - transformed (projected) dataseries in cartesian coordinates
                         - ready to be plotted
                     - `x_cut`
                         - `np.ndarray`
@@ -173,7 +173,7 @@ class LSteinPanel:
         self.panelboundskwargs  = dict(c=plt.rcParams["axes.edgecolor"]) if panelboundskwargs is None else panelboundskwargs
         if "c" not in self.panelboundskwargs.keys():self.panelboundskwargs["c"] = plt.rcParams["axes.edgecolor"]
 
-        #infered attributes
+        #inferred attributes
         self.ylims = (self.yticks[0][0], self.yticks[0][-1])
         self.ylimrange = np.max(self.yticks[0]) - np.min(self.yticks[0])
         self.panel_drawn = False
@@ -394,8 +394,8 @@ class LSteinPanel:
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
         #convert ylims to theta-values
-        r_min, th_min = carth2polar(np.max(self.LSC.xlims), self.ylims[0])
-        r_max, th_max = carth2polar(np.max(self.LSC.xlims), self.ylims[1])
+        r_min, th_min = cart2polar(np.max(self.LSC.xlims), self.ylims[0])
+        r_max, th_max = cart2polar(np.max(self.LSC.xlims), self.ylims[1])
 
         #project x to obey axis-limits
         x_proj = minmaxscale(x,
@@ -411,7 +411,7 @@ class LSteinPanel:
         y_proj = y_scaler * y
         
         #convert to polar coords for transformations
-        r, theta = carth2polar(x_proj, y_proj)
+        r, theta = cart2polar(x_proj, y_proj)
         
         ##rescale theta (i.e., make sure y obeys axis limits)
         theta = minmaxscale(theta,
@@ -419,9 +419,9 @@ class LSteinPanel:
             xmin_ref=th_min, xmax_ref=th_max,
         )
 
-        #convert back to carthesian coords for plotting
+        #convert back to cartesian coords for plotting
         #NOTE: use x_proj as radius because x is plotted in radial direction
-        x_proj, y_proj = polar2carth(x_proj, theta)
+        x_proj, y_proj = polar2cart(x_proj, theta)
 
         return x_proj, y_proj
     
@@ -482,11 +482,11 @@ class LSteinPanel:
         y_proj = np.max(y_slice) * y_proj - y_slice/2
         
         #convert to polar coords for transformations
-        r, theta = carth2polar(x_proj, y_proj)
+        r, theta = cart2polar(x_proj, y_proj)
         theta += theta_offset + np.pi
 
-        #convert back to carthesian coords for plotting
-        x_proj, y_proj = polar2carth(r, theta)
+        #convert back to cartesian coords for plotting
+        x_proj, y_proj = polar2cart(r, theta)
 
         return x_proj, y_proj
     

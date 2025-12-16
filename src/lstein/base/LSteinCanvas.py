@@ -5,7 +5,7 @@ import matplotlib.colors as mcolors
 import numpy as np
 from typing import Any, Dict, List, Literal, Tuple, Union
 
-from ..utils import minmaxscale, polar2carth, carth2polar, get_colors
+from ..utils import minmaxscale, polar2cart, cart2polar, get_colors
 from .LSteinPanel import LSteinPanel
 
 #%%classes
@@ -221,19 +221,19 @@ class LSteinThetaAxis:
                 - `thetatickpos_xi`
                     - `np.ndarray`
                     - inner bound of theta ticks
-                    - in carthesian coordinates
+                    - in cartesian coordinates
                 - `thetatickpos_yi`
                     - `np.ndarray`
                     - inner bound of theta ticks
-                    - in carthesian coordinates 
+                    - in cartesian coordinates 
                 - `thetatickpos_xo`
                     - `np.ndarray`
                     - outer bound of theta ticks
-                    - in carthesian coordinates
+                    - in cartesian coordinates
                 - `thetatickpos_yo`
                     - `np.ndarray`
                     - outer bound of theta ticks
-                    - in carthesian coordinates 
+                    - in cartesian coordinates 
 
             Comments
             --------
@@ -243,9 +243,9 @@ class LSteinThetaAxis:
         thetatickpos_ro = xlimdeadzone*xlimrange              #outer edge of theta ticks
         thetatickpos_th = minmaxscale(thetaticks[0], thetaplotlims[0], thetaplotlims[1])
 
-        #convert to carthesian
-        thetatickpos_xi, thetatickpos_yi            = polar2carth(thetatickpos_ro*(th_pad+0.15), thetatickpos_th)
-        thetatickpos_xo, thetatickpos_yo            = polar2carth(thetatickpos_ro, thetatickpos_th)
+        #convert to cartesian
+        thetatickpos_xi, thetatickpos_yi            = polar2cart(thetatickpos_ro*(th_pad+0.15), thetatickpos_th)
+        thetatickpos_xo, thetatickpos_yo            = polar2cart(thetatickpos_ro, thetatickpos_th)
         
         return (
             thetatickpos_ri, thetatickpos_ro, thetatickpos_th,
@@ -288,8 +288,8 @@ class LSteinThetaAxis:
             --------
         """
         
-        #ticklabel position in carthesian
-        thetaticklabelpos_x, thetaticklabelpos_y    = polar2carth(thetatickpos_ri, thetatickpos_th)
+        #ticklabel position in cartesian
+        thetaticklabelpos_x, thetaticklabelpos_y    = polar2cart(thetatickpos_ri, thetatickpos_th)
         thetaticklabs   = thetaticks[1]
 
         return thetaticklabelpos_x, thetaticklabelpos_y, thetaticklabs
@@ -357,7 +357,7 @@ class LSteinThetaAxis:
             xmin_ref=thetaticks[0][0], xmax_ref=thetaticks[0][-1],
         )
 
-        x_arrow, y_arrow = polar2carth(1.0*thetatickpos_ro, thetaarrowpos_th)
+        x_arrow, y_arrow = polar2cart(1.0*thetatickpos_ro, thetaarrowpos_th)
 
         return x_arrow, y_arrow
 
@@ -461,7 +461,7 @@ class LSteinYAxis:
             xmin_ref=thetaticks[0][0], xmax_ref=thetaticks[0][-1],
         )
 
-        ylabpos_x, ylabpos_y = polar2carth((1+pad) * xlimrange, ylabpos)
+        ylabpos_x, ylabpos_y = polar2cart((1+pad) * xlimrange, ylabpos)
 
         return ylabpos_x, ylabpos_y
 
@@ -830,19 +830,19 @@ class LSteinCanvas:
                 - `thetatickpos_xi`
                     - `np.ndarray`
                     - inner bound of theta ticks
-                    - in carthesian coordinates
+                    - in cartesian coordinates
                 - `thetatickpos_yi`
                     - `np.ndarray`
                     - inner bound of theta ticks
-                    - in carthesian coordinates 
+                    - in cartesian coordinates 
                 - `thetatickpos_xo`
                     - `np.ndarray`
                     - outer bound of theta ticks
-                    - in carthesian coordinates
+                    - in cartesian coordinates
                 - `thetatickpos_yo`
                     - `np.ndarray`
                     - outer bound of theta ticks
-                    - in carthesian coordinates             
+                    - in cartesian coordinates             
                 - `thetaticklabelpos_x`
                     - `np.ndarray`
                     - x-values of position of theta ticklabels

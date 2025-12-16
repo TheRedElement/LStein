@@ -2,7 +2,7 @@
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
-from ..utils import polar2carth
+from ..utils import polar2cart
 
 from ..base.LSteinCanvas import LSteinCanvas
 from ..base.LSteinPanel import LSteinPanel
@@ -193,16 +193,16 @@ class LSteinMPL:
         #get yticks
         ytickpos_th, yticklabs = LSP.get_yticks(theta_lb, theta_ub)
 
-        #convert to carthesian for plotting
-        x_lb, y_lb  = polar2carth(r_bounds, theta_lb)
-        x_ub, y_ub  = polar2carth(r_bounds, theta_ub)
+        #convert to cartesian for plotting
+        x_lb, y_lb  = polar2cart(r_bounds, theta_lb)
+        x_ub, y_ub  = polar2cart(r_bounds, theta_ub)
         x_bounds = np.array([x_lb,x_ub])
         y_bounds = np.array([y_lb,y_ub])
 
         pad = LSP.yticklabelkwargs["pad"]   #padding for yticklabels
         r_, th_ = np.meshgrid(r_bounds, ytickpos_th)
-        ytickpos_x, ytickpos_y              = polar2carth(r_, th_)
-        yticklabelpos_x, yticklabelpos_y    = polar2carth((1+pad)*r_ub, ytickpos_th)
+        ytickpos_x, ytickpos_y              = polar2cart(r_, th_)
+        yticklabelpos_x, yticklabelpos_y    = polar2cart((1+pad)*r_ub, ytickpos_th)
 
         # ytickpos_x, ytickpos_y = ytickpos_x[::-1], ytickpos_y[::-1]
         # yticklabelpos_x, yticklabelpos_y = yticklabelpos_x[::-1], yticklabelpos_y[::-1]
