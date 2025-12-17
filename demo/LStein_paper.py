@@ -312,7 +312,7 @@ def plot_heatmap(
         CMAP,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,
-        # cmap="Greys",
+        cmap=CMAP,
     )
     # ax.legend()
     fig = ax.get_figure()
@@ -330,7 +330,7 @@ def plot_3dsurface(
         colors,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,
-        cmap="Reds",
+        cmap=CMAP,
     )
     fig = ax.get_figure()
     ax.set_box_aspect(None, zoom=0.8)
@@ -701,10 +701,10 @@ def main():
     # plot_scatter_onepanel_offset()
     # plot_scatter_multipanel()
     # plot_scatter_multipanel_group()
-    # plot_heatmap()
-    # plot_3dsurface()
-    plot_projection_methods(context="theta")
-    plot_projection_methods(context="y")
+    plot_heatmap()
+    plot_3dsurface()
+    # plot_projection_methods(context="theta")
+    # plot_projection_methods(context="y")
     # plot_hypsearch()
     # plot_snn()
     # plot_errorband()

@@ -2,11 +2,38 @@
 #%%imports
 import matplotlib.pyplot as plt
 import numpy as np
-
-from lstein import lstein, utils as lsu, makedata as md
+from typing import List, Tuple
 
 
 #%%definitions
+def make_mesh(
+    th:np.ndarray, x:List[np.ndarray], y:List[np.ndarray],
+    res=100
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+        - function to create components for plotting with `np.meshgrid()` (`tt`, `xx`, `yy`)
+        - will
+            - generate `xx`: regularly spaced grid-values spanning from global min(x) to global max(x)
+            - generate `tt`: same as `th` except spanning the grid
+            - interpolate `y` to match the grid-shape spanned by `xx` and `tt` (fills with `np.nan` where out of interpolation range)
+    """
+    xmin = np.min([x_.min() for x_ in x])
+    xmax = np.max([x_.max() for x_ in x])
+    ymin = np.min([y_.min() for y_ in y])
+    ymax = np.max([y_.max() for y_ in y])
+
+    x_int = np.linspace(xmin, xmax, res)
+    y_int = np.empty((len(th), res))
+    th_int = th.copy()
+    for idx, (thi, xi, yi) in enumerate(zip(th, x, y)):
+        y_int[idx] = np.interp(x_int, xi, yi, right=np.nan, left=np.nan)
+    
+    #create meshgrid
+    xx, tt = np.meshgrid(x_int, th_int)
+    yy = y_int
+
+    return tt, xx, yy 
+
 def plot_scatter_onepanel(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
@@ -135,24 +162,15 @@ def plot_heatmap(
         fig.suptitle(f"{otype} ({survey})")
         ax = fig.add_subplot(111, xlabel=xlab, ylabel=thetalab)
 
-    res = 150
-    x_pro_loc = np.array(x_pro.copy())
-    y_pro_loc = np.array(y_pro.copy())
-    xmin = np.min(x_pro_loc)
-    xmax = np.max(x_pro_loc)
-    ymin = np.min(y_pro_loc)
-    ymax = np.max(y_pro_loc)
-    thmin = np.min(theta_raw)
-    thmax = np.max(theta_raw)
-    x  = np.linspace(xmin, xmax, res)
-    y = [np.interp(x, x_pro_loc[i], y_pro_loc[i]) for i in range(len(theta_raw))]
-    th = np.linspace(thmin, thmax, len(theta_raw))
-    
-    yy = np.array(y)
+    tt, xx, yy = make_mesh(theta_raw, x_raw, y_raw, res=100) 
+    # tt, xx, yy = make_mesh(theta_pro, x_pro, y_pro, res=100) 
+    vmin = np.nanmin(yy)
+    vmax = np.nanmax(yy)
 
-    xx, tt = np.meshgrid(x, th)
-
-    mesh = ax.pcolormesh(xx, tt, yy, vmin=ymin, vmax=ymax, cmap=cmap)
+    mesh = ax.pcolormesh(xx, tt, yy, vmin=vmin, vmax=vmax, cmap=cmap)
+    # for i in range(len(th_loc)):
+    #     # ax.axhline(th_loc[i])
+    #     ax.plot(x_loc, y_loc[i])
     # for i in range(len(theta_raw)):
     #     ax.scatter(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], c=y_raw[i], vmin=ymin, vmax=ymax, cmap=colors, ec="w", label="Raw Data"*(i==0))
     cbar = fig.colorbar(mesh, ax=ax)
@@ -176,24 +194,13 @@ def plot_3dsurface(
         fig = plt.figure(figsize=(9,5))
         fig.suptitle(f"{otype} ({survey})")
         ax = fig.add_subplot(111, xlabel=xlab, ylabel=thetalab, zlabel=ylab, projection="3d")
-    res = 150
-    x_pro_loc = np.array(x_pro.copy())
-    y_pro_loc = np.array(y_pro.copy())
-    xmin = np.min(x_pro_loc)
-    xmax = np.max(x_pro_loc)
-    ymin = np.min(y_pro_loc)
-    ymax = np.max(y_pro_loc)
-    thmin = np.min(theta_raw)
-    thmax = np.max(theta_raw)
-    x  = np.linspace(xmin, xmax, res)
-    y = [np.interp(x, x_pro_loc[i], y_pro_loc[i]) for i in range(len(theta_raw))]
-    th = np.linspace(thmin, thmax, len(theta_raw))
-    
-    yy = np.array(y)
 
-    xx, tt = np.meshgrid(x, th)
+    tt, xx, yy = make_mesh(theta_raw, x_raw, y_raw, res=100) 
+    # tt, xx, yy = make_mesh(theta_pro, x_pro, y_pro, res=100) 
+    vmin = np.nanmin(yy)
+    vmax = np.nanmax(yy)
 
-    mesh = ax.plot_surface(xx, tt, yy, cmap=cmap, vmin=ymin, vmax=ymax, alpha=0.9, zorder=0, linewidth=0)
+    mesh = ax.plot_surface(xx, tt, yy, cmap=cmap, vmin=vmin, vmax=vmax, alpha=0.9, zorder=0, linewidth=0)
     # for i in range(len(theta_raw)):
     #     ax.scatter(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], y_raw[i], c=y_raw[i],
     #         vmin=ymin, vmax=ymax,
