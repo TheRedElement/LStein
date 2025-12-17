@@ -411,8 +411,8 @@ def plot_projection_methods(
     fig = plt.figure(figsize=(9,9))
     ax1 = fig.add_subplot(121)
     ax2 = fig.add_subplot(122)
-    ax1.set_title("`y_projection_method=\"theta\"`", y=1.1)
-    ax2.set_title("`y_projection_method=\"y\"`", y=1.1)
+    # ax1.set_title("`y_projection_method=\"theta\"`", y=1.1)
+    # ax2.set_title("`y_projection_method=\"y\"`", y=1.1)
 
     lstein.LSteinMPL(LSC1).show(ax1)
     lstein.LSteinMPL(LSC2).show(ax2)
@@ -703,11 +703,11 @@ def main():
     # plot_scatter_multipanel_group()
     # plot_heatmap()
     # plot_3dsurface()
-    # plot_projection_methods(context="theta")
-    # plot_projection_methods(context="y")
+    plot_projection_methods(context="theta")
+    plot_projection_methods(context="y")
     # plot_hypsearch()
     # plot_snn()
-    plot_errorband()
+    # plot_errorband()
 
     plt.show()
     return
