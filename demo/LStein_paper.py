@@ -13,7 +13,7 @@ import matplotlib.colors as mcolors
 import numpy as np
 import polars as pl
 import re
-from typing import Literal
+from typing import Literal, Tuple
 from LuStCodeSnippets_py.Styles import PlotStyles
 
 from lstein import lstein, utils as lsu, makedata as md, paper_plots as pp
@@ -28,6 +28,10 @@ prop_cycle = (
     cycler(linestyle=["-"]*len(color_cycle)) +
     cycler(color=color_cycle)
 )
+plt.rcParams["font.size"] = 20
+plt.rcParams["lines.markersize"] = 5
+plt.rcParams["legend.framealpha"] = 0.8
+plt.rcParams["legend.facecolor"] = "w"
 plt.rcParams["axes.prop_cycle"] = prop_cycle        #constant linestyle
 plt.rcParams["savefig.bbox"] = "tight"
 plt.rcParams["savefig.transparent"] = True
@@ -39,9 +43,10 @@ np.random.seed(0)
 #%%constants
 SURVEY_MAPPING:dict = {"elasticc":"ELAsTiCC", "des":"DES"}
 OTYPE_MAPPING:dict = {"snia":"SN Ia", "snii":"SN II", "snibc":"SN Ib/c", "tde":"TDE"}
-CMAP:str = "autumn"
+CMAP:str = "plasma"
 CMAP_BANDS:str = "nipy_spectral"
 SAVE:bool = True
+YLIM:Tuple[int,int] = (-5,None)
 
 #%%definitions
 def get_data(fidx:int):
@@ -87,7 +92,7 @@ def get_data(fidx:int):
         # ylab = "m [mag]" if "mag" in df.columns else "Flux [FLUXCAL]"
         thetalab = "Wavelength [nm]"
         xlab = "Time [d]" if "mjd" in df.columns else "Period [d]"
-        ylab = "Brightness"
+        ylab = "Flux [FLUXCAL]"
 
     # df = df.drop_nans()
 
@@ -116,6 +121,16 @@ def get_data(fidx:int):
     y_pro = [df[:,2].to_numpy().astype(np.float64) for df in df_pro_p]
     y_pro_e = [df[:,3].to_numpy().astype(np.float64) for df in df_pro_p]
     
+    # #avoid negative values
+    # y_raw_mask = [(y_raw[idx]) for idx in range(len(y_raw))]
+    # y_raw = [y_raw[idx][y_raw_mask[idx]] for idx in range(len(y_raw))]
+    # x_raw = [x_raw[idx][y_raw_mask[idx]] for idx in range(len(x_raw))]
+    # y_raw_e = [y_raw_e[idx][y_raw_mask[idx]] for idx in range(len(y_raw_e))]
+    # y_pro_mask = [(y_pro[idx]>-1) for idx in range(len(y_pro))]
+    # y_pro = [y_pro[idx][y_pro_mask[idx]] for idx in range(len(y_pro))]
+    # x_pro = [x_pro[idx][y_pro_mask[idx]] for idx in range(len(x_pro))]
+    # y_pro_e = [y_pro_e[idx][y_pro_mask[idx]] for idx in range(len(y_pro_e))]
+
     #artificial, large x-values
     # x_raw = [np.linspace(10000,10010,len(xi)) for xi in x_raw]
     # x_pro = [np.linspace(10000,10010,len(xi)) for xi in x_pro]
@@ -133,10 +148,13 @@ def get_stats(theta_raw, x_raw, y_raw, fname,
     """
         - function to get stats for plot specifications
     """
+    ymin = YLIM[0] if YLIM[0] is not None else np.floor(np.min(np.concat(y_raw)))
+    ymax = YLIM[1] if YLIM[1] is not None else np.ceil(np.max(np.concat(y_raw)))
+    
     unique_thetas = np.unique(theta_raw)
     thetaticks = np.round(np.linspace(np.floor(np.min(theta_raw)), np.ceil(np.max(theta_raw)), nthticks),0).astype(int)
     xticks = np.round(np.linspace(np.floor(np.min(np.concat(x_raw))), np.ceil(np.max(np.concat(x_raw))), nxticks), decimals=0).astype(int)
-    yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), nyticks), decimals=0).astype(int)
+    yticks = np.round(np.linspace(ymin, ymax, nyticks), decimals=0).astype(int)
     # yticks = np.sort(np.append(yticks, [-10, 80]))
     panelsize = np.pi/10
     vmin = 300 if ".py" not in fname else None
@@ -176,10 +194,11 @@ def plot_lstein_snii():
         thetaarrowpos_th=None, ylabpos_th=np.min(theta_raw),
         thetatickkwargs=None, thetaticklabelkwargs=dict(pad=0.3), thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0,-0.7)),
         xtickkwargs=None, xticklabelkwargs=dict(xytext=(0,-1)), xlabelkwargs=dict(xytext=(-7.5,-2)),
+        ylabelkwargs=dict(rotation=-83, textcoords="offset fontsize", xytext=(0,-3)),
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=5, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=4, c="w"))
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
 
@@ -208,20 +227,21 @@ def plot_lstein_tde(
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/2,thetaguidelims[1]-panelsize/2),
-        xlimdeadzone=0.25,
+        xlimdeadzone=0.3,
         panelsize=np.pi/15,
         thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
         thetaarrowpos_th=None, ylabpos_th=np.min(theta_raw),
         thetatickkwargs=None, thetaticklabelkwargs=dict(pad=0.3), thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1.5,1)),
         xtickkwargs=None, xticklabelkwargs=dict(xytext=(0,-1)), xlabelkwargs=dict(rotation=3, xytext=(-7,-2.5)),
+        ylabelkwargs=dict(rotation=-83, textcoords="offset fontsize", xytext=(0,-3)),
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=5, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=3, c="w"))
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
 
-    fig = lstein.draw(LSC, figsize=(7,7))
+    fig = lstein.draw(LSC, figsize=(7.5,7.5))
     fig.tight_layout()
 
     if SAVE: fig.savefig(f"../report/gfx/lstein_{otype}_{survey}.pdf")
@@ -237,6 +257,7 @@ def plot_scatter_onepanel(
         thetalab, xlab, ylab,        
     )
     ax.legend()
+    ax.set_ylim(YLIM)
     fig = ax.get_figure()
     fig.suptitle("")
     fig.tight_layout()
@@ -257,6 +278,7 @@ def plot_scatter_onepanel_offset(
         thetalab, xlab, ylab,        
     )
     ax.legend()
+    ax.set_ylim(YLIM)
     fig = ax.get_figure()
     fig.suptitle("")
     fig.tight_layout()
@@ -266,7 +288,7 @@ def plot_scatter_onepanel_offset(
 
 def plot_scatter_multipanel(
     ):
-
+    
     axs = pp.plot_scatter_multipanel(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
@@ -275,14 +297,17 @@ def plot_scatter_multipanel(
         thetalab, xlab, ylab,        
     )
     for idx, ax in enumerate(axs):
-        ax.legend(loc="lower left")
-        if idx%3 != 0: ax.set_ylabel("")
+        ax.legend(loc="upper left")
+        ax.set_ylim(YLIM)
+        # if idx%3 != 0: ax.set_ylabel("")
+        ax.set_ylabel("")
         if idx < 3: ax.set_xlabel("")
     fig = axs[0].get_figure()
+    fig.text(0, 0.5, ylab, rotation=90, va="center")
     fig.suptitle("")
     fig.tight_layout()
 
-    if SAVE: fig.savefig("../report/gfx/scatter_multipanel.pdf")
+    if SAVE: fig.savefig("../report/gfx/scatter_multipanel.pdf", bbox_inches="tight")
     return
 
 def plot_scatter_multipanel_group(
@@ -295,7 +320,9 @@ def plot_scatter_multipanel_group(
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,        
     )
-    for ax in axs: ax.legend()
+    for ax in axs:
+        ax.legend()
+        ax.set_ylim(YLIM)
     axs[1].set_ylabel("")
     fig = axs[0].get_figure()
     fig.suptitle("")
@@ -312,9 +339,10 @@ def plot_heatmap(
         CMAP,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,
-        cmap=CMAP,
+        cmap=CMAP, vmin=-1, vmax=None,
     )
     # ax.legend()
+    # ax.set_ylim(YLIM)
     fig = ax.get_figure()
     fig.suptitle("")
     fig.tight_layout()
@@ -324,20 +352,25 @@ def plot_heatmap(
 
 def plot_3dsurface(
     ):
+
+    fig, ax = plt.subplots(1,1, figsize=(9,9), subplot_kw=dict(projection="3d", xlabel=xlab, ylabel=thetalab, zlabel=ylab))
     ax = pp.plot_3dsurface(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
         colors,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,
+        ax=ax,
         cmap=CMAP,
     )
+    # ax.set_ylim(YLIM)
     fig = ax.get_figure()
-    ax.set_box_aspect(None, zoom=0.8)
-    ax.xaxis.labelpad = 10
-    ax.yaxis.labelpad = 10
+    ax.set_box_aspect(None, zoom=0.89)
+    ax.xaxis.labelpad = 15
+    ax.yaxis.labelpad = 15
+    ax.zaxis.labelpad = 15
     fig.suptitle("")
-    fig.subplots_adjust(right=10.0)
+    fig.subplots_adjust(left=0.0)
     fig.tight_layout()
 
     if SAVE: fig.savefig("../report/gfx/surface3d.pdf", bbox_inches="tight")
@@ -368,13 +401,16 @@ def plot_projection_methods(
         xlabelkwargs = None
         ylabelkwargs = dict(rotation=-80, textcoords="offset fontsize", xytext=(0,-1.5))
         thetalablekwargs = dict(rotation=0, textcoords="offset fontsize", xytext=(0.5,1))
+        thetaticklabelkwargs = None
         xticklabelkwargs = None
     elif context=="y":
+        yticks = np.round(np.linspace(np.floor(np.min(np.concat(y_raw))), np.ceil(np.max(np.concat(y_raw))), 4), decimals=0).astype(int)
         xlimdeadzone = 0.35
         xlabelkwargs = dict(xytext=(-3,-2))
-        ylabelkwargs = dict(rotation=-80, textcoords="offset fontsize", xytext=(0,-1.5))
-        thetalablekwargs = dict(rotation=-45, textcoords="offset fontsize", xytext=(1.5,1.5))
+        ylabelkwargs = dict(rotation=-80, textcoords="offset fontsize", xytext=(0,-2.7))
+        thetalablekwargs = dict(rotation=-45, textcoords="offset fontsize", xytext=(1.5,0))
         xticklabelkwargs = dict(xytext=(0,-1))
+        thetaticklabelkwargs = dict(rotation=45)
 
     #init canvas (similar to `fig = plt.figure()`)
     # panelsize = np.pi/12
@@ -387,6 +423,7 @@ def plot_projection_methods(
         xlabelkwargs=xlabelkwargs,
         ylabelkwargs=ylabelkwargs,
         xticklabelkwargs=xticklabelkwargs,
+        thetaticklabelkwargs=thetaticklabelkwargs,
     )
     LSC2 = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
@@ -397,6 +434,7 @@ def plot_projection_methods(
         xlabelkwargs=xlabelkwargs,
         ylabelkwargs=ylabelkwargs,
         xticklabelkwargs=xticklabelkwargs,
+        thetaticklabelkwargs=thetaticklabelkwargs,
     )
 
     #plotting all the series (similar to `plt.plot()`)
@@ -420,6 +458,68 @@ def plot_projection_methods(
     
     if SAVE: fig.savefig(f"../report/gfx/projectionmethods_{context}.pdf")
     return fig
+
+def plot_spectra():
+
+    #load data
+    datadir = "../data/Pessi2023_SN2017cfo_spectra/"
+    df_obs = pl.read_csv(f"{datadir}wiserep_spectra.csv").select("IAU name", "Obs-date", "JD", "Ascii file", "Spec. ID")
+    df_obs = df_obs.filter(~pl.col("Spec. ID").is_in([77750,77746,77741,77739]))  #remove very close observations
+    dfs_spec = [pl.read_csv(f"{datadir}{df_obs['Ascii file'][idx]}", separator="\t", has_header=False).with_columns(pl.lit(df_obs["Spec. ID"][idx]).alias("Spec. ID")) for idx in range(df_obs.height)]
+    dfs_spec = [df.rename({"column_1":"wavelength", "column_2":"flux"}) for df in dfs_spec]
+
+    #preprocessing
+    t_explosion = 57822.2   #from Pessi2023
+    mjd_offset =  2400000.5
+    flux_factor = 1e15
+    theta = df_obs["JD"]-mjd_offset - t_explosion
+    # theta = df_obs["index"]
+    X = [df["wavelength"].to_numpy().flatten() for df in dfs_spec]
+    Y = [df["flux"].to_numpy().flatten()*flux_factor for df in dfs_spec]
+
+    #sigma clipping
+    sc_mask = lambda x, n=5: (np.median(x)-n*x.std()<x)&(x<np.median(x)+n*x.std())
+    X = [X[i][sc_mask(Y[i])] for i in range(len(X))]
+    Y = [Y[i][sc_mask(Y[i])] for i in range(len(Y))]
+
+    thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
+    xticks = np.array([[np.min(xi), np.max(xi)] for xi in X])
+    # xticks = np.round(np.linspace(xticks[:,0].min(), xticks[:,1].max(), 5)).astype(int)
+    xticks = np.linspace(4000, 9000, 5).astype(int)
+    yticks = np.array([[np.min(yi), np.max(yi)] for yi in Y])
+    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()])).astype(int)
+
+    colors = lsu.get_colors(theta, cmap=CMAP)
+    panelsize = np.pi/25
+    # erg cm(-2) sec(-1) Ang(-1)
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(-np.pi/2,1*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,1*np.pi/2-panelsize/2), panelsize=panelsize,
+        # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+        thetalabel="Time Since\nExplosion [d]", xlabel="Wavelength $[\mathrm{\AA}]$", ylabel="Flux $\\left[\\frac{\mathrm{erg}}{\mathrm{cm^2\,s\,\AA}}\\right]$",
+        thetalabelkwargs=dict(rotation=0, xytext=(1.5,1.5)),
+        xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
+        xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(5.5,1.2)),
+    )
+    for i in range(len(theta)):
+        LSP = LSC.add_panel(
+            theta[i],
+            panelsize=panelsize,
+            show_panelbounds=True,
+            yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+        )
+        # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+        LSP.plot(X[i], Y[i],  c=colors[i], label=f"")
+
+    fig = lstein.draw(LSC, figsize=(5,9))
+    fig.tight_layout()
+    # fig.legend(bbox_to_anchor=(1.0,0.95), fontsize=10)
+    if SAVE: fig.savefig(f"../report/gfx/spectra.pdf")
+    
+
+
+    return
 
 def plot_hypsearch():
     df = pl.read_csv("../data/autoencoder_hypsearch.csv")
@@ -459,7 +559,7 @@ def plot_hypsearch():
         thetaguidelims=(0,np.pi/2), thetaplotlims=(0+panelsize/2,np.pi/2-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
         thetalabel="Hyperparameter\nCombination", xlabel="Epoch", ylabel="Loss",
-        thetalabelkwargs=dict(rotation=-45, xytext=(1.5,1.5))
+        thetalabelkwargs=dict(rotation=-45, xytext=(1.5,1.5)),
 
     )
     for i in range(len(theta)):
@@ -467,6 +567,7 @@ def plot_hypsearch():
             theta[i], yticks=np.unique(np.linspace(np.floor(Y[i].min()), np.ceil(Y[i].max()), 5).astype(int)),
             panelsize=panelsize,
             show_panelbounds=True,
+            yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
         )
         LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
         LSP.plot(X[i], Y2[i], c=colors[i],  ls="--")
@@ -615,12 +716,13 @@ def plot_snn():
         thetalabel="$I_\mathrm{ext}$ [pA]", xlabel="Time [ms]", ylabel="$u_\mathrm{membrane}$ [mV]",
         thetalabelkwargs=dict(textcoords="offset fontsize", xytext=(2,2)),
         xlabelkwargs=dict(xytext=(-3.5,-2)),
-        ylabelkwargs=dict(rotation=-82, textcoords="offset fontsize", xytext=(0,-3))
+        ylabelkwargs=dict(rotation=-82, textcoords="offset fontsize", xytext=(0,-3)),
+        thetaticklabelkwargs=dict(rotation=30),
     )
 
     LSC.plot(theta, x, y, seriestype="line", series_kwargs=[dict(c=colors[i], label=[f"LIF","","", f"EIF","","", f"QIF","",""][i]) for i in range(len(theta))])
 
-    fig = lstein.draw(LSC, figsize=(6,6))
+    fig = lstein.draw(LSC, figsize=(9,9))
     fig.legend(loc="upper right", bbox_to_anchor=(0.9, 0.9))
     fig.tight_layout()
     if SAVE: fig.savefig(f"../report/gfx/snn.pdf")
@@ -646,7 +748,7 @@ def plot_errorband():
         xlimdeadzone=0.2, 
         thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
         thetaarrowpos_th=None, ylabpos_th=np.min(theta_raw),
-        thetatickkwargs=None, thetaticklabelkwargs=dict(pad=0.3), thetalabelkwargs=dict(rotation=40, textcoords="offset fontsize", xytext=(-1,-0.5)),
+        thetatickkwargs=None, thetaticklabelkwargs=dict(pad=0.3), thetalabelkwargs=dict(rotation=40, textcoords="offset fontsize", xytext=(-2,-1.5)),
         xtickkwargs=None, xticklabelkwargs=dict(xytext=(-0.2,0), ha="right", va="center"), xlabelkwargs=dict(rotation=90, textcoords="offset fontsize", xytext=(-3,-0)),
         ylabelkwargs=dict(textcoords="offset fontsize", xytext=(-0,-2)),
     )
@@ -697,17 +799,23 @@ def main():
     #     except: pass
     # plot_lstein_snii()
     # plot_lstein_tde()
-    # plot_scatter_onepanel()
-    # plot_scatter_onepanel_offset()
-    # plot_scatter_multipanel()
-    # plot_scatter_multipanel_group()
-    plot_heatmap()
-    plot_3dsurface()
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
+    plot_spectra()
     # plot_hypsearch()
     # plot_snn()
     # plot_errorband()
+
+    # plot_scatter_multipanel()
+
+    # #plots with increased fontsize (one column)
+    # plt.rcParams["font.size"] = 25
+    # plot_scatter_onepanel()
+    # plot_scatter_onepanel_offset()
+    # plot_scatter_multipanel_group()
+    # plot_heatmap()
+    # plot_3dsurface()
+    
 
     plt.show()
     return

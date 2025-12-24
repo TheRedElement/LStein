@@ -151,7 +151,7 @@ def plot_heatmap(
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
     ax=None,
-    cmap=None,
+    cmap=None, vmin=None, vmax=None,
     ):
     """
         - function to plot as a heatmap
@@ -164,8 +164,8 @@ def plot_heatmap(
 
     tt, xx, yy = make_mesh(theta_raw, x_raw, y_raw, res=100) 
     # tt, xx, yy = make_mesh(theta_pro, x_pro, y_pro, res=100) 
-    vmin = np.nanmin(yy)
-    vmax = np.nanmax(yy)
+    vmin = np.nanmin(yy) if vmin is None else vmin
+    vmax = np.nanmax(yy) if vmax is None else vmax
 
     mesh = ax.pcolormesh(xx, tt, yy, vmin=vmin, vmax=vmax, cmap=cmap)
     # for i in range(len(th_loc)):
