@@ -496,7 +496,7 @@ def plot_spectra():
         thetaticks, xticks, yticks,
         thetaguidelims=(-np.pi/2,1*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,1*np.pi/2-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
-        thetalabel="Time Since\nExplosion [d]", xlabel="Wavelength $[\mathrm{\AA}]$", ylabel="Flux $\\left[\\frac{\mathrm{erg}}{\mathrm{cm^2\,s\,\AA}}\\right]$",
+        thetalabel="Time Since\nExplosion [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
         thetalabelkwargs=dict(rotation=0, xytext=(1.5,1.5)),
         xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
         xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
