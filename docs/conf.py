@@ -7,7 +7,7 @@ import importlib
 
 #%%main
 metadata = importlib.metadata.metadata("LStein")
-project = metadata["Name"]
-version = metadata["Version"]
-release = version
-description = metadata["Description"]
+project = "LStein"
+# version = metadata["Version"]
+# release = version
+# description = metadata["Description"]
