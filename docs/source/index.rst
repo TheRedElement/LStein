@@ -1,0 +1,1 @@
+Test message in index.rst
