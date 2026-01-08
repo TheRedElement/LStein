@@ -37,7 +37,7 @@ paper = [
     "lustcodesnippets-py",
 ]
 docs = [
-    
+    "numpy>=2.3.2",
 ]
 
 [tool.uv.sources]
