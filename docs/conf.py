@@ -33,7 +33,7 @@ def set_metadata():
 
     #set metadata
     author = metadata["Author"]
-    copyright = "2026" + "Lukas Steinwender"
+    copyright = f"2026, Lukas Steinwender"
     description = metadata["Description"]
     project = metadata["Name"]
     title = metadata["Name"]
