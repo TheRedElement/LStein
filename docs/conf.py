@@ -22,7 +22,7 @@ def add_paths():
     #paths to custom static files
     #loaded after builtin static files => will override => `default.css` overrides internal `default.css`
     html_static_path = [
-        "_static",
+        "assets",
         os.path.abspath("../gfx"),
     ]
     return
@@ -75,8 +75,7 @@ extensions = [
 add_paths()
 set_metadata()
 
-html_static_path = [
-    "assets",
-    "../gfx"
-    # os.path.abspath("../gfx"),
-]
+# html_static_path = [
+#     "assets",
+#     os.path.abspath("../gfx"),
+# ]
