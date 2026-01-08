@@ -75,7 +75,9 @@ extensions = [
 add_paths()
 set_metadata()
 
-# html_static_path = [
-#     "assets",
-#     os.path.abspath("../gfx"),
-# ]
+import shutil
+def setup(app):
+    src = os.path.abspath('../gfx')
+    dst = os.path.join(app.outdir, '_images')
+    if os.path.exists(src):
+        shutil.copytree(src, dst, dirs_exist_ok=True)
