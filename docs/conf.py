@@ -1,6 +1,14 @@
 
+#%%imports
+import importlib
 
-#extensions
-extensions = [
-    "sphinx_pyproject",     #set project metadata from pyproject.toml
-]
+#%%definitions
+
+
+#%%main
+metadata = importlib.metadata.metadata("LStein")
+print(metadata)
+project = metadata["Name"]
+version = metadata["Version"]
+release = version
+description = metadata["Description"]
