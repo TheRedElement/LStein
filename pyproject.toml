@@ -30,6 +30,7 @@ build-backend = "uv_build"
 dev = [
     "brian2>=2.9.0",
     "ipykernel>=6.30.1",
+    "lustcodesnippets-py",
     "nbformat>=5.10.4",
     "polars>=1.32.3",
 ]
@@ -42,7 +43,7 @@ paper = [
 
 
 [tool.uv.sources]
-lustcodesnippets-py = { git = "https://github.com/TheRedElement/LuStCodeSnippets.git", rev = "v0.1.0" }
+lustcodesnippets-py = { git = "https://github.com/TheRedElement/LuStCodeSnippets.git" }
 
 #custom stuff
 [project.urls]

@@ -206,7 +206,7 @@ def plot_lstein_snii():
     fig.tight_layout()
 
     if SAVE: fig.savefig(f"../report/gfx/lstein_{otype}_{survey}.pdf")
-    return
+    return LSC
 
 def plot_lstein_tde(
     ):
@@ -245,7 +245,7 @@ def plot_lstein_tde(
     fig.tight_layout()
 
     if SAVE: fig.savefig(f"../report/gfx/lstein_{otype}_{survey}.pdf")
-    return
+    return LSC
 
 def plot_scatter_onepanel(
     ):
@@ -770,6 +770,21 @@ def plot_errorband():
     if SAVE: fig.savefig("../report/gfx/lstein_errorband.pdf")
     return
 #%%main
+def plot_graphical_abstract(LSCs):
+
+    fig = plt.figure(figsize=(16,9))
+    axs = [
+        fig.add_axes([0.0,0.0,0.55,1.0]),
+        fig.add_axes([0.55,0.0,0.45,1.0]),
+    ]
+    for (ax, LSC) in zip(axs, LSCs):
+        LSC.reset()
+        lstein.LSteinMPL(LSC).show(ax)
+
+    fig.savefig("graphical_abstract.pdf", dpi=180)
+
+    return
+
 def main():
     #declare as global so no arguments have to be passed to nested functions
     global theta_raw, x_raw, y_raw, y_raw_e
@@ -797,11 +812,12 @@ def main():
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    # plot_lstein_snii()
-    # plot_lstein_tde()
+    LSCa = plot_lstein_snii()
+    LSCb = plot_lstein_tde()
+    plot_graphical_abstract([LSCa,LSCb])
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
-    plot_spectra()
+    # plot_spectra()
     # plot_hypsearch()
     # plot_snn()
     # plot_errorband()

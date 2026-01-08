@@ -756,6 +756,7 @@ dependencies = [
 dev = [
     { name = "brian2" },
     { name = "ipykernel" },
+    { name = "lustcodesnippets-py" },
     { name = "nbformat" },
     { name = "polars" },
 ]
@@ -778,16 +779,17 @@ requires-dist = [
 dev = [
     { name = "brian2", specifier = ">=2.9.0" },
     { name = "ipykernel", specifier = ">=6.30.1" },
+    { name = "lustcodesnippets-py", git = "https://github.com/TheRedElement/LuStCodeSnippets.git" },
     { name = "nbformat", specifier = ">=5.10.4" },
     { name = "polars", specifier = ">=1.32.3" },
 ]
 docs = [{ name = "sphinx", specifier = ">=9.0.4" }]
-paper = [{ name = "lustcodesnippets-py", git = "https://github.com/TheRedElement/LuStCodeSnippets.git?rev=v0.1.0" }]
+paper = [{ name = "lustcodesnippets-py", git = "https://github.com/TheRedElement/LuStCodeSnippets.git" }]
 
 [[package]]
 name = "lustcodesnippets-py"
 version = "0.1.0"
-source = { git = "https://github.com/TheRedElement/LuStCodeSnippets.git?rev=v0.1.0#61c96bb1c7083c6a0873006831f909c4d466f3fa" }
+source = { git = "https://github.com/TheRedElement/LuStCodeSnippets.git#cb3d3ee2f60e96018e89e5fea8d37a3d6c0e9d57" }
 dependencies = [
     { name = "astropy" },
     { name = "cycler" },
