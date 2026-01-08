@@ -35,6 +35,7 @@ dev = [
 ]
 docs = [
     "numpy>=2.3.2",
+    "sphinx>=9.0.4",
 ]
 paper = [
     "lustcodesnippets-py",
