@@ -76,6 +76,5 @@ add_paths()
 set_metadata()
 
 html_static_path = [
-    "_static",
     os.path.abspath("../gfx"),
 ]
