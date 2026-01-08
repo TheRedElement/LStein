@@ -2,14 +2,14 @@
 WELCOME
 ===
 
-.. image:: gfx/lstein_logo.svg
+.. image:: lstein_logo.svg
 
 .. toctree::
    :glob:
    :maxdepth: 1
    :caption: Getting started
 
-.. currentmodule:: lstein.base.LSteinCanvas.py
-.. automodule:: lstein.base.LSteinCanvas
-    :members:
-    :show-inheritance:
+.. .. currentmodule:: lstein.base.LSteinCanvas.py
+.. .. automodule:: lstein.base.LSteinCanvas
+..     :members:
+..     :show-inheritance:
