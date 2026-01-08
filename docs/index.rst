@@ -1,1 +1,6 @@
-Test message in index.rst
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   :caption: Getting started
+
+.. automodule:: lstein.base.LSteinCanvas.py
