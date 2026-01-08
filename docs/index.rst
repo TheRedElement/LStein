@@ -2,7 +2,7 @@
 WELCOME
 =======
 
-.. image:: assets/sin_simulated.png
+.. image:: assets/lstein_logo.svg
 
 .. toctree::
    :glob:
