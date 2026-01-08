@@ -1,42 +1,18 @@
-# Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
-
-# Required
 version: 2
 
-# Set the OS, Python version, and other tools you might need
-build:
-  os: ubuntu-24.04
-  tools:
-    python: "3.13"
-
-  #override standard build process
-  commands:
-    # 1. Install uv using asdf (recommended method on RTD)
-    - asdf plugin add uv
-    - asdf install uv latest
-    - asdf global uv latest
-
-    # 2. Create the virtual environment using uv
-    - uv venv $READTHEDOCS_VIRTUALENV_PATH
-
-    # 3. Install your project and documentation dependencies using uv pip install or uv sync
-    # Set VIRTUAL_ENV to ensure uv knows where the environment is located
-    - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH uv --preview pip install .[docs]
-    # Alternatively, if you use a uv.lock file:
-    # - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH uv sync
-
-    # 4. Build the documentation using Sphinx
-    - python -m sphinx -T -b html -d docs/_build/doctrees docs/source $READTHEDOCS_OUTPUT/html
-
-# Build documentation in the "docs/" directory with Sphinx
 sphinx:
    configuration: docs/conf.py
 
-# Optionally, but recommended,
-# declare the Python requirements required to build your documentation
-# See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-# python:
-#    install:
-#    - requirements: docs/requirements.txt
-        
+build:
+   os: ubuntu-24.04
+   tools:
+      python: "3.13"
+   jobs:
+      pre_create_environment:
+         - asdf plugin add uv
+         - asdf install uv latest
+         - asdf global uv latest
+      create_environment:
+         - uv venv "${READTHEDOCS_VIRTUALENV_PATH}"
+      install:
+         - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --frozen --group docs
