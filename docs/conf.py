@@ -15,6 +15,7 @@ def add_paths():
         - make sure to make the path absolute!
     """
     sys.path.insert(0, os.path.abspath("../src"))   #default for uv `project/src/pkg` layout
+    sys.path.insert(0, os.path.abspath("../gfx"))   #default for uv `project/src/pkg` layout
 
     return
 
