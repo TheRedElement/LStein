@@ -628,6 +628,9 @@ dev = [
     { name = "nbformat" },
     { name = "polars" },
 ]
+docs = [
+    { name = "numpy" },
+]
 paper = [
     { name = "lustcodesnippets-py" },
 ]
@@ -646,6 +649,7 @@ dev = [
     { name = "nbformat", specifier = ">=5.10.4" },
     { name = "polars", specifier = ">=1.32.3" },
 ]
+docs = [{ name = "numpy", specifier = ">=2.3.2" }]
 paper = [{ name = "lustcodesnippets-py", git = "https://github.com/TheRedElement/LuStCodeSnippets.git?rev=v0.1.0" }]
 
 [[package]]

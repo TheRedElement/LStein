@@ -33,12 +33,13 @@ dev = [
     "nbformat>=5.10.4",
     "polars>=1.32.3",
 ]
-paper = [
-    "lustcodesnippets-py",
-]
 docs = [
     "numpy>=2.3.2",
 ]
+paper = [
+    "lustcodesnippets-py",
+]
+
 
 [tool.uv.sources]
 lustcodesnippets-py = { git = "https://github.com/TheRedElement/LuStCodeSnippets.git", rev = "v0.1.0" }
