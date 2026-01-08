@@ -2,7 +2,7 @@
 WELCOME
 =======
 
-.. image:: sin_simulated.png
+.. image:: assets/sin_simulated.png
 
 .. toctree::
    :glob:
