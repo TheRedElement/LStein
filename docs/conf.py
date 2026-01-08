@@ -14,7 +14,7 @@ def add_paths():
         - function to add directories to be documented to the path
         - make sure to make the path absolute!
     """
-    sys.path.insert(0, os.path.abspath("../src"))   #default for uv `project/src/pkg` layout
+    sys.path.insert(0, os.path.abspath("../src/lstein"))   #default for uv `project/src/pkg` layout
 
     return
 
