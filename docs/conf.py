@@ -66,9 +66,10 @@ extensions = [
     #sphinx extensions
     "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",
-    "sphinx_copybutton",    
     "sphinx.ext.doctest",
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    #custom extensions
+    # "sphinx_copybutton",
 ]
