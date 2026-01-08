@@ -7,4 +7,7 @@ WELCOME
    :maxdepth: 1
    :caption: Getting started
 
-.. automodule:: lstein.base.LSteinCanvas.py
+.. currentmodule:: lstein.base.LSteinCanvas.py
+.. automodule:: lstein.base.LSteinCanvas
+    :members:
+    :show-inheritance:
