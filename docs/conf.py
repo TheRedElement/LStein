@@ -2,5 +2,5 @@
 
 #extensions
 extensions = [
-    "sphinx-pyproject",     #set project metadata from pyproject.toml
+    "sphinx_pyproject",     #set project metadata from pyproject.toml
 ]

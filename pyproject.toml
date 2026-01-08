@@ -34,8 +34,8 @@ dev = [
     "polars>=1.32.3",
 ]
 docs = [
-    "numpy>=2.3.2",
     "sphinx>=9.0.4",
+    "sphinx-pyproject>=0.3.0",
 ]
 paper = [
     "lustcodesnippets-py",
