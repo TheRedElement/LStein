@@ -2,7 +2,7 @@
 WELCOME
 =======
 
-.. image:: /_images/lstein_logo.svg
+.. image:: /_gfx/lstein_logo.svg
 
 .. toctree::
    :glob:

@@ -6,6 +6,7 @@
 import importlib
 import os
 import sys
+import shutil
 
 
 #%%definitions
@@ -57,6 +58,17 @@ def set_metadata():
 
     return
 
+#%%sphinx internal functions
+"""
+    - function to make some global setups pre build
+"""
+def setup(app):
+
+    #copy gfx to html
+    src = os.path.abspath("../gfx")
+    dst = os.path.join(app.outdir, "_gfx")
+    if os.path.exists(src):
+        shutil.copytree(src, dst, dirs_exist_ok=True)
 #%%main
 #extensions
 extensions = [
@@ -75,9 +87,3 @@ extensions = [
 add_paths()
 set_metadata()
 
-import shutil
-def setup(app):
-    src = os.path.abspath('../gfx')
-    dst = os.path.join(app.outdir, '_images')
-    if os.path.exists(src):
-        shutil.copytree(src, dst, dirs_exist_ok=True)
