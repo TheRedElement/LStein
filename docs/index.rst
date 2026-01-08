@@ -2,6 +2,8 @@
 WELCOME
 ===
 
+.. image:: gfx/lstein_logo.svg
+
 .. toctree::
    :glob:
    :maxdepth: 1
