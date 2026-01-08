@@ -7,10 +7,13 @@ import importlib
 
 #%%main
 metadata = importlib.metadata.metadata("LStein")
+author = metadata["Author"]
+copyright = "2026" + "Lukas Steinwender"
+description = metadata["Description"]
 project = metadata["Name"]
-# version = metadata["Version"]
-# release = version
-# description = metadata["Description"]
+title = metadata["Name"]
+version = metadata["Version"]
+release = metadata["Version"] + ""  #full release (includes alpha, beta, ...)
 
 
 #extensions
