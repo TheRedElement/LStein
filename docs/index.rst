@@ -2,7 +2,7 @@
 WELCOME
 =======
 
-.. image:: gfx/sin_simulated.png
+.. image:: sin_simulated.png
 
 .. toctree::
    :glob:
