@@ -2,7 +2,7 @@
 WELCOME
 =======
 
-.. image:: /lstein_poster.png
+.. image:: gfx/lstein_poster.png
 
 .. toctree::
    :glob:

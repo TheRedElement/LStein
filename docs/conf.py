@@ -18,12 +18,19 @@ def add_paths():
     global html_static_path
 
     sys.path.insert(0, os.path.abspath("../src"))   #default for uv `project/src/pkg` layout
-    sys.path.insert(0, os.path.abspath("../gfx"))   #default for uv `project/src/pkg` layout
 
+    #paths to custom static files
+    #loaded after builtin static files => will override => `default.css` overrides internal `default.css`
     html_static_path = [
         "_static",
         os.path.abspath("../gfx"),
     ]
+    return
+
+def make_themes():
+    global html_theme
+    
+    html_theme = "sphinx_rtd_theme"
     return
 
 def set_metadata():
@@ -59,6 +66,7 @@ extensions = [
     #sphinx extensions
     "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",
+    "sphinx_copybutton",    
     "sphinx.ext.doctest",
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
