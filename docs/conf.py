@@ -58,9 +58,6 @@ def set_metadata():
     return
 
 #%%main
-add_paths()
-set_metadata()
-
 #extensions
 extensions = [
     #sphinx extensions
@@ -72,4 +69,13 @@ extensions = [
     "sphinx.ext.viewcode",
     #custom extensions
     # "sphinx_copybutton",
+]
+
+
+add_paths()
+set_metadata()
+
+html_static_path = [
+    "_static",
+    os.path.abspath("../gfx"),
 ]
