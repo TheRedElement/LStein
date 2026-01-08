@@ -1,8 +1,8 @@
 
 WELCOME
-===
+=======
 
-.. image:: lstein_logo.svg
+.. image:: /lstein_logo.svg
 
 .. toctree::
    :glob:

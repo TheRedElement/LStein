@@ -12,11 +12,18 @@ import sys
 def add_paths():
     """
         - function to add directories to be documented to the path
+        - all paths are relative to `conf.py`
         - make sure to make the path absolute!
     """
+    global html_static_path
+
     sys.path.insert(0, os.path.abspath("../src"))   #default for uv `project/src/pkg` layout
     sys.path.insert(0, os.path.abspath("../gfx"))   #default for uv `project/src/pkg` layout
 
+    html_static_path = [
+        "_static",
+        os.path.abspath("../gfx"),
+    ]
     return
 
 def set_metadata():
