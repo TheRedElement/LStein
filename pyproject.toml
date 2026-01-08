@@ -36,6 +36,9 @@ dev = [
 paper = [
     "lustcodesnippets-py",
 ]
+docs = [
+    
+]
 
 [tool.uv.sources]
 lustcodesnippets-py = { git = "https://github.com/TheRedElement/LuStCodeSnippets.git", rev = "v0.1.0" }
