@@ -791,25 +791,23 @@ def plot_pulsar():
     # data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")
     # data = np.load("../data/pulsar_data/J2222-0137_2021-12-27.npz")
     print(data.files)
-    print(data["freq_phase"].shape)
-    print(data["freq_ctr"], data["nchan"], data["nbin"])
     freq  = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
     phase = np.linspace(0, 1, data["nbin"])
 
-    # fig, axs = plt.subplots(2,1, figsize=(5,5))
-    # axs = axs.flatten()
-    # axs[0].plot(phase, np.nanmean(data["freq_phase"], axis=(0)), zorder=10)
-    # for i in range(0,50,10):
-    #     axs[0].plot(phase, data["freq_phase"][i])
-    # mesh = axs[1].pcolormesh(phase, freq, data["freq_phase"], shading="nearest")
-    # cax = fig.add_axes([0.95, 0.05, 0.05, 0.4])
-    # cbar = fig.colorbar(mesh, cax=cax)
-    # axs[0].set_xlabel("Phase []")
-    # axs[0].set_ylabel("Flux")
-    # axs[1].set_xlabel("Phase []")
-    # axs[1].set_ylabel("Frequency [MHz]")
-    # # axs[1].axhline(data["freq_ctr"])
-    # fig.tight_layout()
+    fig, axs = plt.subplots(2,1, figsize=(5,5))
+    axs = axs.flatten()
+    axs[0].plot(phase, np.nanmean(data["freq_phase"], axis=(0)), zorder=10)
+    for i in range(0,50,10):
+        axs[0].plot(phase, data["freq_phase"][i])
+    mesh = axs[1].pcolormesh(phase, freq, data["freq_phase"], shading="nearest")
+    cax = fig.add_axes([0.95, 0.05, 0.05, 0.4])
+    cbar = fig.colorbar(mesh, cax=cax)
+    axs[0].set_xlabel("Phase []")
+    axs[0].set_ylabel("Flux")
+    axs[1].set_xlabel("Phase []")
+    axs[1].set_ylabel("Frequency [MHz]")
+    # axs[1].axhline(data["freq_ctr"])
+    fig.tight_layout()
 
     #define dimensions
     theta = freq
@@ -844,9 +842,13 @@ def plot_pulsar():
 
     colors = lsu.get_colors(theta, cmap=CMAP)
     panelsize = np.pi/12
+    plotlims = [-np.pi/2, 1*np.pi/2]
+    # plotlims = [np.pi/2, 3*np.pi/2]
+    # xticks = xticks[::-1]
+    # yticks = yticks[::-1]
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
-        thetaguidelims=(-np.pi/2,1*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,1*np.pi/2-panelsize/2), panelsize=panelsize,
+        thetaguidelims=(plotlims[0],1*plotlims[1]), thetaplotlims=(plotlims[0]+panelsize/2,1*plotlims[1]-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
         thetalabel="Frequency\n[MHz]", xlabel="Phase []", ylabel="Flux $\\left[\\right]$",
         thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-0.5,0.0)),
