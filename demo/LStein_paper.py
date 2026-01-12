@@ -977,11 +977,16 @@ def plot_pulsar_combined():
     subint  = np.linspace(0, 8, data["nsubint"])
 
 
-    def plot_subint(subset=slice(0,None,1), alpha=1):
+    def plot_subint(subset=slice(0,None,1), alpha=1, nbins=128):
         #define dimensions
         theta = phase
         X = np.repeat(subint.reshape(1,-1), theta.shape[0], axis=0)
         Y = data["subint_phase"][:theta.shape[0]].T
+
+        #phase binning
+        theta = theta.reshape(nbins,-1).mean(axis=1)
+        X = np.nanmean(X.reshape(nbins,-1,X.shape[-1]), axis=1)
+        Y = np.nanmean(Y.reshape(nbins,-1,Y.shape[-1]), axis=1)
 
         #normalize
         # Y = Y / np.nan(Y, axis=1, keepdims=True)
@@ -1035,11 +1040,16 @@ def plot_pulsar_combined():
             # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
             LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=alpha)
         return LSC
-    def plot_freq(subset=slice(0,None,10), alpha=1):
+    def plot_freq(subset=slice(0,None,10), alpha=1, nbins=128):
         #define dimensions
         theta = phase
         X = np.repeat(freq.reshape(1,-1), theta.shape[0], axis=0)
         Y = data["freq_phase"][:theta.shape[0]].T
+
+        #phase binning
+        theta = theta.reshape(nbins,-1).mean(axis=1)
+        X = np.nanmean(X.reshape(nbins,-1,X.shape[-1]), axis=1)
+        Y = np.nanmean(Y.reshape(nbins,-1,Y.shape[-1]), axis=1)
 
         #normalize
         # Y = Y / np.nan(Y, axis=1, keepdims=True)
@@ -1094,8 +1104,8 @@ def plot_pulsar_combined():
             LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=alpha)
         return LSC
     
-    LSC1 = plot_subint(slice(0,None,1), alpha=0.3)
-    LSC2 = plot_freq(slice(0,None,1), alpha=0.3)
+    LSC1 = plot_subint(slice(0,None,1), alpha=1.0, nbins=128)
+    LSC2 = plot_freq(slice(0,None,1), alpha=1.0, nbins=128)
     fig = plt.figure(figsize=(6.8,5))
     ax1 = fig.add_axes([0,0,0.5,1.0])
     ax2 = fig.add_axes([0.5,0,0.5,1.0])
@@ -1147,9 +1157,9 @@ def main():
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
     # plot_spectra()
-    plot_pulsar_freq_phase()
+    # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
-    # plot_pulsar_combined()
+    plot_pulsar_combined()
     # plot_hypsearch()
     # plot_snn()
     # plot_errorband()
