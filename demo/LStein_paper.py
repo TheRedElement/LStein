@@ -247,6 +247,21 @@ def plot_lstein_tde(
     if SAVE: fig.savefig(f"../report/gfx/lstein_{otype}_{survey}.pdf")
     return LSC
 
+def plot_graphical_abstract(LSCs):
+
+    fig = plt.figure(figsize=(16,9))
+    axs = [
+        fig.add_axes([0.0,0.0,0.55,1.0]),
+        fig.add_axes([0.55,0.0,0.45,1.0]),
+    ]
+    for (ax, LSC) in zip(axs, LSCs):
+        LSC.reset()
+        lstein.LSteinMPL(LSC).show(ax)
+
+    fig.savefig("graphical_abstract.pdf", dpi=180)
+
+    return
+
 def plot_scatter_onepanel(
     ):
     ax = pp.plot_scatter_onepanel(
@@ -770,18 +785,100 @@ def plot_errorband():
     if SAVE: fig.savefig("../report/gfx/lstein_errorband.pdf")
     return
 #%%main
-def plot_graphical_abstract(LSCs):
+def plot_pulsar():
+    
+    data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")
+    # data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")
+    # data = np.load("../data/pulsar_data/J2222-0137_2021-12-27.npz")
+    print(data.files)
+    print(data["freq_phase"].shape)
+    print(data["freq_ctr"], data["nchan"], data["nbin"])
+    freq  = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
+    phase = np.linspace(0, 1, data["nbin"])
 
-    fig = plt.figure(figsize=(16,9))
-    axs = [
-        fig.add_axes([0.0,0.0,0.55,1.0]),
-        fig.add_axes([0.55,0.0,0.45,1.0]),
-    ]
-    for (ax, LSC) in zip(axs, LSCs):
-        LSC.reset()
-        lstein.LSteinMPL(LSC).show(ax)
+    # fig, axs = plt.subplots(2,1, figsize=(5,5))
+    # axs = axs.flatten()
+    # axs[0].plot(phase, np.nanmean(data["freq_phase"], axis=(0)), zorder=10)
+    # for i in range(0,50,10):
+    #     axs[0].plot(phase, data["freq_phase"][i])
+    # mesh = axs[1].pcolormesh(phase, freq, data["freq_phase"], shading="nearest")
+    # cax = fig.add_axes([0.95, 0.05, 0.05, 0.4])
+    # cbar = fig.colorbar(mesh, cax=cax)
+    # axs[0].set_xlabel("Phase []")
+    # axs[0].set_ylabel("Flux")
+    # axs[1].set_xlabel("Phase []")
+    # axs[1].set_ylabel("Frequency [MHz]")
+    # # axs[1].axhline(data["freq_ctr"])
+    # fig.tight_layout()
 
-    fig.savefig("graphical_abstract.pdf", dpi=180)
+    #define dimensions
+    theta = freq
+    X = np.repeat(phase.reshape(1,-1), theta.shape[0], axis=0)
+    Y = data["freq_phase"][:theta.shape[0]]
+    # plt.plot(np.nanmean(X, axis=0), np.nanmean(Y, axis=0), zorder=10)
+    # for i in range(10):
+    #     plt.plot(X[i,:], Y[i,:])
+    # plt.show()
+
+    #normalize
+    # Y = Y / np.nan(Y, axis=1, keepdims=True)
+
+    #filter NaNs
+    nanmask = np.any(np.isfinite(Y), axis=1)
+    theta = theta[nanmask]
+    X = X[nanmask]
+    Y = Y[nanmask]
+
+    subset = slice(0,None,1)
+    theta = theta[subset]
+    X = X[subset,:]
+    Y = Y[subset,:]
+    X = [xi for xi in X]
+    Y = [yi for yi in Y]
+    thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
+    xticks = np.array([[np.nanmin(xi), np.nanmax(xi)] for xi in X])
+    xticks = np.round(np.linspace(np.nanmin(xticks[:,0]), np.nanmax(xticks[:,1]), 5), 1)#.astype(int)
+    # xticks = np.linspace(4000, 9000, 5).astype(int)
+    yticks = np.array([[np.nanmin(yi), np.nanmax(yi)] for yi in Y])
+    yticks = np.array([np.floor(np.nanmin(yticks[:,0])), np.ceil(np.nanmax(yticks[:,1]))])
+
+    colors = lsu.get_colors(theta, cmap=CMAP)
+    panelsize = np.pi/12
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(-np.pi/2,1*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,1*np.pi/2-panelsize/2), panelsize=panelsize,
+        # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+        thetalabel="Frequency\n[MHz]", xlabel="Phase []", ylabel="Flux $\\left[\\right]$",
+        thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-0.5,0.0)),
+        thetaticklabelkwargs=dict(pad=0.25),
+        xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
+        xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(5.5,1.2)),
+    )
+    for i in range(len(theta)):
+        show_y_guides = (i==16) #only for one specific LSP
+
+        LSP = LSC.add_panel(
+            theta[i],
+            panelsize=panelsize,
+            show_panelbounds=show_y_guides,
+            show_yticks=show_y_guides,
+            y_projection_method="y",
+            yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+        )
+        # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+        LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1)
+
+    fig = lstein.draw(LSC, figsize=(5,9))
+    fig.tight_layout()
+    # fig.legend(bbox_to_anchor=(1.0,0.95), fontsize=10)
+    if SAVE: fig.savefig(f"../report/gfx/pulsar.pdf")
+    
+    # #save plotly for homepage
+    # import plotly.io as pio
+    # figply = lstein.draw(LSC, backend="plotly")
+    # figply.show()
+    # # pio.write_json(figply, "../report/gfx/pulsar.json")
 
     return
 
@@ -812,12 +909,14 @@ def main():
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    LSCa = plot_lstein_snii()
-    LSCb = plot_lstein_tde()
-    plot_graphical_abstract([LSCa,LSCb])
+    # LSCa = plot_lstein_snii()
+    # LSCb = plot_lstein_tde()
+    # plot_graphical_abstract([LSCa,LSCb])
+
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
     # plot_spectra()
+    plot_pulsar()
     # plot_hypsearch()
     # plot_snn()
     # plot_errorband()
