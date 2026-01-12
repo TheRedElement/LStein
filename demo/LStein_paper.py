@@ -785,14 +785,16 @@ def plot_errorband():
     if SAVE: fig.savefig("../report/gfx/lstein_errorband.pdf")
     return
 #%%main
-def plot_pulsar():
+def plot_pulsar_freq_phase():
     
     data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")
     # data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")
     # data = np.load("../data/pulsar_data/J2222-0137_2021-12-27.npz")
     print(data.files)
-    freq  = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
-    phase = np.linspace(0, 1, data["nbin"])
+    freq    = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
+    phase   = np.linspace(0, 1, data["nbin"])
+    print(data["nsubint"])
+    subint  = np.linspace(0, 8, data["nsubint"])
 
     fig, axs = plt.subplots(2,1, figsize=(5,5))
     axs = axs.flatten()
@@ -883,6 +885,233 @@ def plot_pulsar():
     # # pio.write_json(figply, "../report/gfx/pulsar.json")
 
     return
+def plot_pulsar_subint_phase():
+    
+    data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")
+    # data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")
+    # data = np.load("../data/pulsar_data/J2222-0137_2021-12-27.npz")
+    print(data.files)
+    freq    = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
+    phase   = np.linspace(0, 1, data["nbin"])
+    subint  = np.linspace(0, 8, data["nsubint"])
+
+    #define dimensions
+    theta = subint
+    X = np.repeat(phase.reshape(1,-1), theta.shape[0], axis=0)
+    Y = data["subint_phase"][:theta.shape[0]]
+
+    #normalize
+    # Y = Y / np.nan(Y, axis=1, keepdims=True)
+
+    #filter NaNs
+    nanmask = np.any(np.isfinite(Y), axis=1)
+    theta = theta[nanmask]
+    X = X[nanmask]
+    Y = Y[nanmask]
+
+    subset = slice(0,None,1)
+    theta = theta[subset]
+    X = X[subset,:]
+    Y = Y[subset,:]
+    X = [xi for xi in X]
+    Y = [yi for yi in Y]
+    thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
+    xticks = np.array([[np.nanmin(xi), np.nanmax(xi)] for xi in X])
+    xticks = np.round(np.linspace(np.nanmin(xticks[:,0]), np.nanmax(xticks[:,1]), 5), 1)#.astype(int)
+    # xticks = np.linspace(4000, 9000, 5).astype(int)
+    yticks = np.array([[np.nanmin(yi), np.nanmax(yi)] for yi in Y])
+    yticks = np.array([np.floor(np.nanmin(yticks[:,0])), np.ceil(np.nanmax(yticks[:,1]))])
+
+    colors = lsu.get_colors(theta, cmap=CMAP)
+    panelsize = np.pi/12
+    plotlims = [-np.pi/2, 1*np.pi/2]
+    # plotlims = [np.pi/2, 3*np.pi/2]
+    # xticks = xticks[::-1]
+    # yticks = yticks[::-1]
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(plotlims[0],1*plotlims[1]), thetaplotlims=(plotlims[0]+panelsize/2,1*plotlims[1]-panelsize/2), panelsize=panelsize,
+        # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+        thetalabel="Time [s]", xlabel="Phase []", ylabel="Flux $\\left[\\right]$",
+        thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-0.5,0.0)),
+        thetaticklabelkwargs=dict(pad=0.25),
+        xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
+        xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(5.5,1.2)),
+    )
+    for i in range(len(theta)):
+        show_y_guides = (i==4) #only for one specific LSP
+
+        LSP = LSC.add_panel(
+            theta[i],
+            panelsize=panelsize,
+            show_panelbounds=show_y_guides,
+            show_yticks=show_y_guides,
+            y_projection_method="y",
+            yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+        )
+        # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+        LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1)
+
+    fig = lstein.draw(LSC, figsize=(5,9))
+    fig.tight_layout()
+    # fig.legend(bbox_to_anchor=(1.0,0.95), fontsize=10)
+    if SAVE: fig.savefig(f"../report/gfx/pulsar.pdf")
+    
+    # #save plotly for homepage
+    # import plotly.io as pio
+    # figply = lstein.draw(LSC, backend="plotly")
+    # figply.show()
+    # # pio.write_json(figply, "../report/gfx/pulsar.json")
+
+    return
+
+def plot_pulsar_combined():
+    
+    data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")
+    # data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")
+    # data = np.load("../data/pulsar_data/J2222-0137_2021-12-27.npz")
+    print(data.files)
+    freq    = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
+    phase   = np.linspace(0, 1, data["nbin"])
+    subint  = np.linspace(0, 8, data["nsubint"])
+
+
+    def plot_subint(subset=slice(0,None,1), alpha=1):
+        #define dimensions
+        theta = phase
+        X = np.repeat(subint.reshape(1,-1), theta.shape[0], axis=0)
+        Y = data["subint_phase"][:theta.shape[0]].T
+
+        #normalize
+        # Y = Y / np.nan(Y, axis=1, keepdims=True)
+
+        #filter NaNs
+        nanmask = np.any(np.isfinite(Y), axis=1)
+        theta = theta[nanmask]
+        X = X[nanmask]
+        Y = Y[nanmask]
+
+        theta = theta[subset]
+        X = X[subset,:]
+        Y = Y[subset,:]
+        X = [xi for xi in X]
+        Y = [yi for yi in Y]
+        thetaticks = np.round(np.linspace(theta.min(), theta.max(), 3), 1)
+        xticks = np.array([[np.nanmin(xi), np.nanmax(xi)] for xi in X])
+        xticks = np.round(np.linspace(np.nanmin(xticks[:,0]), np.nanmax(xticks[:,1]), 5), 1)#.astype(int)
+        # xticks = np.linspace(4000, 9000, 5).astype(int)
+        yticks = np.array([[np.nanmin(yi), np.nanmax(yi)] for yi in Y])
+        yticks = np.array([np.floor(np.nanmin(yticks[:,0])), np.ceil(np.nanmax(yticks[:,1]))])
+
+        colors = lsu.get_colors(theta, cmap=CMAP)
+        panelsize = np.pi/12
+        plotlims = [np.pi/2, 3*np.pi/2]
+        # plotlims = [np.pi/2, 3*np.pi/2]
+        # xticks = xticks[::-1]
+        # yticks = yticks[::-1]
+        LSC = lstein.LSteinCanvas(
+            thetaticks, xticks, yticks,
+            thetaguidelims=(plotlims[0],1*plotlims[1]), thetaplotlims=(plotlims[0]+panelsize/2,1*plotlims[1]-panelsize/2), panelsize=panelsize,
+            # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+            thetalabel="Phase []", xlabel="Time [s]", ylabel="Flux $\\left[\\right]$",
+            thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(2.0,0.0)),
+            thetaticklabelkwargs=dict(pad=0.4),
+            xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(1.4,-2)),
+            xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.2,-0.5)),
+            ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-3.0,0.5)),
+        )
+        for i in range(len(theta)):
+            show_y_guides = (i==4/subset.step) #only for one specific LSP
+
+            LSP = LSC.add_panel(
+                theta[i],
+                panelsize=panelsize,
+                show_panelbounds=show_y_guides,
+                show_yticks=show_y_guides,
+                y_projection_method="y",
+                yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+            )
+            # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+            LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=alpha)
+        return LSC
+    def plot_freq(subset=slice(0,None,10), alpha=1):
+        #define dimensions
+        theta = phase
+        X = np.repeat(freq.reshape(1,-1), theta.shape[0], axis=0)
+        Y = data["freq_phase"][:theta.shape[0]].T
+
+        #normalize
+        # Y = Y / np.nan(Y, axis=1, keepdims=True)
+
+        #filter NaNs
+        nanmask = np.any(np.isfinite(Y), axis=1)
+        theta = theta[nanmask]
+        X = X[nanmask]
+        Y = Y[nanmask]
+
+        theta = theta[subset]
+        X = X[subset,:]
+        Y = Y[subset,:]
+        X = [xi for xi in X]
+        Y = [yi for yi in Y]
+        thetaticks = np.round(np.linspace(theta.min(), theta.max(), 3), 1)
+        xticks = np.array([[np.nanmin(xi), np.nanmax(xi)] for xi in X])
+        xticks = np.round(np.linspace(np.nanmin(xticks[:,0]), np.nanmax(xticks[:,1]), 5), 1).astype(int)
+        # xticks = np.linspace(4000, 9000, 5).astype(int)
+        yticks = np.array([[np.nanmin(yi), np.nanmax(yi)] for yi in Y])
+        yticks = np.array([np.floor(np.nanmin(yticks[:,0])), np.ceil(np.nanmax(yticks[:,1]))]).astype(int)
+
+        colors = lsu.get_colors(theta, cmap=CMAP)
+        panelsize = np.pi/12
+        plotlims = [-np.pi/2, 1*np.pi/2]
+        # plotlims = [np.pi/2, 3*np.pi/2]
+        xticks = xticks[::-1]
+        # yticks = yticks[::-1]
+        LSC = lstein.LSteinCanvas(
+            thetaticks, xticks, yticks,
+            thetaguidelims=(plotlims[0],1*plotlims[1]), thetaplotlims=(plotlims[0]+panelsize/2,1*plotlims[1]-panelsize/2), panelsize=panelsize,
+            # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+            thetalabel="", xlabel="Frequency [MHz]", ylabel="Flux $\\left[\\right]$",
+            thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-0.5,0.0)),
+            thetaticklabelkwargs=dict(pad=0.4),
+            xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.2,-1.2)),
+            xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
+            ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(5.5,1.2)),
+        )
+        for i in range(len(theta)):
+            show_y_guides = (i==200/subset.step) #only for one specific LSP
+
+            LSP = LSC.add_panel(
+                theta[i],
+                panelsize=panelsize,
+                show_panelbounds=show_y_guides,
+                show_yticks=show_y_guides,
+                y_projection_method="y",
+                yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+            )
+            # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+            LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=alpha)
+        return LSC
+    
+    LSC1 = plot_subint(slice(0,None,1), alpha=0.3)
+    LSC2 = plot_freq(slice(0,None,1), alpha=0.3)
+    fig = plt.figure(figsize=(6.8,5))
+    ax1 = fig.add_axes([0,0,0.5,1.0])
+    ax2 = fig.add_axes([0.5,0,0.5,1.0])
+    axs = np.array([ax1,ax2])
+    # fig, axs = plt.subplots(1,2, figsize=(9,5))
+    # axs = axs.flatten()
+    
+    lstein.LSteinMPL(LSC1).show(axs[0])
+    lstein.LSteinMPL(LSC2).show(axs[1])
+    fig.subplots_adjust(wspace=0, hspace=0)
+    # fig = lstein.draw(LSC, figsize=(5,9))
+    # fig.tight_layout()
+    if SAVE: fig.savefig(f"../report/gfx/pulsar.pdf")
+
+    return
+
 
 def main():
     #declare as global so no arguments have to be passed to nested functions
@@ -918,7 +1147,9 @@ def main():
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
     # plot_spectra()
-    plot_pulsar()
+    plot_pulsar_freq_phase()
+    # plot_pulsar_subint_phase()
+    # plot_pulsar_combined()
     # plot_hypsearch()
     # plot_snn()
     # plot_errorband()
