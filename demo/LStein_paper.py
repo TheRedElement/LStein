@@ -521,10 +521,10 @@ def plot_spectra():
         thetaguidelims=(-np.pi/2,1*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,1*np.pi/2-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
         thetalabel="Time Since\nExplosion [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\cdot 10^{15} \\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
-        thetalabelkwargs=dict(rotation=0, xytext=(1.5,1.5)),
+        thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1.2,0.0)),
         xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
         xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
-        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(5.5,1.2)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(4.0,1.2)),
     )
     for i in range(len(theta)):
         LSP = LSC.add_panel(
