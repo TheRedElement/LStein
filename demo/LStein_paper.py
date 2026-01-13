@@ -506,19 +506,53 @@ def plot_spectra():
     X = [X[i][sc_mask(Y[i])] for i in range(len(X))]
     Y = [Y[i][sc_mask(Y[i])] for i in range(len(Y))]
 
+    #binning
+    def binning(
+        x, y, dx,
+        func=np.nanmean,
+        ):
+
+        xbin = np.array([])
+        ybin = np.array([])
+        
+        #init inteval bounds
+        xlb = np.nanmin(x)
+        xub = xlb+dx
+        #apply binning
+        while xub <= np.nanmax(x):
+            mask = (xlb <= x)&(x < xub)  #current inteval
+            xbin = np.append(xbin, func(x[mask]))
+            ybin = np.append(ybin, func(y[mask]))
+            
+            #update
+            xlb += dx
+            xub += dx
+
+
+        return xbin, ybin
+    XY = [binning(xi, yi, 50, np.nanmean) for xi, yi in zip(X, Y)]
+    X = [XYi[0] for XYi in XY]
+    Y = [XYi[1] for XYi in XY]
+
+    #X as an offset (to ensure computation with smaller values => minimize projection effects)
+    Xmin = np.min([np.min(xi) for xi in X])
+    Xmax = np.max([np.max(xi) for xi in X])
+    X = [xi - Xmin for xi in X]
+
     thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
     xticks = np.array([[np.min(xi), np.max(xi)] for xi in X])
-    # xticks = np.round(np.linspace(xticks[:,0].min(), xticks[:,1].max(), 5)).astype(int)
-    xticks = np.linspace(4000, 9000, 5).astype(int)
+    xticks = np.round(np.linspace(xticks[:,0].min(), xticks[:,1].max(), 5)).astype(int)
+    xticks = (xticks,xticks+Xmin.astype(int))   #make sure ticklabels display correct value
     yticks = np.array([[np.min(yi), np.max(yi)] for yi in Y])
-    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()])).astype(int)
+    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1)#.astype(int)
 
     colors = lsu.get_colors(theta, cmap=CMAP)
     panelsize = np.pi/12
+    guidelims = (-np.pi/2,1*np.pi/2)
     # erg cm(-2) sec(-1) Ang(-1)
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
-        thetaguidelims=(-np.pi/2,1*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,1*np.pi/2-panelsize/2), panelsize=panelsize,
+        thetaguidelims=guidelims, thetaplotlims=(guidelims[0]+panelsize/2,guidelims[1]-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
         thetalabel="Time Since\nExplosion [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\cdot 10^{15} \\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
         thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1.2,0.0)),
@@ -527,11 +561,13 @@ def plot_spectra():
         ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(4.0,1.2)),
     )
     for i in range(len(theta)):
+        rot = lsu.minmaxscale(theta[i], *LSC.thetaplotlims, *LSC.thetalims)*180/np.pi #rotating labels
         LSP = LSC.add_panel(
             theta[i],
             panelsize=panelsize,
             show_panelbounds=True,
-            yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+            y_projection_method="theta",
+            yticklabelkwargs=dict(rotation=rot),
         )
         # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
         LSP.plot(X[i], Y[i],  c=colors[i], label=f"")
