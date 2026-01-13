@@ -479,7 +479,16 @@ def plot_spectra():
     #load data
     datadir = "../data/Pessi2023_SN2017cfo_spectra/"
     df_obs = pl.read_csv(f"{datadir}wiserep_spectra.csv").select("IAU name", "Obs-date", "JD", "Ascii file", "Spec. ID")
-    df_obs = df_obs.filter(~pl.col("Spec. ID").is_in([77750,77746,77741,77739]))  #remove very close observations
+    print(df_obs["Spec. ID"].unique().to_numpy())
+    df_obs = df_obs.filter(~pl.col("Spec. ID").is_in([
+        77750,
+        77746,
+        77743,
+        # 77742,
+        77741,
+        77740,
+        77739
+    ]))  #remove very close observations
     dfs_spec = [pl.read_csv(f"{datadir}{df_obs['Ascii file'][idx]}", separator="\t", has_header=False).with_columns(pl.lit(df_obs["Spec. ID"][idx]).alias("Spec. ID")) for idx in range(df_obs.height)]
     dfs_spec = [df.rename({"column_1":"wavelength", "column_2":"flux"}) for df in dfs_spec]
 
@@ -505,13 +514,13 @@ def plot_spectra():
     yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()])).astype(int)
 
     colors = lsu.get_colors(theta, cmap=CMAP)
-    panelsize = np.pi/25
+    panelsize = np.pi/12
     # erg cm(-2) sec(-1) Ang(-1)
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=(-np.pi/2,1*np.pi/2), thetaplotlims=(-np.pi/2+panelsize/2,1*np.pi/2-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
-        thetalabel="Time Since\nExplosion [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
+        thetalabel="Time Since\nExplosion [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\cdot 10^{15} \\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
         thetalabelkwargs=dict(rotation=0, xytext=(1.5,1.5)),
         xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
         xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
@@ -1156,10 +1165,10 @@ def main():
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
-    # plot_spectra()
+    plot_spectra()
     # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
-    plot_pulsar_combined()
+    # plot_pulsar_combined()
     # plot_hypsearch()
     # plot_snn()
     # plot_errorband()
