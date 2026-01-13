@@ -49,7 +49,7 @@ SAVE:bool = True
 YLIM:Tuple[int,int] = (-5,None)
 
 #%%definitions
-def get_data(fidx:int):
+def get_data(fidx:int, gp:bool=True,):
     """
         - function to load some data
     """
@@ -121,19 +121,11 @@ def get_data(fidx:int):
     y_pro = [df[:,2].to_numpy().astype(np.float64) for df in df_pro_p]
     y_pro_e = [df[:,3].to_numpy().astype(np.float64) for df in df_pro_p]
     
-    # #avoid negative values
-    # y_raw_mask = [(y_raw[idx]) for idx in range(len(y_raw))]
-    # y_raw = [y_raw[idx][y_raw_mask[idx]] for idx in range(len(y_raw))]
-    # x_raw = [x_raw[idx][y_raw_mask[idx]] for idx in range(len(x_raw))]
-    # y_raw_e = [y_raw_e[idx][y_raw_mask[idx]] for idx in range(len(y_raw_e))]
-    # y_pro_mask = [(y_pro[idx]>-1) for idx in range(len(y_pro))]
-    # y_pro = [y_pro[idx][y_pro_mask[idx]] for idx in range(len(y_pro))]
-    # x_pro = [x_pro[idx][y_pro_mask[idx]] for idx in range(len(x_pro))]
-    # y_pro_e = [y_pro_e[idx][y_pro_mask[idx]] for idx in range(len(y_pro_e))]
-
-    #artificial, large x-values
-    # x_raw = [np.linspace(10000,10010,len(xi)) for xi in x_raw]
-    # x_pro = [np.linspace(10000,10010,len(xi)) for xi in x_pro]
+    if not gp:
+        theta_pro = []
+        x_pro = []
+        y_pro = []
+        y_pro_e = []
 
     return (
         theta_raw, x_raw, y_raw, y_raw_e,
@@ -166,13 +158,13 @@ def get_stats(theta_raw, x_raw, y_raw, fname,
         colors,
     )
 
-def plot_lstein_snii():
+def plot_lstein_snii(gp=True):
     
     #load data
     theta_raw, x_raw, y_raw, y_raw_e, \
     theta_pro, x_pro, y_pro, y_pro_e, \
     legend, thetalab, xlab, ylab, fname, \
-        pb_mappings, otype, survey = get_data(7)    
+        pb_mappings, otype, survey = get_data(7, gp=gp)    
 
     unique_thetas, \
     thetaticks, xticks, yticks, \
@@ -180,27 +172,30 @@ def plot_lstein_snii():
     colors = get_stats(theta_raw, x_raw, y_raw, fname)
 
 
-    thetaguidelims=(0*np.pi/2,2*np.pi/2)
+    # thetaguidelims=(0*np.pi/2,2*np.pi/2)
+    thetaguidelims=(2*np.pi/2,0*np.pi/2)
+    thetaticks = thetaticks[::-1]
     xticks = xticks[::-1]
     yticks = yticks[::-1]
 
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
-        # thetaguidelims=(0*np.pi/2,2*np.pi/2), thetaplotlims=(0*np.pi/2+panelsize/2,2*np.pi/2-panelsize/2),
-        thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/2,thetaguidelims[1]-panelsize/2),
+        # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/2,thetaguidelims[1]-panelsize/2),
+        thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize+panelsize/2,thetaguidelims[1]+panelsize-panelsize/2),
         xlimdeadzone=0.3,
         panelsize=panelsize,
         thetalabel=thetalab, xlabel=xlab, ylabel=ylab,
         thetaarrowpos_th=None, ylabpos_th=np.min(theta_raw),
-        thetatickkwargs=None, thetaticklabelkwargs=dict(pad=0.3), thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0,-0.7)),
-        xtickkwargs=None, xticklabelkwargs=dict(xytext=(0,-1)), xlabelkwargs=dict(xytext=(-7.5,-2)),
+        thetatickkwargs=None, thetaticklabelkwargs=dict(pad=0.3), thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(1,-0.7)),
+        xtickkwargs=None, xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-0.5,-1)), xlabelkwargs=dict(textcoords="offset fontsize", xytext=(-1,-2)),
         ylabelkwargs=dict(rotation=-83, textcoords="offset fontsize", xytext=(0,-3)),
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
-    LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=4, c="w"))
-    LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    if gp:
+        LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=4, c="w"))
+        LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
 
     fig = lstein.draw(LSC, figsize=(9,5))
     fig.tight_layout()
@@ -208,14 +203,13 @@ def plot_lstein_snii():
     if SAVE: fig.savefig(f"../report/gfx/lstein_{otype}_{survey}.pdf")
     return LSC
 
-def plot_lstein_tde(
-    ):
+def plot_lstein_tde(gp=True):
     
     #load data
     theta_raw, x_raw, y_raw, y_raw_e, \
     theta_pro, x_pro, y_pro, y_pro_e, \
     legend, thetalab, xlab, ylab, fname, \
-        pb_mappings, otype, survey = get_data(21)    
+        pb_mappings, otype, survey = get_data(21, gp=gp)    
 
     unique_thetas, \
     thetaticks, xticks, yticks, \
@@ -237,7 +231,7 @@ def plot_lstein_tde(
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=3, c="w"))
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
 
@@ -258,12 +252,11 @@ def plot_graphical_abstract(LSCs):
         LSC.reset()
         lstein.LSteinMPL(LSC).show(ax)
 
-    fig.savefig("graphical_abstract.pdf", dpi=180)
+    fig.savefig("../report/gfx/graphical_abstract.pdf", dpi=180)
 
     return
 
-def plot_scatter_onepanel(
-    ):
+def plot_scatter_onepanel():
     ax = pp.plot_scatter_onepanel(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
@@ -280,9 +273,8 @@ def plot_scatter_onepanel(
     if SAVE: fig.savefig("../report/gfx/scatter_onepanel.pdf")
     return
 
-def plot_scatter_onepanel_offset(
-    ):
-    
+def plot_scatter_onepanel_offset():
+
     offset = [10]*len(theta_raw)
     offset = theta_raw / 100
     ax = pp.plot_scatter_onepanel_offset(
@@ -301,8 +293,7 @@ def plot_scatter_onepanel_offset(
     if SAVE: fig.savefig("../report/gfx/scatter_onepanel_offset.pdf")
     return
 
-def plot_scatter_multipanel(
-    ):
+def plot_scatter_multipanel():
     
     axs = pp.plot_scatter_multipanel(
         theta_raw, x_raw, y_raw, y_raw_e,
@@ -1180,11 +1171,14 @@ def main():
     global panelsize
     global colors
 
+    #global flags
+    gp = False
+
     #load data
     theta_raw, x_raw, y_raw, y_raw_e, \
     theta_pro, x_pro, y_pro, y_pro_e, \
     legend, thetalab, xlab, ylab, fname, \
-        pb_mappings, otype, survey = get_data(7)    
+        pb_mappings, otype, survey = get_data(7, gp=gp)
 
     unique_thetas, \
     thetaticks, xticks, yticks, \
@@ -1195,13 +1189,13 @@ def main():
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    # LSCa = plot_lstein_snii()
-    # LSCb = plot_lstein_tde()
-    # plot_graphical_abstract([LSCa,LSCb])
+    LSCa = plot_lstein_snii(gp=gp)
+    LSCb = plot_lstein_tde(gp=True)
+    plot_graphical_abstract([LSCa,LSCb])
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
-    plot_spectra()
+    # plot_spectra()
     # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
