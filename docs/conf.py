@@ -58,6 +58,25 @@ def set_metadata():
 
     return
 
+def modify_docstrings(app, what, name, obj, options, lines):
+    """
+        - function to apply modifications to docstrings
+    """
+    mapping = {
+        "=": "-",
+        "-": "~",
+        "~": "^",
+        "^": '"',
+    }
+
+    for i, line in enumerate(lines[:-1]):
+        next_line = lines[i + 1]
+        if set(next_line) == {"="} and len(next_line) >= len(line):
+            lines[i + 1] = mapping["="] * len(next_line)
+    
+    return
+
+
 #%%sphinx internal functions
 """
     - function to make some global setups pre build
@@ -69,6 +88,9 @@ def setup(app):
     dst = os.path.join(app.outdir, "_gfx")
     if os.path.exists(src):
         shutil.copytree(src, dst, dirs_exist_ok=True)
+
+    app.connect("autodoc-process-docstring", modify_docstrings)
+
 
     
 #%%main
