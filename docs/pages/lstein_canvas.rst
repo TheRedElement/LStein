@@ -6,16 +6,16 @@ LSteinCanvas
    :local:
    :depth: 3
 
-.. toctree::
-   :maxdepth: 2
+.. .. toctree::
+..    :maxdepth: 2
 
-   self
+..    self
 
 .. autosummary::
    :toctree: generated/
    :recursive:
 
-   your_module_name
+   lstein
 
 
 .. currentmodule:: lstein.lstein.py
