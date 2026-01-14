@@ -6,19 +6,18 @@ WELCOME
 
 .. rubric:: Contents
 
-.. contents::
-   :local:
-   :depth: 2
+   .. contents::
+      :local:
+      :depth: 2
 
-.. toctree::
-   :glob:
-   :maxdepth: 1
-   :caption: Getting started
+   .. toctree::
+      :glob:
+      :maxdepth: 1
 
-   pages/quickstart.rst
-   pages/lstein_canvas.rst
-   pages/lstein_panel.rst
-   pages/backends.rst
+      pages/quickstart.rst
+      pages/lstein_canvas.rst
+      pages/lstein_panel.rst
+      pages/backends.rst
 
 .. .. currentmodule:: lstein.base.LSteinCanvas.py
 .. .. automodule:: lstein.base.LSteinCanvas
