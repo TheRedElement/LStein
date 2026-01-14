@@ -16,6 +16,8 @@ WELCOME
    :caption: Getting started
 
    pages/quickstart.rst
+   pages/canvas.rst
+   pages/backends.rst
 
 .. .. currentmodule:: lstein.base.LSteinCanvas.py
 .. .. automodule:: lstein.base.LSteinCanvas
