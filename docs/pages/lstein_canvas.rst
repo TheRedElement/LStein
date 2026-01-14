@@ -2,15 +2,11 @@
 LSteinCanvas
 ============
 
-.. autosummary::
-   :toctree: _stubs
-   :recursive:
-
-   lstein.lstein.LSteinCanvas
-
 .. contents::
    :local:
-   :depth: 2
+   :depth: 3
+
+   self
 
 
 .. currentmodule:: lstein.lstein.py
