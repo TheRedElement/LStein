@@ -11,6 +11,12 @@ LSteinCanvas
 
    self
 
+.. autosummary::
+   :toctree: generated/
+   :recursive:
+
+   your_module_name
+
 
 .. currentmodule:: lstein.lstein.py
 .. autoclass:: lstein.lstein.LSteinCanvas
