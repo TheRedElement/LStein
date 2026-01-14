@@ -2,20 +2,20 @@
 LSteinCanvas
 ============
 
-.. contents::
-   :local:
-   :depth: 3
+.. .. contents::
+..    :local:
+..    :depth: 3
 
 .. .. toctree::
 ..    :maxdepth: 2
 
 ..    self
 
-.. autosummary::
-   :toctree: generated/
-   :recursive:
+.. .. autosummary::
+..    :toctree: generated/
+..    :recursive:
 
-   lstein
+..    lstein
 
 
 .. currentmodule:: lstein.lstein.py
