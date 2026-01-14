@@ -78,7 +78,7 @@ def modify_docstrings(app, what, name, obj, options, lines):
         for char in heading_mapping.keys():
             if set(next_line) == {char} and len(next_line) >= len(line):
                 # lines[i] = "TEST" + lines[i]
-                lines[i + 1] = " " * len(next_line)
+                lines[i + 1] = "~" * len(next_line)
 
     return
 
