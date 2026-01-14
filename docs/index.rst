@@ -16,8 +16,8 @@ WELCOME
 
       pages/quickstart.rst
       pages/lstein_canvas.rst
-      pages/lstein_panel.rst
-      pages/backends.rst
+      .. pages/lstein_panel.rst
+      .. pages/backends.rst
 
 
 Installation
