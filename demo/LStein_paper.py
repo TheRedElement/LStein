@@ -11,6 +11,7 @@ import importlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
+import pandas as pd
 import polars as pl
 import re
 from typing import Literal, Tuple
@@ -49,6 +50,30 @@ SAVE:bool = True
 YLIM:Tuple[int,int] = (-5,None)
 
 #%%definitions
+def binning(
+        x, y, dx,
+        func=np.nanmean,
+        ):
+
+        xbin = np.array([])
+        ybin = np.array([])
+        
+        #init inteval bounds
+        xlb = np.nanmin(x)
+        xub = xlb+dx
+        #apply binning
+        while xub <= np.nanmax(x):
+            mask = (xlb <= x)&(x < xub)  #current inteval
+            xbin = np.append(xbin, func(x[mask]))
+            ybin = np.append(ybin, func(y[mask]))
+            
+            #update
+            xlb += dx
+            xub += dx
+
+
+        return xbin, ybin
+    
 def get_data(fidx:int, gp:bool=True,):
     """
         - function to load some data
@@ -465,30 +490,28 @@ def plot_projection_methods(
     if SAVE: fig.savefig(f"../report/gfx/projectionmethods_{context}.pdf")
     return fig
 
-def plot_spectra():
+def plot_spectra_pessi():
 
-    #load data
     datadir = "../data/Pessi2023_SN2017cfo_spectra/"
-    df_obs = pl.read_csv(f"{datadir}wiserep_spectra.csv").select("IAU name", "Obs-date", "JD", "Ascii file", "Spec. ID")
-    print(df_obs["Spec. ID"].unique().to_numpy())
-    df_obs = df_obs.filter(~pl.col("Spec. ID").is_in([
-        77750,
-        77746,
-        77743,
-        # 77742,
-        77741,
-        77740,
-        77739
-    ]))  #remove very close observations
-    dfs_spec = [pl.read_csv(f"{datadir}{df_obs['Ascii file'][idx]}", separator="\t", has_header=False).with_columns(pl.lit(df_obs["Spec. ID"][idx]).alias("Spec. ID")) for idx in range(df_obs.height)]
-    dfs_spec = [df.rename({"column_1":"wavelength", "column_2":"flux"}) for df in dfs_spec]
+    
+    #load data
+    df_obs = pl.read_csv(f"{datadir}wiserep_spectra.csv").select("IAU name", "Obs-date", "JD", "Ascii file", "Phase (days)", "Spec. ID")
+    df_obs = df_obs[[1,3,5,7,9],:] #pessi2023
+    dfs_spec = [] 
+    for idx in range(df_obs.height):
+        f = open(f"{datadir}{df_obs['Ascii file'][idx]}")
+        df_spec = np.array(re.findall(r"(\S+)\s+(\S+)", f.read())).astype(np.float64)
+        f.close()
+        dfs_spec.append(
+            pl.from_numpy(df_spec, schema=["wavelength", "flux"])
+                .with_columns(pl.lit(df_obs["Spec. ID"][idx]).alias("Spec. ID"))
+        )
 
     #preprocessing
     t_explosion = 57822.2   #from Pessi2023
     mjd_offset =  2400000.5
     flux_factor = 1e15
     theta = df_obs["JD"]-mjd_offset - t_explosion
-    # theta = df_obs["index"]
     X = [df["wavelength"].to_numpy().flatten() for df in dfs_spec]
     Y = [df["flux"].to_numpy().flatten()*flux_factor for df in dfs_spec]
 
@@ -498,37 +521,17 @@ def plot_spectra():
     Y = [Y[i][sc_mask(Y[i])] for i in range(len(Y))]
 
     #binning
-    def binning(
-        x, y, dx,
-        func=np.nanmean,
-        ):
-
-        xbin = np.array([])
-        ybin = np.array([])
-        
-        #init inteval bounds
-        xlb = np.nanmin(x)
-        xub = xlb+dx
-        #apply binning
-        while xub <= np.nanmax(x):
-            mask = (xlb <= x)&(x < xub)  #current inteval
-            xbin = np.append(xbin, func(x[mask]))
-            ybin = np.append(ybin, func(y[mask]))
-            
-            #update
-            xlb += dx
-            xub += dx
-
-
-        return xbin, ybin
     XY = [binning(xi, yi, 50, np.nanmean) for xi, yi in zip(X, Y)]
     X = [XYi[0] for XYi in XY]
     Y = [XYi[1] for XYi in XY]
+    # for i in range(len(X)):
+    #     plt.plot(X[i], Y[i])
 
     #X as an offset (to ensure computation with smaller values => minimize projection effects)
     Xmin = np.min([np.min(xi) for xi in X])
     Xmax = np.max([np.max(xi) for xi in X])
     X = [xi - Xmin for xi in X]
+
 
     thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
     xticks = np.array([[np.min(xi), np.max(xi)] for xi in X])
@@ -538,7 +541,7 @@ def plot_spectra():
     yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1)#.astype(int)
 
     colors = lsu.get_colors(theta, cmap=CMAP)
-    panelsize = np.pi/12
+    panelsize = np.pi/8
     guidelims = (-np.pi/2,1*np.pi/2)
     # erg cm(-2) sec(-1) Ang(-1)
     LSC = lstein.LSteinCanvas(
@@ -558,6 +561,98 @@ def plot_spectra():
             panelsize=panelsize,
             show_panelbounds=True,
             y_projection_method="theta",
+            yticklabelkwargs=dict(rotation=rot),
+        )
+        # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+        LSP.plot(X[i], Y[i],  c=colors[i], label=f"")
+
+    fig = lstein.draw(LSC, figsize=(5,9))
+    fig.tight_layout()
+    # fig.legend(bbox_to_anchor=(1.0,0.95), fontsize=10)
+    if SAVE: fig.savefig(f"../report/gfx/spectra.pdf")
+
+    return
+def plot_spectra_mayall():
+
+    datadir = "../data/wiserep_SN2023ixf_spectra/"
+    
+    #load data
+    df_obs = (pl.read_csv(f"{datadir}wiserep_spectra.csv", comment_prefix="#")
+        .select("IAU name", "Obs-date", "JD", "Ascii file", "Phase (days)", "Spec. ID")
+        .filter(pl.col("Ascii file").str.contains("Mayall"))   #different format -> ignore
+        .sort("Ascii file")
+        # .sort("Phase (days)")
+    )
+    print(df_obs["Phase (days)"].to_numpy())
+    print(df_obs.height)
+    df_obs = df_obs[[0,5,11,15,17],:] #wiserep
+
+    # df_obs = df_obs.filter((pl.col("Phase (days)").abs() < 1)) #wiserep
+    dfs_spec = [] 
+    for idx in range(df_obs.height):
+        df_spec = (
+            pl.read_csv(f"{datadir}{df_obs['Ascii file'][idx]}", comment_prefix="#", separator=" ")
+                .rename({"WAVE":"wavelength","FLUX":"flux"})
+        )
+        dfs_spec.append(df_spec)
+
+    #preprocessing
+    flux_factor = 1#1e15
+    theta = df_obs["Phase (days)"]
+    # theta = df_obs["index"]
+    X = [df["wavelength"].to_numpy().flatten() for df in dfs_spec]
+    Y = [df["flux"].to_numpy().flatten()*flux_factor for df in dfs_spec]
+
+    #wavelength constraint
+    # Y = [Y[i][((3000<X[i]) & (X[i]<7000))] for i in range(len(X))]
+    # X = [X[i][((3000<X[i]) & (X[i]<7000))] for i in range(len(X))]
+
+    #sigma clipping
+    sc_mask = lambda x, n=5: (np.median(x)-n*x.std()<x)&(x<np.median(x)+n*x.std())
+    X = [X[i][sc_mask(Y[i])] for i in range(len(X))]
+    Y = [Y[i][sc_mask(Y[i])] for i in range(len(Y))]
+
+    #binning
+    XY = [binning(xi, yi, 50, np.nanmean) for xi, yi in zip(X, Y)]
+    X = [XYi[0] for XYi in XY]
+    Y = [XYi[1] for XYi in XY]
+
+    # for i in range(len(theta)):
+    #     plt.plot(X[i], Y[i])
+
+    #X as an offset (to ensure computation with smaller values => minimize projection effects)
+    Xmin = np.min([np.min(xi) for xi in X])
+    Xmax = np.max([np.max(xi) for xi in X])
+    # X = [lsu.minmaxscale(xi, 0, 100, Xmin, Xmax) for xi in X]
+
+    thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
+    xticks = np.array([[np.min(xi), np.max(xi)] for xi in X])
+    xticks = np.round(np.linspace(xticks[:,0].min(), xticks[:,1].max(), 5), 5).astype(int)
+    # xticks = (xticks,np.linspace(Xmin,Xmax,5).astype(int))   #make sure ticklabels display correct value
+    yticks = np.array([[np.min(yi), np.max(yi)] for yi in Y])
+    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1)#.astype(int)
+
+    colors = lsu.get_colors(theta, cmap=CMAP)
+    panelsize = np.pi/8
+    guidelims = (-np.pi/2,1*np.pi/2)
+    # erg cm(-2) sec(-1) Ang(-1)
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=guidelims, thetaplotlims=(guidelims[0]+1.3*panelsize/2,guidelims[1]-panelsize/2), panelsize=panelsize,
+        # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+        thetalabel="Time Since\nPeak [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\cdot 10^{17} \\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
+        thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1.2,0.0)),
+        xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
+        xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(4.0,1.2)),
+    )
+    for i in range(len(theta)):
+        rot = lsu.minmaxscale(theta[i], *LSC.thetaplotlims, *LSC.thetalims)*180/np.pi #rotating labels
+        LSP = LSC.add_panel(
+            theta[i],
+            panelsize=panelsize,
+            show_panelbounds=True,
+            y_projection_method="y",
             yticklabelkwargs=dict(rotation=rot),
         )
         # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
@@ -1189,13 +1284,14 @@ def main():
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    LSCa = plot_lstein_snii(gp=gp)
-    LSCb = plot_lstein_tde(gp=True)
-    plot_graphical_abstract([LSCa,LSCb])
+    # LSCa = plot_lstein_snii(gp=gp)
+    # LSCb = plot_lstein_tde(gp=True)
+    # plot_graphical_abstract([LSCa,LSCb])
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
-    # plot_spectra()
+    # plot_spectra_pessi()
+    plot_spectra_mayall()
     # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
