@@ -116,6 +116,7 @@ autodoc_default_options = {
     "members": True,
     "member-order": "alphabetical",
 }
+toc_object_entries = True
 
 add_paths()
 set_metadata()
