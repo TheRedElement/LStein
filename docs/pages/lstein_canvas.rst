@@ -4,7 +4,7 @@ LSteinCanvas
 
 .. contents::
    :local:
-   :maxdepth: 2
+   :depth: 2
 
 
 .. currentmodule:: lstein.lstein.py
