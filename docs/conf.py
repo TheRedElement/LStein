@@ -62,7 +62,9 @@ def modify_docstrings(app, what, name, obj, options, lines):
     """
         - function to apply modifications to docstrings
     """
-    mapping = {
+
+    #mapping to downgrade headings
+    heading_mapping = {
         "=": "~",
         "-": "^",
         "~": '"',
@@ -71,9 +73,11 @@ def modify_docstrings(app, what, name, obj, options, lines):
 
     for i, line in enumerate(lines[:-1]):
         next_line = lines[i + 1]
+        
+        #downgrade headings
         if set(next_line) == {"="} and len(next_line) >= len(line):
-            lines[i + 1] = mapping["="] * len(next_line)
-    
+            lines[i + 1] = heading_mapping["="] * len(next_line)
+
     return
 
 
