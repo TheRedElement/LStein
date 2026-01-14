@@ -10,7 +10,7 @@ LSteinCanvas
 
 .. contents::
    :local:
-   :depth: 1
+   :depth: 2
 
 
 .. currentmodule:: lstein.lstein.py
