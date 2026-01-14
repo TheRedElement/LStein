@@ -4,15 +4,21 @@ WELCOME
 
 .. image:: /_gfx/lstein_logo.svg
 
-.. toctree::
-   :glob:
-   :maxdepth: 1
-   :caption: Table Of Contents
+.. rubric:: Contents
 
-   pages/quickstart.rst
-   pages/lstein_canvas.rst
-   .. pages/lstein_panel.rst
-   .. pages/backends.rst
+   .. contents::
+      :local:
+      :depth: 2
+
+   .. toctree::
+      :glob:
+      :maxdepth: 1
+      :caption: Table Of Contents
+
+      pages/quickstart.rst
+      pages/lstein_canvas.rst
+      pages/lstein_panel.rst
+      pages/backends.rst
 
 
 Installation
