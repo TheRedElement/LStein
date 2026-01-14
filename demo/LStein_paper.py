@@ -628,8 +628,8 @@ def plot_spectra_mayall():
     #     plt.plot(X_cont[i], Y_cont[i])
 
     # #wavelength constraint
-    # Y = [Y[i][((5000<X[i]) & (X[i]<8000))] for i in range(len(X))]
-    # X = [X[i][((5000<X[i]) & (X[i]<8000))] for i in range(len(X))]
+    Y = [Y[i][((5000<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
+    X = [X[i][((5000<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
 
     #sigma clipping
     sc_mask = lambda x, n=5: (np.median(x)-n*x.std()<x)&(x<np.median(x)+n*x.std())
@@ -647,31 +647,36 @@ def plot_spectra_mayall():
     #X as an offset (to ensure computation with smaller values => minimize projection effects)
     Xmin = np.min([np.min(xi) for xi in X])
     Xmax = np.max([np.max(xi) for xi in X])
-    # X = [lsu.minmaxscale(xi, 0, 100, Xmin, Xmax) for xi in X]
+    Xmin = 5000
+    Xmax = 9500
+    X = [lsu.minmaxscale(xi, 0, 10, Xmin, Xmax) for xi in X]
 
     thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
     xticks = np.array([[np.min(xi), np.max(xi)] for xi in X])
     xticks = np.round(np.linspace(xticks[:,0].min(), xticks[:,1].max(), 5), 5).astype(int)
     # xticks = (xticks,np.linspace(Xmin,Xmax,5).astype(int))   #make sure ticklabels display correct value
     yticks = np.array([[np.min(yi), np.max(yi)] for yi in Y])
-    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1).astype(int)
+    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1).astype(float)
 
     colors = lsu.get_colors(theta, cmap=CMAP)
     panelsize = np.pi/10
-    guidelims = (-np.pi/2,1*np.pi/2)
+    # guidelims = (-np.pi/2,1*np.pi/2)
+    guidelims = (3*np.pi/2,np.pi/2)
+    xticks = (xticks[::-1], np.linspace(Xmin,Xmax,5).astype(int)[::-1])
+    yticks = yticks[::-1]
     # erg cm(-2) sec(-1) Ang(-1)
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
-        thetaguidelims=guidelims, thetaplotlims=(guidelims[0]+1.3*panelsize/2,guidelims[1]-panelsize/2), panelsize=panelsize,
+        thetaguidelims=guidelims, thetaplotlims=(guidelims[0]-1.3*panelsize+1.3*panelsize/2,guidelims[1]+panelsize-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
         thetalabel="Time Since\nPeak [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\cdot 10^{-20} \\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
-        thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1.2,0.0)),
-        xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
-        xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
-        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(4.0,1.2)),
+        thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(0.8,0.0)),
+        xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(2.3,-0.0)),
+        xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(0.3,-0.2)),
+        ylabelkwargs=dict(rotation=-45, textcoords="offset fontsize", xytext=(-11.5,-0.0)),
     )
     for i in range(len(theta)):
-        rot = lsu.minmaxscale(theta[i], *LSC.thetaplotlims, *LSC.thetalims)*180/np.pi #rotating labels
+        rot = lsu.minmaxscale(theta[i], *LSC.thetaplotlims, *LSC.thetalims)*180/np.pi + 180 #rotating labels
         LSP = LSC.add_panel(
             theta[i],
             panelsize=panelsize,
@@ -679,7 +684,6 @@ def plot_spectra_mayall():
             y_projection_method="theta",
             yticklabelkwargs=dict(rotation=rot),
         )
-        # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
         LSP.plot(X[i], Y[i],  c=colors[i], label=f"")
 
     fig = lstein.draw(LSC, figsize=(5,9))
