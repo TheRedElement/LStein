@@ -58,28 +58,28 @@ def set_metadata():
 
     return
 
-def modify_docstrings(app, what, name, obj, options, lines):
-    """
-        - function to apply modifications to docstrings
-    """
+# def modify_docstrings(app, what, name, obj, options, lines):
+#     """
+#         - function to apply modifications to docstrings
+#     """
 
-    #mapping to downgrade headings
-    heading_mapping = {
-        "=": "~",
-        "-": "~",
-        "~": '~',
-        "^": '~',
-    }
+#     #mapping to downgrade headings
+#     heading_mapping = {
+#         "=": "~",
+#         "-": "~",
+#         "~": '~',
+#         "^": '~',
+#     }
 
-    for i, line in enumerate(lines[:-1]):
-        next_line = lines[i + 1]
+#     for i, line in enumerate(lines[:-1]):
+#         next_line = lines[i + 1]
         
-        #downgrade headings
-        for char in heading_mapping.keys():
-            if set(next_line) == {char} and len(next_line) >= len(line):
-                lines[i + 1] = heading_mapping[char] * len(next_line)
+#         #downgrade headings
+#         for char in heading_mapping.keys():
+#             if set(next_line) == {char} and len(next_line) >= len(line):
+#                 lines[i + 1] = heading_mapping[char] * len(next_line)
 
-    return
+#     return
 
 
 #%%sphinx internal functions
