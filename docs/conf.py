@@ -103,6 +103,7 @@ extensions = [
     #sphinx extensions
     "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
@@ -115,6 +116,7 @@ autodoc_default_options = {
     "members": True,
     "member-order": "alphabetical",
 }
+autosummary_generate = True
 
 add_paths()
 set_metadata()
