@@ -63,9 +63,9 @@ def modify_docstrings(app, what, name, obj, options, lines):
         - function to apply modifications to docstrings
     """
     mapping = {
-        "=": "-",
-        "-": "~",
-        "~": "^",
+        "=": "~",
+        "-": "^",
+        "~": '"',
         "^": '"',
     }
 
