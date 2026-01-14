@@ -107,6 +107,10 @@ extensions = [
     # "sphinx_copybutton",
 ]
 
+autodoc_default_options = {
+    "members": True,
+    "member-order": "alphabetical",
+}
 
 add_paths()
 set_metadata()

@@ -8,11 +8,8 @@ LSteinCanvas
 
 
 .. currentmodule:: lstein.lstein.py
-.. automodule:: lstein.lstein.LSteinCanvas
+.. autoclass:: lstein.lstein.LSteinCanvas
     :members:
     :show-inheritance:
-
-.. currentmodule:: lstein.lstein.py
-.. automodule:: lstein.lstein.LSteinCanvas.compute_xaxis
-    :members:
-    :show-inheritance:
+    :exclude-members: __init__, __repr__, _private
+    :member-order: alphabetical
