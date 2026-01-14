@@ -894,7 +894,10 @@ def plot_snn():
         thetaticklabelkwargs=dict(rotation=30),
     )
 
-    LSC.plot(theta, x, y, seriestype="line", series_kwargs=[dict(c=colors[i], label=[f"LIF","","", f"EIF","","", f"QIF","",""][i]) for i in range(len(theta))])
+    LSC.plot(theta, x, y, seriestype="line",
+        series_kwargs=[dict(c=colors[i], label=[f"LIF","","", f"EIF","","", f"QIF","",""][i]) for i in range(len(theta))],
+        panel_kwargs=[dict(show_yticks=[True,True,True,False,False,False,False,False,False][i]) for i in range(len(theta))],
+    )
 
     fig = lstein.draw(LSC, figsize=(9,9))
     fig.legend(loc="upper right", bbox_to_anchor=(0.9, 0.9))
