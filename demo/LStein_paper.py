@@ -50,6 +50,20 @@ SAVE:bool = True
 YLIM:Tuple[int,int] = (-5,None)
 
 #%%definitions
+def blackbody(lbda, T):
+    h = 6.626e-34 #Js
+    kB = 1.380649e-23 #J/K
+    c = 299_792_458 #m/s
+    f1 = 2*h*c**2/lbda**5
+    exp = h*c/(lbda*kB*T)
+
+    return f1 * 1/(np.exp(exp) - 1)
+
+# x = np.linspace(1000,8000, 100)*1e-10
+# T = np.linspace(5000,15000,5)
+# for Ti in T:
+#     plt.plot(x, blackbody(x,Ti))
+
 def binning(
         x, y, dx,
         func=np.nanmean,
@@ -585,7 +599,7 @@ def plot_spectra_mayall():
     )
     print(df_obs["Phase (days)"].to_numpy())
     print(df_obs.height)
-    df_obs = df_obs[[0,5,11,15,17],:] #wiserep
+    df_obs = df_obs[[0,5,8,11,15,17],:] #wiserep
 
     # df_obs = df_obs.filter((pl.col("Phase (days)").abs() < 1)) #wiserep
     dfs_spec = [] 
@@ -597,15 +611,25 @@ def plot_spectra_mayall():
         dfs_spec.append(df_spec)
 
     #preprocessing
-    flux_factor = 1#1e15
+    flux_factor = 1e-3#1e15
     theta = df_obs["Phase (days)"]
     # theta = df_obs["index"]
     X = [df["wavelength"].to_numpy().flatten() for df in dfs_spec]
     Y = [df["flux"].to_numpy().flatten()*flux_factor for df in dfs_spec]
 
-    #wavelength constraint
-    # Y = [Y[i][((3000<X[i]) & (X[i]<7000))] for i in range(len(X))]
-    # X = [X[i][((3000<X[i]) & (X[i]<7000))] for i in range(len(X))]
+    #continuum removal
+    XY_cont = [binning(xi, yi, 500, np.nanmedian) for xi, yi in zip(X, Y)]
+    X_cont = [np.linspace(X[i].min(), X[i].max(), X[i].shape[0]) for i in range(len(X))]
+    Y_cont = [np.interp(np.linspace(X[i].min(), X[i].max(), X[i].shape[0]), XY_cont[i][0], XY_cont[i][1]) for i in range(len(X))]
+    
+    Y = [Y[i] - Y_cont[i] for i in range(len(Y))]
+    # for i in range(len(X)):
+    #     plt.plot(X[i], Y[i])
+    #     plt.plot(X_cont[i], Y_cont[i])
+
+    # #wavelength constraint
+    # Y = [Y[i][((5000<X[i]) & (X[i]<8000))] for i in range(len(X))]
+    # X = [X[i][((5000<X[i]) & (X[i]<8000))] for i in range(len(X))]
 
     #sigma clipping
     sc_mask = lambda x, n=5: (np.median(x)-n*x.std()<x)&(x<np.median(x)+n*x.std())
@@ -613,7 +637,7 @@ def plot_spectra_mayall():
     Y = [Y[i][sc_mask(Y[i])] for i in range(len(Y))]
 
     #binning
-    XY = [binning(xi, yi, 50, np.nanmean) for xi, yi in zip(X, Y)]
+    XY = [binning(xi, yi, 10, np.nanmean) for xi, yi in zip(X, Y)]
     X = [XYi[0] for XYi in XY]
     Y = [XYi[1] for XYi in XY]
 
@@ -630,17 +654,17 @@ def plot_spectra_mayall():
     xticks = np.round(np.linspace(xticks[:,0].min(), xticks[:,1].max(), 5), 5).astype(int)
     # xticks = (xticks,np.linspace(Xmin,Xmax,5).astype(int))   #make sure ticklabels display correct value
     yticks = np.array([[np.min(yi), np.max(yi)] for yi in Y])
-    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1)#.astype(int)
+    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1).astype(int)
 
     colors = lsu.get_colors(theta, cmap=CMAP)
-    panelsize = np.pi/8
+    panelsize = np.pi/10
     guidelims = (-np.pi/2,1*np.pi/2)
     # erg cm(-2) sec(-1) Ang(-1)
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=guidelims, thetaplotlims=(guidelims[0]+1.3*panelsize/2,guidelims[1]-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
-        thetalabel="Time Since\nPeak [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\cdot 10^{17} \\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
+        thetalabel="Time Since\nPeak [d]", xlabel="Wavelength $[\\mathrm{\AA}]$", ylabel="Flux $\cdot 10^{-20} \\left[\\frac{\mathrm{erg}}{\\mathrm{cm^2\,s\,}\\mathrm{\AA}}\\right]$",
         thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-1.2,0.0)),
         xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
         xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
@@ -652,7 +676,7 @@ def plot_spectra_mayall():
             theta[i],
             panelsize=panelsize,
             show_panelbounds=True,
-            y_projection_method="y",
+            y_projection_method="theta",
             yticklabelkwargs=dict(rotation=rot),
         )
         # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
