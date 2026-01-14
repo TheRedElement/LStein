@@ -3,7 +3,8 @@ LSteinCanvas
 ============
 
 .. toctree::
-   :depth: 2
+   :glob:
+   :max-depth: 2
 
 
 .. currentmodule:: lstein.lstein.py
