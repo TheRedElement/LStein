@@ -69,6 +69,8 @@ def setup(app):
     dst = os.path.join(app.outdir, "_gfx")
     if os.path.exists(src):
         shutil.copytree(src, dst, dirs_exist_ok=True)
+
+    
 #%%main
 #extensions
 extensions = [
