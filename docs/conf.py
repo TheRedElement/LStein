@@ -94,7 +94,7 @@ def setup(app):
     if os.path.exists(src):
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
-    app.connect("autodoc-process-docstring", modify_docstrings)
+    # app.connect("autodoc-process-docstring", modify_docstrings)
 
 
     
