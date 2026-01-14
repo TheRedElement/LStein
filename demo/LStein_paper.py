@@ -483,12 +483,12 @@ def plot_projection_methods(
     )
 
     #plotting all the series (similar to `plt.plot()`)
-    LSC1.plot(theta_raw[::1], x_raw[::1], y_raw[::1], seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True, show_yticks=True), series_kwargs=[dict(s=5, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
-    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True, show_yticks=False), series_kwargs=dict(lw=5, c="w"))
-    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True, show_yticks=False), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
-    LSC2.plot(theta_raw[::1], x_raw[::1], y_raw[::1], seriestype="scatter", panel_kwargs=dict(y_projection_method="y", show_panelbounds=True, show_yticks=True), series_kwargs=[dict(s=5, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
-    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="y", show_panelbounds=True, show_yticks=False), series_kwargs=dict(lw=5, c="w"))
-    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line", panel_kwargs=dict(y_projection_method="y", show_panelbounds=True, show_yticks=False), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC1.plot(theta_raw[::1], x_raw[::1], y_raw[::1], seriestype="scatter", panel_kwargs=dict(y_projection_method="theta",  show_panelbounds=True, show_yticks=True),   series_kwargs=[dict(s=5, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line",    panel_kwargs=dict(y_projection_method="theta",  show_panelbounds=True, show_yticks=False),  series_kwargs=dict(lw=5, c="w"))
+    LSC1.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line",    panel_kwargs=dict(y_projection_method="theta",  show_panelbounds=True, show_yticks=False),  series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC2.plot(theta_raw[::1], x_raw[::1], y_raw[::1], seriestype="scatter", panel_kwargs=dict(y_projection_method="y",      show_panelbounds=True, show_yticks=True),   series_kwargs=[dict(s=5, alpha=0.5, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line",    panel_kwargs=dict(y_projection_method="y",      show_panelbounds=True, show_yticks=False),  series_kwargs=dict(lw=5, c="w"))
+    LSC2.plot(theta_pro[::1], x_pro[::1], y_pro[::1], seriestype="line",    panel_kwargs=dict(y_projection_method="y",      show_panelbounds=True, show_yticks=False),  series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
 
     #plotting
     fig = plt.figure(figsize=(9,9))
