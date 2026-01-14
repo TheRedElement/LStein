@@ -2,9 +2,8 @@
 LSteinCanvas
 ============
 
-.. contents::
-   :local:
-   :depth: 3
+.. toctree::
+   :depth: 2
 
    self
 
