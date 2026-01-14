@@ -6,6 +6,11 @@ LSteinCanvas
    :local:
    :depth: 3
 
+.. toctree::
+   :maxdepth: 2
+
+   self
+
 
 .. currentmodule:: lstein.lstein.py
 .. autoclass:: lstein.lstein.LSteinCanvas
