@@ -7,6 +7,7 @@ WELCOME
 .. toctree::
    :glob:
    :maxdepth: 1
+   :caption: Table Of Contents
 
    pages/quickstart.rst
    pages/lstein_canvas.rst
