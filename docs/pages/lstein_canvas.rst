@@ -2,8 +2,8 @@
 LSteinCanvas
 ============
 
-.. toctree::
-   :glob:
+.. contents::
+   :local:
    :maxdepth: 2
 
 
