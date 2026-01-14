@@ -19,11 +19,6 @@ WELCOME
       pages/lstein_panel.rst
       pages/backends.rst
 
-.. .. currentmodule:: lstein.base.LSteinCanvas.py
-.. .. automodule:: lstein.base.LSteinCanvas
-..     :members:
-..     :show-inheritance:
-
 
 Installation
 ------------
