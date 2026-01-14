@@ -5,8 +5,6 @@ LSteinCanvas
 .. toctree::
    :depth: 2
 
-   self
-
 
 .. currentmodule:: lstein.lstein.py
 .. autoclass:: lstein.lstein.LSteinCanvas

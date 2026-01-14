@@ -75,8 +75,9 @@ def modify_docstrings(app, what, name, obj, options, lines):
         next_line = lines[i + 1]
         
         #downgrade headings
-        if set(next_line) == {"="} and len(next_line) >= len(line):
-            lines[i + 1] = heading_mapping["="] * len(next_line)
+        for char in heading_mapping.keys():
+            if set(next_line) == {char} and len(next_line) >= len(line):
+                lines[i + 1] = heading_mapping[char] * len(next_line)
 
     return
 
