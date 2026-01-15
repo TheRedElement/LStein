@@ -474,9 +474,8 @@ class LSteinCanvas:
         - analogous to `matplotlib.figure.Figure`
         - parent to `LSteinPanel`
 
-        Attribues
-        ^^^^^^^^^
-
+        Attributes
+        ----------
             - `ax`
                 `plt.Axes`
                 - axes to add the `LStein` plot to
