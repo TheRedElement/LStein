@@ -18,6 +18,20 @@ WELCOME
    :local:
    :depth: 1
 
+Reference
+---------
+If you find `LStein` useful in your work we would appreciate it if you cite it's paper:
+.. todo:: update citation once published
+
+.. code-block:: latex
+   @software{PY_Steinwender2025_lstein,
+      author    = {{Steinwender}, Lukas},
+      title     = {LStein: Linking Series to envision information neatly},
+      month     = Jul,
+      year      = 2025,
+      version   = {latest},
+      url       = {https://github.com/TheRedElement/LStein.git}
+   }
 
 Installation
 ------------

@@ -120,6 +120,7 @@ autodoc_default_options = {
 }
 # autoclass_content = "both"
 autosummary_generate = True
+todo_include_todos = True
 
 
 add_paths()

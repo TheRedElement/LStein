@@ -7,8 +7,8 @@
 Exceptions
 
 Classes
-    - LSteinPlotly  -- use Plotly as the backend
-    - LSteinMPL     -- use matplotlib as the backend
+    - `LSteinPlotly`  -- use Plotly as the backend
+    - `LSteinMPL`     -- use matplotlib as the backend
 
 Functions
 
