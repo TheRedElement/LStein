@@ -10,7 +10,7 @@ WELCOME
 
 .. toctree::
    :glob:
-   :maxdepth: 1
+   :maxdepth: 2
 
    pages/*
    pages/*/*
