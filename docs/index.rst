@@ -9,6 +9,7 @@ WELCOME
    .. contents::
       :local:
       :depth: 2
+      :caption: Contents
 
    .. toctree::
       :glob:
