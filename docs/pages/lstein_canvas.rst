@@ -7,7 +7,9 @@ LSteinCanvas
 
 .. currentmodule:: lstein.lstein.py
 
-      
+.. autosummary::
+   :signatures: short
+
 .. autoclass:: lstein.lstein.LSteinCanvas
    :members:
    :show-inheritance:
