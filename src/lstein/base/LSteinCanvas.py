@@ -476,24 +476,24 @@ class LSteinCanvas:
     - parent to `LSteinPanel`
 
     Attributes
-        - `thetaticks` -- see constructor
-        - `xticks` -- see constructor
-        - `yticks` -- see constructor
-        - `thetaguidelims` -- see constructor
-        - `thetaplotlims` -- see constructor
-        - `xlimdeadzone` -- see constructor
-        - `panelsize` -- see constructor
-        - `thetalabel` -- see constructor
-        - `xlabel` -- see constructor
-        - `ylabel` -- see constructor
-        - `thetaarrowpos_th` -- see constructor
-        - `ylabpos_th` -- see constructor
-        - `thetatickkwargs` -- see constructor
-        - `thetaticklabelkwargs` -- see constructor
-        - `thetalabelkwargs` -- see constructor
-        - `xtickkwargs` -- see constructor
-        - `xticklabelkwargs` -- see constructor
-        - `labelkwargs` -- see constructor
+        - `thetaticks` -- see `__init__()`
+        - `xticks` -- see `__init__()`
+        - `yticks` -- see `__init__()`
+        - `thetaguidelims` -- see `__init__()`
+        - `thetaplotlims` -- see `__init__()`
+        - `xlimdeadzone` -- see `__init__()`
+        - `panelsize` -- see `__init__()`
+        - `thetalabel` -- see `__init__()`
+        - `xlabel` -- see `__init__()`
+        - `ylabel` -- see `__init__()`
+        - `thetaarrowpos_th` -- see `__init__()`
+        - `ylabpos_th` -- see `__init__()`
+        - `thetatickkwargs` -- see `__init__()`
+        - `thetaticklabelkwargs` -- see `__init__()`
+        - `thetalabelkwargs` -- see `__init__()`
+        - `xtickkwargs` -- see `__init__()`
+        - `xticklabelkwargs` -- see `__init__()`
+        - `labelkwargs` -- see `__init__()`
 
     Inferred Attributes
         - `thetalims`
