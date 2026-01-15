@@ -22,4 +22,5 @@ API Reference
    :toctree: tocAPI/
    :recursive:
 
-   lstein.lstein
+   lstein.lstein.LSteinCanvas
+   lstein.lstein.LSteinPanel
