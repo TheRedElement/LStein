@@ -7,7 +7,7 @@ LSteinPanel
 
 .. autosummary::
    :signatures: none
-   :toctree: generated/
+   :toctree: generatedPanel/
 
    LSteinPanel
    LSteinPanel.__init__
