@@ -7,7 +7,7 @@ LSteinCanvas
 
 .. autosummary::
    :signatures: none
-   :members:
+   :recursive:
    :toctree: generated/
 
    LSteinCanvas
