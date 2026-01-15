@@ -9,7 +9,7 @@ LSteinCanvas
    :signatures: none
    :toctree: generated/
 
-   LSteinCanvas.add_panel
+   LSteinCanvas
 
 .. autoclass:: LSteinCanvas
    :members:
