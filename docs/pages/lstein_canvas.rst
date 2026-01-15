@@ -8,9 +8,11 @@ LSteinCanvas
 .. autosummary::
    :signatures: none
    :recursive:
+   :members:
    :toctree: generated/
 
    LSteinCanvas
+
 
 .. autoclass:: LSteinCanvas
    :members:
