@@ -1,3 +1,4 @@
+.. base template for autosummary
 
 {{ fullname }}
 {{ "=" * fullname|length }}

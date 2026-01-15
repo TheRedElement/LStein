@@ -23,16 +23,11 @@ class LSteinPlotly:
             - especially relevant for annotations (tick labels, axis labels, ...)
 
     Attributes
-    ----------
-        - `LSC`
-            - `LSteinCanvas`
-            - canvas to display
+        - `LSC` -- see `__init__()`
 
     Inferred Attributes
-    -------------------
 
     Methods
-    -------
         - `add_xaxis()`
         - `add_thetaaxis()`
         - `add_yaxis()`
@@ -43,18 +38,26 @@ class LSteinPlotly:
         - `show()`
 
     Dependencies
-    ------------
         - `logging`
         - `matplotlib`
         - `numpy`
-
-    Comments
-    --------
     """
     
     def __init__(self,
         LSC:LSteinCanvas,
         ):
+        """constructor
+
+        - initializes class
+
+        Parameters
+            - `LSC`
+                - `LSteinCanvas`
+                - canvas to display
+        Raises
+
+        Returns
+        """
         self.LSC = LSC
 
         #convert kwargs from matplotlib to plotly
@@ -63,21 +66,20 @@ class LSteinPlotly:
         return
     
     def translate_kwargs(self):
-        """
-            - method to translate default kwargs specified in `LSteinCanvas` and `LSteinPanel` to plotly
-                - original kwargs are specified in matplotlib
+        """translates kwargs from matplotlib to plotly names
 
-            Parameters
-            ----------
+        - method to translate default kwargs specified in `LSteinCanvas` and `LSteinPanel` to plotly
+            - original kwargs are specified in matplotlib
+        - overrides any relevant `...kwargs` attribute of `self.LSC`
+        - currently included
+            - the default values for the kwargs
+            - some commonly used values
 
-            Raises
-            ------
+        Parameters
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
+        Returns
         """
         ls2plotly = {"-":"solid", "--":"dash", ":":"dot", "-.":"dashdot"}
         c2plotly = {"k":"#000000", "black":"#000000", "w":"#ffffff", "tab:grey":"#7f7f7f"}
@@ -162,29 +164,24 @@ class LSteinPlotly:
         fig:go.Figure,
         row:int, col:int,
         ):
-        """
-            - method to add the x-axis to `fig`
+        """adds x-axis to `fig`
+            
+        - method to add the x-axis to `fig`
 
-            Parameters
-            ----------
-                - `fig`
-                    - `Figure`
-                    - plotly figure to draw into
-                - `row`
-                    - `int`
-                    - row of the panel to plot into
-                - `col`
-                    - `int`
-                    - column of the panel to plot into
+        Parameters
+            - `fig`
+                - `Figure`
+                - plotly figure to draw into
+            - `row`
+                - `int`
+                - row of the panel to plot into
+            - `col`
+                - `int`
+                - column of the panel to plot into
 
-            Raises
-            ------
+        Raises
 
-            Returns
-            -------
-
-            Comments
-            --------
+        Returns
         """
         #get quantities
         circles_x, circles_y, \
@@ -225,29 +222,24 @@ class LSteinPlotly:
         fig:go.Figure,
         row:int, col:int,
         ):
-        """
-            - method to add the theta-axis to `fig`
+        """adds theta-axis to `fig`
 
-            Parameters
-            ----------
-                - `fig`
-                    - `Figure`
-                    - plotly figure to draw into
-                - `row`
-                    - `int`
-                    - row of the panel to plot into
-                - `col`
-                    - `int`
-                    - column of the panel to plot into
+        - method to add the theta-axis to `fig`
 
-            Raises
-            ------
+        Parameters
+            - `fig`
+                - `Figure`
+                - plotly figure to draw into
+            - `row`
+                - `int`
+                - row of the panel to plot into
+            - `col`
+                - `int`
+                - column of the panel to plot into
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
+        Returns
         """    
         #get quantities
         thetatickpos_xi, thetatickpos_yi, thetatickpos_xo, thetatickpos_yo, \
@@ -297,29 +289,24 @@ class LSteinPlotly:
         fig:go.Figure,
         row:int, col:int,
         ):
-        """
-            - method to add the y-label to `fig`
+        """adds y-label to `fig`
 
-            Parameters
-            ----------
-                - `fig`
-                    - `Figure`
-                    - plotly figure to draw into
-                - `row`
-                    - `int`
-                    - row of the panel to plot into
-                - `col`
-                    - `int`
-                    - column of the panel to plot into
+        - method to add the y-label to `fig`
 
-            Raises
-            ------
+        Parameters
+            - `fig`
+                - `Figure`
+                - plotly figure to draw into
+            - `row`
+                - `int`
+                - row of the panel to plot into
+            - `col`
+                - `int`
+                - column of the panel to plot into
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
+        Returns
         """        
         #get quantities
         ylabpos_x, ylabpos_y = self.LSC.compute_ylabel()
@@ -341,28 +328,23 @@ class LSteinPlotly:
         fig:go.Figure,
         row:int, col:int,        
         ):
-        """
-            - method to add the y-axis of `LSP` to `fig`
+        """adds y-axis of `LSP` to `fig`
 
-            Parameters
-            ----------
-                - `fig`
-                    - `Figure`
-                    - plotly figure to draw into
-                - `row`
-                    - `int`
-                    - row of the panel to plot into
-                - `col`
-                    - `int`
-                    - column of the panel to plot into
-            Raises
-            ------
+        - method to add the y-axis of `LSP` to `fig`
 
-            Returns
-            -------
+        Parameters
+            - `fig`
+                - `Figure`
+                - plotly figure to draw into
+            - `row`
+                - `int`
+                - row of the panel to plot into
+            - `col`
+                - `int`
+                - column of the panel to plot into
+        Raises
 
-            Comments
-            --------
+        Returns
         """    
         #get panel boundaries
         theta_offset, theta_lb, theta_ub = LSP.get_thetabounds()
@@ -430,40 +412,35 @@ class LSteinPlotly:
         x:np.ndarray, y:np.ndarray,
         *args, **kwargs
         ):
-        """
-            - method to add a scatterplot
+        """adds a scatterplot of `x` and `y` to `fig`
 
-            Parameters
-            ----------
-                - `fig`
-                    - `Figure`
-                    - plotly figure to draw into
-                - `row`
-                    - `int`
-                    - row of the panel to plot into
-                - `col`
-                    - `int`
-                    - column of the panel to plot into
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series
-                    - has to have same length as `y`
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series
-                    - has to have same length as `x`
-                -`kwargs`
-                    - kwargs to pass to `go.Scatter()`
-                        
-            Raises
-            ------
+        - method to add a scatterplot
+        - only to be called from within `LSteinPlotly.show()`
 
-            Returns
-            -------
+        Parameters
+            - `fig`
+                - `Figure`
+                - plotly figure to draw into
+            - `row`
+                - `int`
+                - row of the panel to plot into
+            - `col`
+                - `int`
+                - column of the panel to plot into
+            - `x`
+                - `np.ndarray`
+                - x-values of the series
+                - has to have same length as `y`
+            - `y`
+                - `np.ndarray`
+                - y-values of the series
+                - has to have same length as `x`
+            -`kwargs`
+                - kwargs to pass to `go.Scatter()`
+                    
+        Raises
 
-            Comments
-            --------
-                - only to be called from within `LSteinPlotly.show()`
+        Returns
         """
         #translate kwargs
         c, = (kwargs.pop(k) for k in ["c"])
@@ -485,40 +462,35 @@ class LSteinPlotly:
         x:np.ndarray, y:np.ndarray,
         *args, **kwargs
         ):
-        """
-            - method to add a lineplot
+        """adds a lineplot of `x` and `y` to `fig`
 
-            Parameters
-            ----------
-                - `fig`
-                    - `Figure`
-                    - plotly figure to draw into
-                - `row`
-                    - `int`
-                    - row of the panel to plot into
-                - `col`
-                    - `int`
-                    - column of the panel to plot into
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series
-                    - has to have same length as `y`
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series
-                    - has to have same length as `x`
-                -`kwargs`
-                    - kwargs to pass to `go.Scatter()`
-                        
-            Raises
-            ------
+        - method to add a lineplot
+        - only to be called from within `LSteinPlotly.show()`
 
-            Returns
-            -------
+        Parameters
+            - `fig`
+                - `Figure`
+                - plotly figure to draw into
+            - `row`
+                - `int`
+                - row of the panel to plot into
+            - `col`
+                - `int`
+                - column of the panel to plot into
+            - `x`
+                - `np.ndarray`
+                - x-values of the series
+                - has to have same length as `y`
+            - `y`
+                - `np.ndarray`
+                - y-values of the series
+                - has to have same length as `x`
+            -`kwargs`
+                - kwargs to pass to `go.Scatter()`
+                    
+        Raises
 
-            Comments
-            --------
-                - only to be called from within `LSteinPlotly.show()`
+        Returns
         """    
         #translate kwargs
         c, = (kwargs.pop(k) for k in ["c"])
@@ -539,36 +511,31 @@ class LSteinPlotly:
         fig:go.Figure,
         row:int, col:int,
         ) -> go.Figure:
-        """
-            - method to display `self.LSC` within a plotly figure
-            - will
-                - draw the canvas
-                - add each panel
-                - plot series for each panel
+        """display LStein plot in `fig`
 
-            Parameters
-            ----------
-                - `fig`
-                    - `Figure`
-                    - plotly figure to draw into
-                - `row`
-                    - `int`
-                    - row of the panel to plot into
-                - `col`
-                    - `int`
-                    - column of the panel to plot into
-            
-            Raises
-            ------
+        - method to display `self.LSC` within a plotly figure
+        - will
+            - draw the canvas
+            - add each panel
+            - plot series for each panel
 
-            Returns
-            -------
-                - `fig`
-                    - `go.Figure`
-                    - `fig` with the respective elements added
+        Parameters
+            - `fig`
+                - `Figure`
+                - plotly figure to draw into
+            - `row`
+                - `int`
+                - row of the panel to plot into
+            - `col`
+                - `int`
+                - column of the panel to plot into
+        
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `fig`
+                - `go.Figure`
+                - `fig` with the respective elements added
         """
 
 

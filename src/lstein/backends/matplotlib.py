@@ -19,6 +19,8 @@ class LSteinMPL:
     Attributes
         - `LSC` -- see `__init__()`
 
+    Inferred Attributes
+
     Methods
         - `add_xaxis()`
         - `add_thetaaxis()`
@@ -270,7 +272,7 @@ class LSteinMPL:
 
     #combined
     def show(self, ax:plt.Axes):
-        """display `self.LSC` in `ax`
+        """display LStein plot in `ax`
 
         - method to display `self.LSC` within a matplotlib figure
         - similar to `plt.show()`

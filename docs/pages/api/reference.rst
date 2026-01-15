@@ -51,12 +51,10 @@ Backends
 `matplotlib <https://matplotlib.org/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 .. autosummary::
     :signatures: none
     :recursive:
     :toctree: tocMPL/
-    :template: _templates/autosummary/base.rst
 
     LSteinMPL
     LSteinMPL.__init__
@@ -68,3 +66,17 @@ Backends
 
 `Plotly <https://plotly.com/python/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+    :signatures: none
+    :recursive:
+    :toctree: tocPlotly/
+
+    LSteinPlotly
+    LSteinPlotly.__init__
+    LSteinPlotly.add_thetaaxis
+    LSteinPlotly.add_xaxis
+    LSteinPlotly.add_yaxis
+    LSteinPlotly.add_ylabel
+    LSteinPlotly.show
+    LSteinPlotly.translate_kwargs
