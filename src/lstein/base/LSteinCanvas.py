@@ -474,9 +474,9 @@ class LSteinCanvas:
         - analogous to `matplotlib.figure.Figure`
         - parent to `LSteinPanel`
 
-        Attributes
-        ^^^^^^^^^^
-        
+        Attribues
+        ^^^^^^^^^
+
             - `ax`
                 `plt.Axes`
                 - axes to add the `LStein` plot to
@@ -623,8 +623,8 @@ class LSteinCanvas:
                 - the default is `None`
                     - will be set to `dict(c=plt.rcParams["axes.labelcolor"], pad=0.15)`
             
-        Infered Attributes
-        ------------------
+        Inferred Attributes
+        -------------------
             - `thetalims`
                 - `Tuple[float,float]`
                 - axis limits applied to `theta`
@@ -636,7 +636,7 @@ class LSteinCanvas:
                 - axis limits applied to `x`
                     - i.e., in radial direction
                     - `xlims[0]` corresponds to the value plotted at the end of `xlimdeadzone`
-                    - `xlims[1]` corresponds to the value plotted at the outer bound of the LStein plot
+                    - `xlims[----------1]` corresponds to the value plotted at the outer bound of the LStein plot
             - `xlimrange`
                 - `float`
                 - range of x-values
