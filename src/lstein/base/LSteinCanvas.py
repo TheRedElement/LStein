@@ -547,7 +547,7 @@ class LSteinCanvas:
         xtickkwargs:dict=None, xticklabelkwargs:dict=None, xlabelkwargs:dict=None,
         ylabelkwargs:dict=None,
         ):
-        """
+        """constructor
 
         Parameters
             - `thetaticks`
