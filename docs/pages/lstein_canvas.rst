@@ -6,9 +6,8 @@ LSteinCanvas
 .. currentmodule:: lstein.lstein
 
 .. autosummary::
-   :toctree: generated/
-   :members:
    :signatures: none
+   :toctree: generated/
 
    LSteinCanvas.add_panel
 
