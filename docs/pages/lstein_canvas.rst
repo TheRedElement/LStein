@@ -7,12 +7,18 @@ LSteinCanvas
 
 .. autosummary::
    :signatures: none
-   :recursive:
-   :members:
    :toctree: generated/
 
    LSteinCanvas
-
+   LSteinCanvas.__init__
+   LSteinCanvas.add_panel
+   LSteinCanvas.compute_thetaaxis
+   LSteinCanvas.compute_xaxis
+   LSteinCanvas.compute_ylabel
+   LSteinCanvas.get_panel
+   LSteinCanvas.get_thetas
+   LSteinCanvas.plot
+   LSteinCanvas.reset
 
 .. autoclass:: LSteinCanvas
    :members:
