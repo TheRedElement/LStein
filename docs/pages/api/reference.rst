@@ -3,6 +3,9 @@ API Reference
 
 .. currentmodule:: lstein.lstein
 
+LSteinCanvas
+------------
+
 .. autosummary::
    :signatures: none
    :toctree: tocLSC/
@@ -17,6 +20,10 @@ API Reference
    LSteinCanvas.get_thetas
    LSteinCanvas.plot
    LSteinCanvas.reset
+
+
+LSteinPanel
+-----------
 
 .. autosummary::
    :signatures: none
