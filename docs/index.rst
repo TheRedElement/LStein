@@ -6,11 +6,6 @@ WELCOME
 
 .. rubric:: Contents
 
-   .. contents::
-      :local:
-      :depth: 2
-      :caption: Contents
-
    .. toctree::
       :glob:
       :maxdepth: 1
