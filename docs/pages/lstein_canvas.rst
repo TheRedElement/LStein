@@ -10,7 +10,7 @@ LSteinCanvas
    :members:
    :signature: short
 
-   LSteinCanvas
+   LSteinCanvas.__init__
 
 .. autoclass:: LSteinCanvas
    :members:
