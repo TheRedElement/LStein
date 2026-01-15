@@ -56,14 +56,15 @@ Backends
     :signatures: none
     :recursive:
     :toctree: tocMPL/
+    :template: _templates/autosummary/base.rst
 
     LSteinMPL
     LSteinMPL.__init__
     LSteinMPL.add_thetaaxis
     LSteinMPL.add_xaxis
-    LSteinMPL.show   
     LSteinMPL.add_yaxis
     LSteinMPL.add_ylabel
+    LSteinMPL.show
 
 `Plotly <https://plotly.com/python/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
