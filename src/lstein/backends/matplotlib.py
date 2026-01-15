@@ -11,40 +11,47 @@ logger = logging.getLogger(__name__)
 
 #%%definitions
 class LSteinMPL:
-    """
-        - matplotlib backend to show an `LSteinCanvas` with all its `LSteinPanel` elements
+    """represents matplotlib backend for plotting LStein
+    
+    - matplotlib backend to show an `LSteinCanvas` with all its `LSteinPanel` elements
+    - `ax` is a method argument to ensure signature equivalence of different backends
 
-        Attributes
-        ----------
-            - `LSC`
-                - `LSteinCanvas`
-                - canvas to display
+    Attributes
+        - `LSC` -- see `__init__()`
 
-        Methods
-        -------
-            - `add_xaxis()`
-            - `add_thetaaxis()`
-            - `add_yaxis()`
-            - `add_ylabel()`
-            - `add_yaxis()`
-            - `scatter_()`
-            - `plot_()`
-            - `show()`
+    Methods
+        - `add_xaxis()`
+        - `add_thetaaxis()`
+        - `add_yaxis()`
+        - `add_ylabel()`
+        - `add_yaxis()`
+        - `scatter_()`
+        - `plot_()`
+        - `show()`
 
-        Dependencies
-        ------------
-            - `logging`
-            - `matplotlib`
-            - `numpy`
+    Dependencies
+        - `logging`
+        - `matplotlib`
+        - `numpy`
 
-        Comments
-        --------
-            - `ax` as method argument to ensure signature equivalence of different backends
+    Comments
     """
     
     def __init__(self,
         LSC:LSteinCanvas,
         ):
+        """constructor
+
+        - initializes class
+
+        Parameters
+            - `LSC`
+                - `LSteinCanvas`
+                - canvas to display
+        Raises
+
+        Returns
+        """
         self.LSC = LSC
         return
 
@@ -52,23 +59,18 @@ class LSteinMPL:
     def add_xaxis(self,
         ax:plt.Axes
         ):
-        """
-            - method to add the x-axis to `ax`
+        """adds x-axis to `ax`
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
+        - method to add the x-axis to `ax`
 
-            Raises
-            ------
+        Parameters
+            - `ax`
+                - `plt.Axes`
+                - axis to draw into
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
+        Returns
         """
         #get quantities
         circles_x, circles_y, \
@@ -86,23 +88,18 @@ class LSteinMPL:
     def add_thetaaxis(self,
         ax:plt.Axes
         ):
-        """
-            - method to add the theta-axis to `ax`
+        """adds theta-axis to `ax`
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
+        - method to add the theta-axis to `ax`
 
-            Raises
-            ------
+        Parameters
+            - `ax`
+                - `plt.Axes`
+                - axis to draw into
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
+        Returns
         """    
         #get quantities
         thetatickpos_xi, thetatickpos_yi, thetatickpos_xo, thetatickpos_yo, \
@@ -134,23 +131,18 @@ class LSteinMPL:
     def add_ylabel(self,
         ax:plt.Axes
         ):
-        """
-            - method to add the y-label to `ax`
+        """adds y-label to `ax`
+        
+        - method to add the y-label to `ax`
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
+        Parameters
+            - `ax`
+                - `plt.Axes`
+                - axis to draw into
 
-            Raises
-            ------
+        Raises
 
-            Returns
-            -------
-
-            Comments
-            --------
+        Returns
         """        
         #get quantities
         ylabpos_x, ylabpos_y = self.LSC.compute_ylabel()
@@ -164,26 +156,21 @@ class LSteinMPL:
     def add_yaxis(self,
         LSP:LSteinPanel, ax:plt.Axes
         ):
-        """
-            - method to add the y-axis of `LSP` to `ax`
+        """adds y-axis of `LSP` to `ax`
 
-            Parameters
-            ----------
-                - `LSP`
-                    - `LSteinPanel`
-                    - y-axis of this canvas will be drawn
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
+        - method to add the y-axis of `LSP` to `ax`
 
-            Raises
-            ------
+        Parameters
+            - `LSP`
+                - `LSteinPanel`
+                - y-axis of this canvas will be drawn
+            - `ax`
+                - `plt.Axes`
+                - axis to draw into
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
+        Returns
         """    
         #get panel boundaries
         theta_offset, theta_lb, theta_ub = LSP.get_thetabounds()
@@ -223,34 +210,29 @@ class LSteinMPL:
         ax:plt.Axes, x:np.ndarray, y:np.ndarray,
         *args, **kwargs
         ):
-        """
-            - method to add a scatterplot
+        """adds a scatterplot of `x` and `y` to `ax`
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series
-                    - has to have same length as `y`
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series
-                    - has to have same length as `x`
-                -`kwargs`
-                    - kwargs to pass to `ax.scatter()`
-                        
-            Raises
-            ------
+        - method to add a scatterplot
+        - only to be called from within `LSteinMPL.show()`
 
-            Returns
-            -------
+        Parameters
+            - `ax`
+                - `plt.Axes`
+                - axis to draw into
+            - `x`
+                - `np.ndarray`
+                - x-values of the series
+                - has to have same length as `y`
+            - `y`
+                - `np.ndarray`
+                - y-values of the series
+                - has to have same length as `x`
+            -`kwargs`
+                - kwargs to pass to `ax.scatter()`
+                    
+        Raises
 
-            Comments
-            --------
-                - only to be called from within `LSteinMPL.show()`
+        Returns
         """
         ax.scatter(x, y, **kwargs)
         return
@@ -259,65 +241,55 @@ class LSteinMPL:
         ax:plt.Axes, x:np.ndarray, y:np.ndarray,
         *args, **kwargs
         ):
-        """
-            - method to add a lineplot
+        """adds a lineplot of `x` and `y` to `ax`
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series
-                    - has to have same length as `y`
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series
-                    - has to have same length as `x`
-                - `kwargs`
-                    - kwargs to pass to `ax.plot()`
-                        
-            Raises
-            ------
+        - method to add a lineplot
+        - only to be called from within `LSteinMPL.show()`
 
-            Returns
-            -------
+        Parameters
+            - `ax`
+                - `plt.Axes`
+                - axis to draw into
+            - `x`
+                - `np.ndarray`
+                - x-values of the series
+                - has to have same length as `y`
+            - `y`
+                - `np.ndarray`
+                - y-values of the series
+                - has to have same length as `x`
+            - `kwargs`
+                - kwargs to pass to `ax.plot()`
+                    
+        Raises
 
-            Comments
-            --------
-                - only to be called from within `LSteinMPL.show()`
+        Returns
         """    
         ax.plot(x, y, **kwargs)
         return
 
     #combined
     def show(self, ax:plt.Axes):
-        """
-            - method to display `self.LSC` within a matplotlib figure
-            - similar to `plt.show()`
-            - will
-                - draw the canvas
-                - add each panel
-                - plot series for each panel
+        """display `self.LSC` in `ax`
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`
-                    - axis to draw into
-            
-            Raises
-            ------
+        - method to display `self.LSC` within a matplotlib figure
+        - similar to `plt.show()`
+        - will
+            - draw the canvas
+            - add each panel
+            - plot series for each panel
 
-            Returns
-            -------
-                - `ax`
-                    - `plt.Axes`
-                    - `ax` with the respective elements added
+        Parameters
+            - `ax`
+                - `plt.Axes`
+                - axis to draw into
+        
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `ax`
+                - `plt.Axes`
+                - `ax` with the respective elements added
         """
 
         #disable some default settings

@@ -39,3 +39,30 @@ LSteinPanel
    LSteinPanel.project_xy
    LSteinPanel.project_xy_theta
    LSteinPanel.project_xy_y
+
+Backends
+--------
+
+matplotlib
+~~~~~~~~~~
+
+`matplotlib` _pymatplotlib.
+
+.. autosummary::
+   :signatures: none
+   :toctree: tocLSP/
+
+   LSteinPanel
+   LSteinPanel.__init__
+   LSteinPanel.apply_axis_limits
+   LSteinPanel.get_rbounds
+   LSteinPanel.get_thetabounds
+   LSteinPanel.get_yticks
+   LSteinPanel.plot
+   LSteinPanel.project_xy
+   LSteinPanel.project_xy_theta
+   LSteinPanel.project_xy_y
+
+
+.. links
+.. _pymatplotlib: https://matplotlib.org/
