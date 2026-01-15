@@ -475,7 +475,7 @@ class LSteinCanvas:
         - parent to `LSteinPanel`
 
         Attributes
-        ----------
+        ^^^^^^^^^^
             - `ax`
                 `plt.Axes`
                 - axes to add the `LStein` plot to
