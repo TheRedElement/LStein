@@ -46,7 +46,7 @@ Backends
 matplotlib
 ~~~~~~~~~~
 
-`matplotlib` _pymatplotlib.
+`matplotlib <https://matplotlib.org/>`_
 
 .. autosummary::
    :signatures: none
