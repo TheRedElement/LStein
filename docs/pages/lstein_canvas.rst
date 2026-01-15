@@ -6,19 +6,6 @@ LSteinCanvas
 .. currentmodule:: lstein.lstein
 
 
-Methods
--------
-
-.. autosummary::
-   :toctree: generated/
-   :recursive:
-   :members:
-   :signatures: short
-
-   LSteinCanvas
-
-
-
 
 .. autoclass:: LSteinCanvas
    :members:
