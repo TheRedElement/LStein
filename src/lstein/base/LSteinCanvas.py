@@ -13,29 +13,29 @@ from .LSteinPanel import LSteinPanel
 #Child Classes#
 ###############
 class LSteinXAxis:
+    """computes arrays and values for adding the x-axis to the LStein canvas
+
+    - class to compute arrays and values relevant for adding an x-axis to the LStein canvas
+
+    Attributes
+
+    Methods
+        - `compute_ticks()`
+        - `compute_ticklabs()`
+        - `compute_labs()`
+
+    Dependencies
+        - `matplotlib`
+        - `numpy`
+        - `typing`
+
+    Comments
     """
-        - class to compute arrays and values relevant for adding an x-axis to the LStein canvas
 
-        Attributes
-        ----------
-
-        Methods
-        -------
-            - `compute_ticks()`
-            - `compute_ticklabs()`
-            - `compute_labs()`
-
-        Dependencies
-        ------------
-            - `matplotlib`
-            - `numpy`
-            - `typing`
-
-        Comments
-        --------
-    """
     def __init__(self,
         ):
+        """constructor
+        """
         pass
     
     def compute_ticks(self,
@@ -45,27 +45,24 @@ class LSteinXAxis:
         xlims:Tuple[float,float],
         xlimrange:float,
         ) -> Tuple[np.ndarray,np.ndarray]:
-        """
-            - method to compute values for drawing x-ticks
+        """returns coordinates defining the circles for the x-axis
 
-            Parameters
-            ----------
-                - see `LSteinCanvas`
+        - method to compute values for drawing x-ticks
 
-            Raises
-            ------
+        Parameters
+            - see `LSteinCanvas`
 
-            Returns
-            -------
-                - `circles_x`
-                    - `np.ndarray`
-                    - x-values to draw circles denoting x-ticks
-                - `circles_y`
-                    - `np.ndarray`
-                    - y-values to draw circles denoting x-ticks
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `circles_x`
+                - `np.ndarray`
+                - x-values to draw circles denoting x-ticks
+            - `circles_y`
+                - `np.ndarray`
+                - y-values to draw circles denoting x-ticks
+
+        Comments
         """
         th_circ = np.linspace(thetaguidelims[0], thetaguidelims[1], 100)
         r_circ = xticks[0]
@@ -84,36 +81,33 @@ class LSteinXAxis:
         xticks:Union[Tuple[List[float],List[Any]],List[float]],
         circles_x:np.ndarray, circles_y:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray,np.ndarray]:
-        """
-            - method to compute values for drawing x-ticks
+        """returns coordinates and labels for drawing x-ticklabels
 
-            Parameters
-            ----------
-                - `circles_x`
-                    - `np.ndarray`
-                    - x-values to draw circles denoting x-ticks
-                - `circles_y`
-                    - `np.ndarray`
-                    - y-values to draw circles denoting x-ticks
-                - see `LSteinCanvas` for remaining parameters
+        - method to compute values for adding x-ticklabels
 
-            Raises
-            ------
+        Parameters
+            - `circles_x`
+                - `np.ndarray`
+                - x-values to draw circles denoting x-ticks
+            - `circles_y`
+                - `np.ndarray`
+                - y-values to draw circles denoting x-ticks
+            - see `LSteinCanvas` for remaining parameters
 
-            Returns
-            -------
-                - `xtickpos_x`
-                    - `np.ndarray`
-                    - x-values to place x-ticklabels at
-                - `xtickpos_y`
-                    - `np.ndarray`
-                    - y-values to place x-ticklabels at
-                - `xticklabs`
-                    - `np.ndarray`
-                    - text to be displayed as x-ticklabels
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `xtickpos_x`
+                - `np.ndarray`
+                - x-values to place x-ticklabels at
+            - `xtickpos_y`
+                - `np.ndarray`
+                - y-values to place x-ticklabels at
+            - `xticklabs`
+                - `np.ndarray`
+                - text to be displayed as x-ticklabels
+
+        Comments
         """
         #xticklabels
         xtickpos_x  = circles_x[:,1]
@@ -125,32 +119,29 @@ class LSteinXAxis:
     def compute_labs(self,
         xtickpos_x:np.ndarray, xtickpos_y:np.ndarray,
         ) -> Tuple[float,float]:
-        """
-            - method to compute position of the x-label
+        """returns coordinates of the x-label
 
-            Parameters
-            ----------
-                - `xtickpos_x`
-                    - `np.ndarray`
-                    - x-values to place x-ticklabels at
-                - `xtickpos_y`
-                    - `np.ndarray`
-                    - y-values to place x-ticklabels at
-            
-            Raises
-            ------
+        - method to compute position of the x-label
 
-            Returns
-            -------
-                - `xlabpos_x`
-                    - `float`
-                    - x-value to place x-label at
-                - `xlabpos_y`
-                    - `float`
-                    - y-value to place x-label at
+        Parameters
+            - `xtickpos_x`
+                - `np.ndarray`
+                - x-values to place x-ticklabels at
+            - `xtickpos_y`
+                - `np.ndarray`
+                - y-values to place x-ticklabels at
+        
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `xlabpos_x`
+                - `float`
+                - x-value to place x-label at
+            - `xlabpos_y`
+                - `float`
+                - y-value to place x-label at
+
+        Comments
         """        
         xlabpos_x = xtickpos_x[-1]
         xlabpos_y = xtickpos_y[-1]
@@ -158,30 +149,28 @@ class LSteinXAxis:
         return xlabpos_x, xlabpos_y
 
 class LSteinThetaAxis:
+    """computes arrays and values for adding the theta-axis to the LStein canvas
+    
+    - class to compute arrays and values relevant for adding a theta-axis to the LStein canvas
+
+    Attributes
+
+    Methods
+        - `compute_ticks()`
+        - `compute_ticklabs()`
+        - `compute_labs()`
+        - `compute_indicator()`
+
+    Dependencies
+        - `matplotlib`
+        - `numpy`
+        - `typing`
     """
-        - class to compute arrays and values relevant for adding a theta-axis to the LStein canvas
 
-        Attributes
-        ----------
-
-        Methods
-        -------
-            - `compute_ticks()`
-            - `compute_ticklabs()`
-            - `compute_labs()`
-            - `compute_indicator()`
-
-        Dependencies
-        ------------
-            - `matplotlib`
-            - `numpy`
-            - `typing`
-
-        Comments
-        --------
-    """
     def __init__(self,
         ):
+        """constructor
+        """
         pass
 
     def compute_ticks(self,
@@ -191,53 +180,49 @@ class LSteinThetaAxis:
         th_pad:float,
         xlimrange:Tuple[float,float],
         ) -> Tuple[np.ndarray,np.ndarray,np.ndarray]:
-        """
-            - method to compute values for drawing theta-ticks
+        """returns coordinates defining the ticks of the theta-axis
 
-            Parameters
-            ----------
-                - `th_pad`
-                    - `float`
-                    - padding to use for theta ticklabels wrt theta ticks
-                - see `LSteinCanvas` for remaining parameters
+        - method to compute values for drawing theta-ticks
+        - theta ticks are drawn as straight lines between `(thetatickpos_ri,thetatickpos_th)` and `(thetatickpos_ro,thetatickpos_th)`
 
-            Raises
-            ------
 
-            Returns
-            -------
-                - `thetatickpos_ri`
-                    - `np.ndarray`
-                    - inner bound of theta ticks
-                    - in polar coordinates
-                - `thetatickpos_ro`
-                    - `np.ndarray`
-                    - outer bound of theta ticks
-                    - in polar coordinates 
-                - `thetatickpos_th`
-                    - `np.ndarray`
-                    - angular position of theta ticks
-                    - in polar coordinates
-                - `thetatickpos_xi`
-                    - `np.ndarray`
-                    - inner bound of theta ticks
-                    - in cartesian coordinates
-                - `thetatickpos_yi`
-                    - `np.ndarray`
-                    - inner bound of theta ticks
-                    - in cartesian coordinates 
-                - `thetatickpos_xo`
-                    - `np.ndarray`
-                    - outer bound of theta ticks
-                    - in cartesian coordinates
-                - `thetatickpos_yo`
-                    - `np.ndarray`
-                    - outer bound of theta ticks
-                    - in cartesian coordinates 
+        Parameters
+            - `th_pad`
+                - `float`
+                - padding to use for theta ticklabels wrt theta ticks
+            - see `LSteinCanvas` for remaining parameters
 
-            Comments
-            --------
-                - theta ticks are drawn as straight lines between `(thetatickpos_ri,thetatickpos_th)` and `(thetatickpos_ro,thetatickpos_th)`
+        Raises
+
+        Returns
+            - `thetatickpos_ri`
+                - `np.ndarray`
+                - inner bound of theta ticks
+                - in polar coordinates
+            - `thetatickpos_ro`
+                - `np.ndarray`
+                - outer bound of theta ticks
+                - in polar coordinates 
+            - `thetatickpos_th`
+                - `np.ndarray`
+                - angular position of theta ticks
+                - in polar coordinates
+            - `thetatickpos_xi`
+                - `np.ndarray`
+                - inner bound of theta ticks
+                - in cartesian coordinates
+            - `thetatickpos_yi`
+                - `np.ndarray`
+                - inner bound of theta ticks
+                - in cartesian coordinates 
+            - `thetatickpos_xo`
+                - `np.ndarray`
+                - outer bound of theta ticks
+                - in cartesian coordinates
+            - `thetatickpos_yo`
+                - `np.ndarray`
+                - outer bound of theta ticks
+                - in cartesian coordinates 
         """
         thetatickpos_ri = th_pad * xlimdeadzone*xlimrange     #inner edge of theta ticks
         thetatickpos_ro = xlimdeadzone*xlimrange              #outer edge of theta ticks
@@ -256,36 +241,31 @@ class LSteinThetaAxis:
         thetaticks:Tuple[List[float],List[Any]],
         thetatickpos_ri:np.ndarray, thetatickpos_th:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray,np.ndarray]:
-        """
-            - method to compute values for drawing theta-ticks
+        """returns coordinates and labels for drawing theta-ticklabels
 
-            Parameters
-            ----------
-                - `thetatickpos_ri`
-                    - `np.ndarray`
-                    - inner bound of theta ticks 
-                - `thetatickpos_th`
-                    - `np.ndarray`
-                    - angular position of the theta ticks
-                - see `LSteinCanvas` for remaining parameters
+        - method to compute values for drawing theta-ticks
 
-            Raises
-            ------
+        Parameters
+            - `thetatickpos_ri`
+                - `np.ndarray`
+                - inner bound of theta ticks 
+            - `thetatickpos_th`
+                - `np.ndarray`
+                - angular position of the theta ticks
+            - see `LSteinCanvas` for remaining parameters
 
-            Returns
-            -------
-                - `thetaticklabelpos_x`
-                    - `np.ndarray`
-                    - x-values of position of theta ticklabels
-                - `thetaticklabelpos_y`
-                    - `np.ndarray`
-                    - y-values of position of theta ticklabels
-                - `thetaticklabs`
-                    - `np.ndarray`
-                    - text to be displayed as x-ticklabels
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `thetaticklabelpos_x`
+                - `np.ndarray`
+                - x-values of position of theta ticklabels
+            - `thetaticklabelpos_y`
+                - `np.ndarray`
+                - y-values of position of theta ticklabels
+            - `thetaticklabs`
+                - `np.ndarray`
+                - text to be displayed as x-ticklabels
         """
         
         #ticklabel position in cartesian
@@ -296,26 +276,21 @@ class LSteinThetaAxis:
     
     def compute_labs(self
         )-> Tuple[float,float]:
-        """
+        """returns coordinates of the theta-label
+
             - method to compute position of the theta-label
 
             Parameters
-            ----------
             
             Raises
-            ------
 
             Returns
-            -------
                 - `thlabpos_x`
                     - `float`
                     - x-value to place theta-label at
                 - `thlabpos_y`
                     - `float`
                     - y-value to place theta-label at
-
-            Comments
-            --------
         """
         thlabpos_x, thlabpos_y = (0,0)
         return thlabpos_x, thlabpos_y
@@ -327,30 +302,25 @@ class LSteinThetaAxis:
         thetalims:Tuple[float,float],
         thetatickpos_ro:np.ndarray,
         ) -> Tuple[float,float]:
-        """
-            - method to compute position of the indicator arrow
+        """returns coordinates of the direction indicator arrow
 
-            Parameters
-            ----------
-                - `thetatickpos_ro`
-                    - `np.ndarray`
-                    - outer bound of theta ticks
-                - see `LSteinCanvas` for remaining parameters
+        - method to compute position of the indicator arrow
 
-            Raises
-            ------
+        Parameters
+            - `thetatickpos_ro`
+                - `np.ndarray`
+                - outer bound of theta ticks
+            - see `LSteinCanvas` for remaining parameters
 
-            Returns
-            -------
-                - `x_arrow`
-                    - `float`
-                    - x-value to place indicator arrow at
-                - `x_arrow`
-                    - `float`
-                    - y-value to place indicator arrow at
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `x_arrow`
+                - `float`
+                - x-value to place indicator arrow at
+            - `y_arrow`
+                - `float`
+                - y-value to place indicator arrow at
         """        
         thetaarrowpos_th = minmaxscale(np.linspace(thetalims[0], thetaarrowpos_th, 101),
             thetaplotlims[0], thetaplotlims[1],
@@ -362,64 +332,55 @@ class LSteinThetaAxis:
         return x_arrow, y_arrow
 
 class LSteinYAxis:
-    """
-        - class to compute arrays and values relevant for adding a y-axis to the LStein canvas
+    """computes arrays and values for adding the y-axis to the LStein canvas
 
-        Attributes
-        ----------
+    - class to compute arrays and values relevant for adding a y-axis to the LStein canvas
+    - only computes global parameters
+        - each `LSteinPanel` does individual computations to fully define the y-axis
 
-        Methods
-        -------
-            - `compute_ticks()`
-            - `compute_ticklabs()`
-            - `compute_labs()`
+    Attributes
 
-        Dependencies
-        ------------
-            - `matplotlib`
-            - `numpy`
-            - `typing`
+    Methods
+        - `compute_ticks()`
+        - `compute_ticklabs()`
+        - `compute_labs()`
 
-        Comments
-        --------
+    Dependencies
+        - `matplotlib`
+        - `numpy`
+        - `typing`
     """
     def __init__(self,
         ):
+        """constructor
+        """
         return
     
     def compute_ticks(self):
-        """
-            Parameters
-            ----------
+        """not needed (for consistency only)
+        
+        - not needed (for consistency only)
+        - dealt with in `LSteinPanel`
 
-            Raises
-            ------
+        Parameters
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
-                - not needed (for consistency only)
-                - dealt with in `LSteinPanel`
+        Returns
         """
         return
     
     def compute_ticklabs(self):
-        """
-            Parameters
-            ----------
+        """not needed (for consistency only)
 
-            Raises
-            ------
+        - not needed (for consistency only)
+        - dealt with in `LSteinPanel`
+        
+        Parameters
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
-                - not needed (for consistency only)
-                - dealt with in `LSteinPanel`
+        Returns
         """        
         return
     
@@ -431,30 +392,25 @@ class LSteinYAxis:
         xlimrange:Tuple[float,float],
         pad:float,
         ):
-        """
-            - method to compute position of the y-label
+        """returns coordinates of the theta-label
 
-            Parameters
-            ----------
-                - `pad`
-                    - `float`
-                    - padding of the y-label
-                - see `LSteinCanvas` for remaining parameters
-            
-            Raises
-            ------
+        - method to compute position of the y-label
 
-            Returns
-            -------
-                - `ylabpos_x`
-                    - `float`
-                    - x-value to place y-label at
-                - `ylabpos_y`
-                    - `float`
-                    - y-value to place y-label at
+        Parameters
+            - `pad`
+                - `float`
+                - padding of the y-label
+            - see `LSteinCanvas` for remaining parameters
+        
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `ylabpos_x`
+                - `float`
+                - x-value to place y-label at
+            - `ylabpos_y`
+                - `float`
+                - y-value to place y-label at
         """
         ylabpos = minmaxscale(ylabpos_th,
             thetaplotlims[0], thetaplotlims[1],
@@ -533,9 +489,6 @@ class LSteinCanvas:
         - `matplotlib`
         - `numpy`
         - `typing`
-
-    Comments
-
     """
 
     def __init__(self,
@@ -789,8 +742,6 @@ class LSteinCanvas:
             - `xlabpos_y`
                 - `float`
                 - y-value to place x-label at
-
-        Comments
         """
 
         #default parameters
@@ -863,8 +814,6 @@ class LSteinCanvas:
             - `x_arrow`
                 - `float`
                 - y-value to place indicator arrow at
-
-        Comments
         """
         #default parameters
 
@@ -919,8 +868,6 @@ class LSteinCanvas:
             - `ylabpos_y`
                 - `float`
                 - y-value to place y-label at            
-
-        Comments
         """
         #default parameters
 
@@ -1021,8 +968,6 @@ class LSteinCanvas:
             - `LSP`
                 - `LSteinPanel`
                 - created panel
-
-        Comments
         """
         #default parameters
         if isinstance(yticks, (list, np.ndarray)):
@@ -1062,8 +1007,6 @@ class LSteinCanvas:
             - `thetas`
                 - `List[float]`
                 - theta values associated with each panel in `self.Panels`
-
-        Comments
         """        
         thetas = [P.theta for P in self.Panels]
 
@@ -1089,8 +1032,6 @@ class LSteinCanvas:
                 - `LSteinPanel`, `None`
                 - panel associated with `theta`
                 - `None` if no panel associated with `theta`
-
-        Comments
         """  
 
         for P in self.Panels:
@@ -1154,8 +1095,6 @@ class LSteinCanvas:
         Raises
 
         Returns
-
-        Comments
         """
         #default parameters
         if isinstance(seriestype,str): seriestype = [seriestype]*len(theta)
@@ -1201,8 +1140,6 @@ class LSteinCanvas:
         Raises
 
         Returns
-
-        Comments
         """
         self.canvas_drawn = False
         for LSP in self.Panels: LSP.panel_drawn = False
