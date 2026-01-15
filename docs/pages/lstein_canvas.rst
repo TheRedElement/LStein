@@ -8,6 +8,8 @@ LSteinCanvas
 .. currentmodule:: lstein.lstein.py
 
 .. autosummary::
+   :toctree: generated/
+   :recursive:
    :signatures: short
 
 .. autoclass:: lstein.lstein.LSteinCanvas
