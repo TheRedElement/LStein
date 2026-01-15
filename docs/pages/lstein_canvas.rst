@@ -12,9 +12,10 @@ Methods
 .. autosummary::
    :toctree: generated/
    :recursive:
+   :members:
    :signatures: short
 
-   LSteinCanvas.add_panel
+   LSteinCanvas
 
 
 
