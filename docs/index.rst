@@ -9,13 +9,16 @@ WELCOME
 .. toctree::
    :glob:
    :maxdepth: 2
+   :numbered:
+   :hidden:
 
    pages/*
    pages/*/*
 
-.. contents::
+.. contents:: Table of Contents
    :local:
    :depth: 1
+   :
 
 
 
