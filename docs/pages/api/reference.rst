@@ -1,3 +1,6 @@
+.. NOTE: :recursive: -> show all children as well (to display all methods when summarizing class)
+
+
 API Reference
 =============
 
@@ -8,6 +11,7 @@ LSteinCanvas
 
 .. autosummary::
     :signatures: none
+    :recursive:
     :toctree: tocLSC/
 
     LSteinCanvas
@@ -27,6 +31,7 @@ LSteinPanel
 
 .. autosummary::
     :signatures: none
+    :recursive:
     :toctree: tocLSP/
 
     LSteinPanel
@@ -50,15 +55,15 @@ Backends
 .. autosummary::
     :signatures: none
     :recursive:
-    :toctree: tocLSP/
+    :toctree: tocMPL/
 
     LSteinMPL
     LSteinMPL.__init__
     LSteinMPL.add_thetaaxis
     LSteinMPL.add_xaxis
+    LSteinMPL.show   
     LSteinMPL.add_yaxis
     LSteinMPL.add_ylabel
-    LSteinMPL.show   
 
 `Plotly <https://plotly.com/python/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
