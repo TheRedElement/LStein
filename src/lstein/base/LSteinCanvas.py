@@ -476,6 +476,7 @@ class LSteinCanvas:
 
         Attributes
         ^^^^^^^^^^
+        
             - `ax`
                 `plt.Axes`
                 - axes to add the `LStein` plot to
