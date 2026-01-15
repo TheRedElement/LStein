@@ -2,7 +2,7 @@
 LSteinCanvas
 ============
 
-.. toctree::
+.. contents::
    :local:
 
 
