@@ -1,6 +1,7 @@
 .. base template for autosummary
 
 .. display name as main title
+
 {{ fullname }}
 {{ "=" * fullname|length }}
 

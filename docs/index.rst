@@ -23,7 +23,7 @@ Reference
 If you find `LStein` useful in your work we would appreciate it if you cite it's paper:
 .. todo:: update citation once published
 
-.. code-block:: latex
+.. code-block:: bibtex
    @software{PY_Steinwender2025_lstein,
       author    = {{Steinwender}, Lukas},
       title     = {LStein: Linking Series to envision information neatly},
