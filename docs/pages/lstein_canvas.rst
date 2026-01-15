@@ -8,7 +8,7 @@ LSteinCanvas
 .. autosummary::
    :toctree: generated/
    :members:
-   :signature: short
+   :signatures: none
 
    LSteinCanvas.add_panel
 
