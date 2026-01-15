@@ -2,6 +2,9 @@
 LSteinCanvas
 ============
 
+.. toctree::
+   :local:
+
 
 .. currentmodule:: lstein.lstein.py
 .. autoclass:: lstein.lstein.LSteinCanvas
