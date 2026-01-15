@@ -5,7 +5,12 @@ LSteinCanvas
 
 .. currentmodule:: lstein.lstein
 
+.. autosummary::
+   :toctree: generated/
+   :members:
+   :signature: short
 
+   LSteinCanvas
 
 .. autoclass:: LSteinCanvas
    :members:
