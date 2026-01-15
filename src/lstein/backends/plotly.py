@@ -16,6 +16,11 @@ class LSteinPlotly:
     """represents plotly backend for plotting LStein
 
     - plotly backend to show an `LSteinCanvas` with all its `LSteinPanel` elements
+    - `ax` is a method argument to ensure signature equivalence of different backends
+    - LStein is mainly developed for matplotlib
+        - some arguments might not work
+            - have not been dealt with in `translate_kwargs()`
+            - especially relevant for annotations (tick labels, axis labels, ...)
 
     Attributes
     ----------
@@ -23,8 +28,8 @@ class LSteinPlotly:
             - `LSteinCanvas`
             - canvas to display
 
-    Infered Attributes
-    ------------------
+    Inferred Attributes
+    -------------------
 
     Methods
     -------
@@ -45,7 +50,6 @@ class LSteinPlotly:
 
     Comments
     --------
-        - `ax` as method argument to ensure signature equivalence of different backends
     """
     
     def __init__(self,

@@ -6,5 +6,7 @@
     :signatures: none
     :toctree: generated/
 
+    {{ fullname }}
+
 .. automodule:: {{ module }}
    :members:
