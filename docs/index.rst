@@ -7,6 +7,7 @@ WELCOME
 
 .. toctree::
    :glob:
+   :recursive:
    :maxdepth: 1
 
    pages/*
@@ -14,3 +15,11 @@ WELCOME
 
 Installation
 ------------
+
+API Reference
+-------------
+.. autosummary::
+   :toctree: tocAPI/
+   :recursive:
+
+   lstein.lstein
