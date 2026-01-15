@@ -118,7 +118,7 @@ extensions = [
 #     "members": True,
 #     "member-order": "alphabetical",
 # }
-autoclass_content = "both"
+# autoclass_content = "both"
 autosummary_generate = True
 
 
