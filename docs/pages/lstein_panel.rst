@@ -9,16 +9,16 @@ LSteinPanel
    :signatures: none
    :toctree: generated/
 
-   .. LSteinCanvas
-   .. LSteinCanvas.__init__
-   .. LSteinCanvas.add_panel
-   .. LSteinCanvas.compute_thetaaxis
-   .. LSteinCanvas.compute_xaxis
-   .. LSteinCanvas.compute_ylabel
-   .. LSteinCanvas.get_panel
-   .. LSteinCanvas.get_thetas
-   .. LSteinCanvas.plot
-   .. LSteinCanvas.reset
+   LSteinPanel
+   LSteinPanel.__init__
+   LSteinPanel.get_thetabounds
+   LSteinPanel.get_rbounds
+   LSteinPanel.get_yticks
+   LSteinPanel.apply_axis_limits
+   LSteinPanel.project_xy_theta
+   LSteinPanel.project_xy_y
+   LSteinPanel.project_xy
+   LSteinPanel.plot
 
 .. autoclass:: LSteinPanel
    :members:
