@@ -120,7 +120,7 @@ extensions = [
 # }
 # autoclass_content = "both"
 autosummary_generate = True
-templates_path = ["_templates"]
+# templates_path = ["_templates"]
 
 
 

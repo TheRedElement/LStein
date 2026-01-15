@@ -1,4 +1,6 @@
 .. base template (used for modules, classes, methods, ... - unless overridden)
+
+.. title
 {{ fullname }}
 {{ "=" * fullname|length }}
 
@@ -6,5 +8,6 @@
    :local:
    :depth: 2
 
+.. autodocument module
 .. automodule:: {{ module }}
    :members:
