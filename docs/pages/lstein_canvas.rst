@@ -7,7 +7,7 @@ LSteinCanvas
 
 .. autosummary::
    :signatures: none
-   :toctree: generated/
+   :toctree: canvastoc/
 
    LSteinCanvas
    LSteinCanvas.__init__
