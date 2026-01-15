@@ -9,11 +9,93 @@ from ..utils import minmaxscale, polar2cart, cart2polar
 
 #%%classes
 class LSteinPanel:
-    """
-        - class defining a panel sitting within a `LSteinCanvas`
+    """represents a single panel in the `LSteinCanvas`
 
-        Attributes
-        ----------
+    - class defining a panel sitting within a `LSteinCanvas`
+
+    Attributes
+        - `LSC` -- see `__init__()`
+        - `theta` -- see `__init__()`
+        - `yticks` -- see `__init__()`
+        - `panelsize` -- see `__init__()`
+        - `show_panelbounds` -- see `__init__()`
+        - `show_yticks` -- see `__init__()`
+        - `y_projection_method` -- see `__init__()`
+        - `ytickkwargs` -- see `__init__()`
+        - `yticklabelkwargs` -- see `__init__()`
+        - `panelboundskwargs` -- see `__init__()`
+    
+    Inferred Attributes
+        - `ylims`
+            - `Tuple[float,float]`
+            - axis limits applied to `y`
+        - `ylimrange`
+            - `real`
+            - range of y-values
+            - convenience field for relative definitions of plot elements
+        - `panel_drawn`
+            - `bool`
+            - flag denoting if the panel has been drawn already
+            - to prevent drawing the panel several times when plotting
+        - `dataseries`
+            - `List[Dict[str,Any]]`
+            - dataseries to be used for plotting
+            - contains
+                - `x`
+                    - `np.ndarray`
+                    - LSteinCanvastransformed (projected) dataseries in cartesian coordinates
+                    - ready to be plotted
+                - `y`
+                    - `np.ndarray`
+                    - transformed (projected) dataseries in cartesian coordinates
+                    - ready to be plotted
+                - `x_cut`
+                    - `np.ndarray`
+                    - original dataseries with axis-limits applied
+                - `y_cut`
+                    - `np.ndarray`
+                    - original dataseries with axis-limits applied
+            - `seriestype`
+                - `Literal["scatter","line"]`
+                - kind of the series to be displayed
+                - used for implementation of plotting functions in backends
+            - `kwargs`
+                - kwargs to be passed to the respective plotting function in the backend
+    
+    Methods
+        - `get_thetabounds()`
+        - `get_rbounds()`
+        - `set_yticks()`
+        - `draw()`
+        - `apply_axis_limits()`
+        - `project_xy_theta()`
+        - `project_xy_y()`
+        - `project_xy()`
+        - `plot()`
+        - `scatter()`
+
+    Dependencies
+        - `matplotlib`
+        - `numpy`
+        - `typing`
+    """
+
+    def __init__(self,
+        LSC,#:LSteinCanvas,
+        theta:float,
+        yticks:Tuple[List[float],List[Any]],
+        panelsize:float=np.pi/8,
+        show_panelbounds:bool=False, show_yticks:bool=True,
+        y_projection_method:Literal["theta","y"]="theta",
+        ytickkwargs:dict=None, yticklabelkwargs:dict=None,
+        panelboundskwargs:dict=None,
+        ):
+        """constructor
+
+        - initializes class
+        - computes inferred attributes
+        
+        Parameters
             - `LSC`
                 - `LSteinCanvas`
                 - parent canvas the panel is associated with
@@ -74,78 +156,10 @@ class LSteinPanel:
                 - the default is `None`
                     - will be set to `dict(c=plt.rcParams["axes.edgecolor"])`
 
-        Inferred Attributes
-        -------------------
-            - `ylims`
-                - `Tuple[float,float]`
-                - axis limits applied to `y`
-            - `ylimrange`
-                - `real`
-                - range of y-values
-                - convenience field for relative definitions of plot elements
-            - `panel_drawn`
-                - `bool`
-                - flag denoting if the panel has been drawn already
-                - to prevent drawing the panel several times when plotting
-            - `dataseries`
-                - `List[Dict[str,Any]]`
-                - dataseries to be used for plotting
-                - contains
-                    - `x`
-                        - `np.ndarray`
-                        - transformed (projected) dataseries in cartesian coordinates
-                        - ready to be plotted
-                    - `y`
-                        - `np.ndarray`
-                        - transformed (projected) dataseries in cartesian coordinates
-                        - ready to be plotted
-                    - `x_cut`
-                        - `np.ndarray`
-                        - original dataseries with axis-limits applied
-                    - `y_cut`
-                        - `np.ndarray`
-                        - original dataseries with axis-limits applied
-                    - `seriestype`
-                        - `Literal["scatter","line"]`
-                        - kind of the series to be displayed
-                        - used for implementation of plotting functions in backends
-                    - `kwargs`
-                        - kwargs to be passed to the respective plotting function in the backend
-        
-        Methods
-        -------
-            - `get_thetabounds()`
-            - `get_rbounds()`
-            - `set_yticks()`
-            - `draw()`
-            - `apply_axis_limits()`
-            - `project_xy_theta()`
-            - `project_xy_y()`
-            - `project_xy()`
-            - `plot()`
-            - `scatter()`
+        Raises
 
-        Dependencies
-        ------------
-            - `matplotlib`
-            - `numpy`
-            - `typing`
-
-        Comments
-        --------
-        
-    """
-
-    def __init__(self,
-        LSC,#:LSteinCanvas,
-        theta:float,
-        yticks:Tuple[List[float],List[Any]],
-        panelsize:float=np.pi/8,
-        show_panelbounds:bool=False, show_yticks:bool=True,
-        y_projection_method:Literal["theta","y"]="theta",
-        ytickkwargs:dict=None, yticklabelkwargs:dict=None,
-        panelboundskwargs:dict=None,
-        ):
+        Returns        
+        """
 
         self.LSC               = LSC
         
@@ -182,38 +196,34 @@ class LSteinPanel:
         return
 
     def __repr__(self) -> str:
+        """returns string representation of the class"""
         return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
 
     #panel methods
     def get_thetabounds(self) -> Tuple[float,float,float]:
-        """
-            - method to compute bounds of the panel as an angle measured from the x-axis counterclockwise (in radians)
+        """returns panel location and bounds as angles in radians
 
-            Parameters
-            ----------
+        - method to compute bounds of the panel as an angle measured from the x-axis counterclockwise (in radians)
 
-            Raises
-            ------
+        Parameters
 
-            Returns
-            -------
-                - `theta_lb`
-                    - `float`
-                    - lower bound of the panel as an angle in radians
-                    - corresponds to `self.ylims[0]`
-                - `theta_ub`
-                    - `float`
-                    - upper bound of the panel as an angle in radians
-                    - corresponds to `self.ylims[1]`
-                - `theta_offset`
-                    - `float`
-                    - offset of the panel w.r.t. the x-axis
-                    - defines the angular position of the central ray of the panel
-                        - as an angle measured from the x-axis counterclockwise
-                        - in radians
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `theta_lb`
+                - `float`
+                - lower bound of the panel as an angle in radians
+                - corresponds to `self.ylims[0]`
+            - `theta_ub`
+                - `float`
+                - upper bound of the panel as an angle in radians
+                - corresponds to `self.ylims[1]`
+            - `theta_offset`
+                - `float`
+                - offset of the panel w.r.t. the x-axis
+                - defines the angular position of the central ray of the panel
+                    - as an angle measured from the x-axis counterclockwise
+                    - in radians
         """
         theta_offset = minmaxscale(self.theta, #panel position
             self.LSC.thetaplotlims[0], self.LSC.thetaplotlims[1],
@@ -224,30 +234,27 @@ class LSteinPanel:
         return theta_offset, theta_lb, theta_ub
 
     def get_rbounds(self) -> Tuple[float,float]:
-        """
-            - method to compute bounds of the panel in radial direction
+        """returns panel bounds in radial direction
 
-            Parameters
-            ----------
+        - method to compute bounds of the panel in radial direction
 
-            Raises
-            ------
+        Parameters
 
-            Returns
-            -------
-                - `r_lb`
-                    - `float`
-                    - lower bound of the panel in x-direction (radially)
-                    - located at `self.xlimdeadzone*self.LSC.xlimrange`
-                    - corresponds to `self.xlims[0]`
-                - `r_ub`
-                    - `float`
-                    - upper bound of the panel in x-direction (radially)
-                    - located at `self.LSC.xlimrange`
-                    - corresponds to `self.xlims[1]`
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `r_lb`
+                - `float`
+                - lower bound of the panel in x-direction (radially)
+                - located at `self.xlimdeadzone*self.LSC.xlimrange`
+                - corresponds to `self.xlims[0]`
+            - `r_ub`
+                - `float`
+                - upper bound of the panel in x-direction (radially)
+                - located at `self.LSC.xlimrange`
+                - corresponds to `self.xlims[1]`
+
+        Comments
         """        
         r_lb = self.LSC.xlimdeadzone*self.LSC.xlimrange
         r_ub = self.LSC.xlimrange
@@ -256,35 +263,30 @@ class LSteinPanel:
     def get_yticks(self,
         theta_lb:float, theta_ub:float
         ) -> Tuple[List[float],List[Any]]:
-        """
-            - method to compute angular positions of the y-ticks angles measured from the x-axis counterclockwise (in radians)
+        """returns yticklabels and location of yticks
 
-            Parameters
-            ----------
-                - `theta_lb`
-                    - `float`
-                    - lower bound of the panel as an angle in radians
-                    - corresponds to `self.ylims[0]`
-                - `theta_ub`
-                    - `float`
-                    - upper bound of the panel as an angle in radians
-                    - corresponds to `self.ylims[1]`
+        - method to compute angular positions of the y-ticks angles measured from the x-axis counterclockwise (in radians)
 
-            Raises
-            ------
+        Parameters
+            - `theta_lb`
+                - `float`
+                - lower bound of the panel as an angle in radians
+                - corresponds to `self.ylims[0]`
+            - `theta_ub`
+                - `float`
+                - upper bound of the panel as an angle in radians
+                - corresponds to `self.ylims[1]`
 
-            Returns
-            -------
-                - `ytickpos_th`
-                    - `List[float]`
-                    - tickpositions angles measured from the x-axis counterclockwise (in radians)
-                - `yticklabs`
-                    - `List[Any]`
-                    - labels assigned to each tick
-                    - same length as `ytickpos_th` 
-            
-            Comments
-            --------
+        Raises
+
+        Returns
+            - `ytickpos_th`
+                - `List[float]`
+                - tickpositions angles measured from the x-axis counterclockwise (in radians)
+            - `yticklabs`
+                - `List[Any]`
+                - labels assigned to each tick
+                - same length as `ytickpos_th` 
         """
         ytickpos_th = minmaxscale(self.yticks[0], theta_lb, theta_ub, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
         yticklabs = self.yticks[1]
@@ -296,46 +298,40 @@ class LSteinPanel:
         x:np.ndarray, y:np.ndarray,
         **kwargs,
         ) -> Tuple[np.ndarray,np.ndarray,Dict]:
-        """
-            - method enforce axis limits onto the dataseries
-                - only applies out-of-bounds cuts
-                - removes any datapoints that are out of bounds in x- or y-direction
+        """returns `x`, `y` and `**kwargs` after application of axis limits
 
-            Parameters
-            ----------
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series to be plotted
-                    - will serve as reference for enforcing `self.LSC.xlims`
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series to be plotted
-                    - will serve as reference for enforcing `self.ylims`
-                - `**kwargs`
-                    - `kwargs` ultimately used when plotting `y` vs `x`
-                    - also get modified accordingly i.e.,
-                        - `"c"` needs to be set to same size as `x_cut` and `y_cut`
-                        - `"s"` needs to be set to same size as `x_cut` and `y_cut`
-                        - `"alpha"` needs to be set to same size as `x_cut` and `y_cut`
+        - method enforce axis limits onto the dataseries
+            - only applies out-of-bounds cuts
+            - removes any datapoints that are out of bounds in x- or y-direction
 
-            Raises
-            ------
+        Parameters
+            - `x`
+                - `np.ndarray`
+                - x-values of the series to be plotted
+                - will serve as reference for enforcing `self.LSC.xlims`
+            - `y`
+                - `np.ndarray`
+                - y-values of the series to be plotted
+                - will serve as reference for enforcing `self.ylims`
+            - `**kwargs`
+                - `kwargs` ultimately used when plotting `y` vs `x`
+                - also get modified accordingly i.e.,
+                    - `"c"` needs to be set to same size as `x_cut` and `y_cut`
+                    - `"s"` needs to be set to same size as `x_cut` and `y_cut`
+                    - `"alpha"` needs to be set to same size as `x_cut` and `y_cut`
 
-            Returns
-            -------
-                - `x_cut`
-                    - `np.ndarray`
-                    - `x` after applying axis-limit cuts
-                - `y_cut`
-                    - `np.ndarray`
-                    - `y` after applying axis-limit cuts
-                - `kwargs`
-                    - `Dict`
-                    - `**kwargs` after applying axis-limit cuts
+        Raises
 
-            
-            Comments
-            --------
+        Returns
+            - `x_cut`
+                - `np.ndarray`
+                - `x` after applying axis-limit cuts
+            - `y_cut`
+                - `np.ndarray`
+                - `y` after applying axis-limit cuts
+            - `kwargs`
+                - `Dict`
+                - `**kwargs` after applying axis-limit cuts
         """
 
         x_bool = (np.min(self.LSC.xlims)<=x)&(x<=np.max(self.LSC.xlims))
@@ -359,35 +355,32 @@ class LSteinPanel:
     def project_xy_theta(self,
         x:np.ndarray, y:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray]:
-        """
-            - method implementing a way to project `x` and `y` into the panel
-            - operates in `theta`-space when projecting the series
+        """returns `x` and `y` after projection into the panel
 
-            Parameters
-            ----------
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series to be projected into the panel
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series to be projected into the panel
+        - method implementing a way to project `x` and `y` into the panel
+        - operates in `theta`-space when projecting the series
+        - advantages
+            - more accurate representation of y-direction
+        - downsides
+            - more distorsion in x-direction
 
-            Raises
-            ------
+        Parameters
+            - `x`
+                - `np.ndarray`
+                - x-values of the series to be projected into the panel
+            - `y`
+                - `np.ndarray`
+                - y-values of the series to be projected into the panel
 
-            Returns
-            -------
-                - `x_proj`
-                    - `np.ndarray`
-                    - `x` after projection
-                - `y_proj`
-                    - `np.ndarray`
-                    - `y` after projection
+        Raises
 
-            Comments
-            --------
-                - more distorsion in x-direction
-                - more accurate representation of y-direction
+        Returns
+            - `x_proj`
+                - `np.ndarray`
+                - `x` after projection
+            - `y_proj`
+                - `np.ndarray`
+                - `y` after projection
         """
 
         #global variables
@@ -428,36 +421,32 @@ class LSteinPanel:
     def project_xy_y(self,
         x:np.ndarray, y:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray, Dict]:
-        """
-            - method implementing a way to project `x` and `y` into the panel
-            - operates in `y`-space when projecting the series
+        """returns `x` and `y` after projection into the panel
 
-            Parameters
-            ----------
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series to be projected into the panel
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series to be projected into the panel
+        - method implementing a way to project `x` and `y` into the panel
+        - operates in `y`-space when projecting the series
+        - advantages
+            - less distorsion in x-direction
+        - downsides
+            - can lead to unpredictable offsets in y-direction
 
+        Parameters
+            - `x`
+                - `np.ndarray`
+                - x-values of the series to be projected into the panel
+            - `y`
+                - `np.ndarray`
+                - y-values of the series to be projected into the panel
 
-            Raises
-            ------
+        Raises
 
-            Returns
-            -------
-                - `x_proj`
-                    - `np.ndarray`
-                    - `x` after projection
-                - `y_proj`
-                    - `np.ndarray`
-                    - `y` after projection
-
-            Comments
-            --------
-                - less distorsion in x-direction
-                - can lead to unpredictable offsets in y-direction
+        Returns
+            - `x_proj`
+                - `np.ndarray`
+                - `x` after projection
+            - `y_proj`
+                - `np.ndarray`
+                - `y` after projection
         """
 
         #global variables
@@ -492,40 +481,36 @@ class LSteinPanel:
     
     def project_xy(self,
         x:np.ndarray, y:np.ndarray,
-        y_projection_method:Literal["theta", "y"]="theta"
+        y_projection_method:Literal["theta","y"]="theta"
         ) -> Tuple[np.ndarray,np.ndarray]:
-        """
-            - method to project `x` and `y` into the panel using `y_projection_method`
+        """returns `x` and `y` after projection into the panel
 
-            Parameters
-            ----------
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series to be projected into the panel
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series to be projected into the panel
-                - `y_projection_method`
-                    - `Literal["theta","y"]`, optioal
-                    - method to use for the projection
-                    - the default is `theta`
-                        - uses `self.project_xy_theta()`
+        - method to project `x` and `y` into the panel using `y_projection_method`
+        - calls upon `project_xy_...()` based on `y_projection_method`
+        - generally `y_projection_method="theta"` is the preferred modus operandi
 
-            Raises
-            ------
+        Parameters
+            - `x`
+                - `np.ndarray`
+                - x-values of the series to be projected into the panel
+            - `y`
+                - `np.ndarray`
+                - y-values of the series to be projected into the panel
+            - `y_projection_method`
+                - `Literal["theta","y"]`, optioal
+                - method to use for the projection
+                - the default is `theta`
+                    - uses `self.project_xy_theta()`
 
-            Returns
-            -------
-                - `x_proj`
-                    - `np.ndarray`
-                    - `x` after projection
-                - `y_proj`
-                    - `np.ndarray`
-                    - `y` after projection
+        Raises
 
-            Comments
-            --------
-                - generally `y_projection_method="theta"` is the preferred modus operandi
+        Returns
+            - `x_proj`
+                - `np.ndarray`
+                - `x` after projection
+            - `y_proj`
+                - `np.ndarray`
+                - `y` after projection
         """
 
         if y_projection_method == "theta":
@@ -542,35 +527,31 @@ class LSteinPanel:
         seriestype:Literal["line","scatter"]="line",
         **kwargs,
         ):
-        """
-            - method to add a series to the panel for plotting
+        """attaches a dataseries to plot to the panel
 
-            Parameters
-            ----------
-                - `x`
-                    - `np.ndarray`
-                    - x-values of the series
-                    - has to have same length as `y`
-                - `y`
-                    - `np.ndarray`
-                    - y-values of the series
-                    - has to have same length as `x`
-                - `ax`
-                    - `plt.Axes`, optional
-                    - axis to draw into
-                    - the default is `None`
-                        - will be set to `self.LSC.ax` (axis of parent)
-                -`**kwargs`
-                    - kwargs to pass to `ax.plot()`
-                        
-            Raises
-            ------
+        - method to add a series to the panel for plotting
 
-            Returns
-            -------
+        Parameters
+            - `x`
+                - `np.ndarray`
+                - x-values of the series
+                - has to have same length as `y`
+            - `y`
+                - `np.ndarray`
+                - y-values of the series
+                - has to have same length as `x`
+            - `seriestpye`
+                - `Literal["line","scatter"]`, optional
+                - which style to use for plotting the series
+                    `"line"` -- line plot
+                    `"scatter"` -- scatter plot
+                - the default is `"line"`
+            -`**kwargs`
+                - kwargs to pass to `ax.plot()`
+                    
+        Raises
 
-            Comments
-            --------        
+        Returns
         """
 
         #apply axis limits

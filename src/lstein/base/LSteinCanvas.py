@@ -502,6 +502,9 @@ class LSteinCanvas:
         ):
         """constructor
 
+        - initializes class
+        - computes inferred attributes
+        
         Parameters
             - `thetaticks`
                 - `Tuple[List[float],List[Any]]`, `List[float]`
@@ -645,6 +648,10 @@ class LSteinCanvas:
                 - `pad` determines the padding w.r.t. the ticks     
                 - the default is `None`
                     - will be set to `dict(c=plt.rcParams["axes.labelcolor"], pad=0.15)`
+
+        Raises
+
+        Returns
         """        
 
         self.thetaticks     = (thetaticks, thetaticks) if isinstance(thetaticks, (list, np.ndarray)) else thetaticks
@@ -709,6 +716,7 @@ class LSteinCanvas:
         return
 
     def __repr__(self) -> str:
+        """returns string representation of the class"""
         return f"{self.__class__.__name__}(" + ", ".join([f"{attr}={val}" for attr, val in self.__dict__.items()]) + ")"
 
     #canvas methods
@@ -1071,6 +1079,17 @@ class LSteinCanvas:
                 - can contain arrays of different lengths
                     - have to have same length as corresponding entries in `y`
                 - each series will be plotted in it's own panel associated with `theta`
+            - `seriestpye`
+                - `Literal["line","scatter"]`, `List[str]`, optional
+                - which style to use for plotting the series
+                    `"line"` -- line plot
+                    `"scatter"` -- scatter plot                
+                - if `List[str]`
+                    - has to have same length as `X`
+                    - applied to each series individually
+                - if `Literal[]`
+                    - applied to all series in `X`
+                - the default is `"line"`
             - `panel_kwargs`
                 - `List[Dict]`, `Dict` optional
                 - kwargs to pass to `self.add_panel()`

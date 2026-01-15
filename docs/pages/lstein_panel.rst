@@ -2,14 +2,29 @@
 LSteinPanel
 ============
 
-.. contents::
-   :local:
-   :depth: 1
 
+.. currentmodule:: lstein.lstein
 
-.. currentmodule:: lstein.lstein.py
-.. autoclass:: lstein.lstein.LSteinPanel
-    :members:
-    :show-inheritance:
-    :exclude-members: __init__, __repr__, _private
-    :member-order: alphabetical
+.. autosummary::
+   :signatures: none
+   :toctree: generated/
+
+   .. LSteinCanvas
+   .. LSteinCanvas.__init__
+   .. LSteinCanvas.add_panel
+   .. LSteinCanvas.compute_thetaaxis
+   .. LSteinCanvas.compute_xaxis
+   .. LSteinCanvas.compute_ylabel
+   .. LSteinCanvas.get_panel
+   .. LSteinCanvas.get_thetas
+   .. LSteinCanvas.plot
+   .. LSteinCanvas.reset
+
+.. autoclass:: LSteinPanel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :exclude-members:  __repr__, _private
+   :special-members: __init__
+   :member-order: alphabetical
+
