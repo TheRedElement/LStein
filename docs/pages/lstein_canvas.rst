@@ -3,7 +3,7 @@ LSteinCanvas
 ============
 
 
-.. currentmodule:: lstein.lstein.LSteinCanvas
+.. currentmodule:: lstein.lstein
 
 
 Methods
