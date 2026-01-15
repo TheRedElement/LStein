@@ -20,7 +20,7 @@ Methods
 
 
 
-.. autoclass:: lstein.lstein.LSteinCanvas
+.. autoclass:: LSteinCanvas
    :members:
    :undoc-members:
    :show-inheritance:
