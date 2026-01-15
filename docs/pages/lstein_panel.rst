@@ -7,18 +7,18 @@ LSteinPanel
 
 .. autosummary::
    :signatures: none
-   :toctree: generatedPanel/
+   :toctree: paneltoc/
 
    LSteinPanel
    LSteinPanel.__init__
-   LSteinPanel.get_thetabounds
-   LSteinPanel.get_rbounds
-   LSteinPanel.get_yticks
    LSteinPanel.apply_axis_limits
+   LSteinPanel.get_rbounds
+   LSteinPanel.get_thetabounds
+   LSteinPanel.get_yticks
+   LSteinPanel.plot
+   LSteinPanel.project_xy
    LSteinPanel.project_xy_theta
    LSteinPanel.project_xy_y
-   LSteinPanel.project_xy
-   LSteinPanel.plot
 
 .. autoclass:: LSteinPanel
    :members:

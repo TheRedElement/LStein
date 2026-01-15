@@ -351,7 +351,7 @@ class LSteinPanel:
         
         return x_cut, y_cut, kwargs
     
-
+    #projection methods
     def project_xy_theta(self,
         x:np.ndarray, y:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray]:
