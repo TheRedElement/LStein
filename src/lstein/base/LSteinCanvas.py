@@ -548,6 +548,7 @@ class LSteinCanvas:
         ylabelkwargs:dict=None,
         ):
         """
+
         Parameters
             - `thetaticks`
                 - `Tuple[List[float],List[Any]]`, `List[float]`
