@@ -5,7 +5,7 @@ LSteinCanvas
 .. contents::
    :local:
 
-.. automodule:: lstein.lstein.py
+.. currentmodule:: lstein.lstein.py
 
    .. autosummary::
       :members:
