@@ -7,10 +7,10 @@ WELCOME
 
 .. toctree::
    :glob:
-   :recursive:
    :maxdepth: 1
 
    pages/*
+   pages/*/*
 
 
 Installation
