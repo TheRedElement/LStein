@@ -14,7 +14,7 @@ Methods
    :members:
    :nosignatures:
 
-   lstein.lstein.LSteinCanvas.add_panel
+   LSteinCanvas.add_panel
 
 
 
