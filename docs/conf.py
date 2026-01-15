@@ -114,13 +114,12 @@ extensions = [
     # "sphinx_copybutton",
 ]
 
-# autodoc_default_options = {
-#     "members": True,
-#     "member-order": "alphabetical",
-# }
+autodoc_default_options = {
+    "members": True,
+    "member-order": "alphabetical",
+}
 # autoclass_content = "both"
 autosummary_generate = True
-
 
 
 add_paths()

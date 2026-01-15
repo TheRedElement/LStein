@@ -49,6 +49,7 @@ Backends
 
 .. autosummary::
     :signatures: none
+    :recursive:
     :toctree: tocLSP/
 
     LSteinMPL
