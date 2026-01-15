@@ -11,8 +11,8 @@ Methods
 
 .. autosummary::
    :toctree: generated/
-   :members:
-   :nosignatures:
+   :recursive:
+   :signatures: short
 
    LSteinCanvas.add_panel
 
