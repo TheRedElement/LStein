@@ -15,6 +15,9 @@ Methods
    :members:
    :signatures: short
 
+   LSteinCanvas
+
+
 
 
 .. autoclass:: lstein.lstein.LSteinCanvas
