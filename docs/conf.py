@@ -11,10 +11,11 @@ import shutil
 
 #%%definitions
 def add_paths():
-    """
-        - function to add directories to be documented to the path
-        - all paths are relative to `conf.py`
-        - make sure to make the path absolute!
+    """adds directories to be documented to the path
+        
+    - function to add directories to be documented to the path
+    - all paths are relative to `conf.py`
+    - make sure to make the path absolute!
     """
     global html_static_path
 
@@ -83,10 +84,9 @@ def set_metadata():
 
 
 #%%sphinx internal functions
-"""
-    - function to make some global setups pre build
-"""
 def setup(app):
+    """makes some global setups pre build
+    """
 
     #copy gfx to html
     src = os.path.abspath("../gfx")
