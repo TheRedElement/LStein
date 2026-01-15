@@ -469,16 +469,86 @@ class LSteinYAxis:
 #Parent Class#
 ##############
 class LSteinCanvas:
-    """
-        - class containing the canvas to draw `LSteinPanel`s into
-        - analogous to `matplotlib.figure.Figure`
-        - parent to `LSteinPanel`
+    """main canvas to draw `LSteinPanels` into
 
-        Attributes
-        ----------
-            - `ax`
-                `plt.Axes`
-                - axes to add the `LStein` plot to
+    - class containing the canvas to draw `LSteinPanel`s into
+    - analogous to `matplotlib.figure.Figure`
+    - parent to `LSteinPanel`
+
+    Attributes
+        - `thetaticks` -- see constructor
+        - `xticks` -- see constructor
+        - `yticks` -- see constructor
+        - `thetaguidelims` -- see constructor
+        - `thetaplotlims` -- see constructor
+        - `xlimdeadzone` -- see constructor
+        - `panelsize` -- see constructor
+        - `thetalabel` -- see constructor
+        - `xlabel` -- see constructor
+        - `ylabel` -- see constructor
+        - `thetaarrowpos_th` -- see constructor
+        - `ylabpos_th` -- see constructor
+        - `thetatickkwargs` -- see constructor
+        - `thetaticklabelkwargs` -- see constructor
+        - `thetalabelkwargs` -- see constructor
+        - `xtickkwargs` -- see constructor
+        - `xticklabelkwargs` -- see constructor
+        - `labelkwargs` -- see constructor
+
+    Inferred Attributes
+        - `thetalims`
+            - `Tuple[float,float]`
+            - axis limits applied to `theta`
+                - i.e., in azimuthal direction
+                - `thetalims[0]` corresponds to the lowest value of `theta` that will be plotted
+                - `thetalims[1]` corresponds to the highest value of `theta` that will be plotted
+        - `xlims`
+            - `Tuple[float,float]`
+            - axis limits applied to `x`
+                - i.e., in radial direction
+                - `xlims[0]` corresponds to the value plotted at the end of `xlimdeadzone`
+                - `xlims[1]` corresponds to the value plotted at the outer bound of the LStein plot
+        - `xlimrange`
+            - `float`
+            - range of x-values
+            - convenience field for relative definitions of plot elements
+        - `Panels`
+            - `List[LSteinPanel]`
+            - collection of panels associated with `LSteinCanvas` instance
+        - `canvas_drawn`
+            - `bool`
+            - flag denoting if the canvas has been drawn alrady
+            - to prevent drawing the canvas several times when plotting
+
+    Methods
+        - `compute_xaxis()`
+        - `compute_thetaaxis()`
+        - `compute_ylabel()`
+        - `add_panel()`
+        - `get_thetas()`
+        - `get_panel()`
+        - `plot()`
+
+    Dependencies
+        - `matplotlib`
+        - `numpy`
+        - `typing`
+
+    Comments
+
+    """
+
+    def __init__(self,
+        thetaticks:Union[Tuple[List[float],List[Any]],List[float]], xticks:Union[Tuple[List[float],List[Any]],List[float]], yticks:Union[Tuple[List[float],List[Any]],List[float]],
+        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, panelsize:float=np.pi/8,
+        thetalabel:str=None, xlabel:str=None, ylabel:str=None,
+        thetaarrowpos_th:float=None, ylabpos_th:float=None,
+        thetatickkwargs:dict=None, thetaticklabelkwargs:dict=None, thetalabelkwargs:dict=None,
+        xtickkwargs:dict=None, xticklabelkwargs:dict=None, xlabelkwargs:dict=None,
+        ylabelkwargs:dict=None,
+        ):
+        """
+        Parameters
             - `thetaticks`
                 - `Tuple[List[float],List[Any]]`, `List[float]`
                 - ticks to draw for the theta-axis (angular positioning)
@@ -545,7 +615,7 @@ class LSteinCanvas:
             - `panelsize`
                 - `float`, optional
                     - global default of (angular) space any created panel will occupy
-                    - in radians
+                    - in rthetalims
                     - can be overridden by calling `self.add_panel()`
                     - the entire canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
                     - the default is `np.pi/8`
@@ -621,61 +691,7 @@ class LSteinCanvas:
                 - `pad` determines the padding w.r.t. the ticks     
                 - the default is `None`
                     - will be set to `dict(c=plt.rcParams["axes.labelcolor"], pad=0.15)`
-            
-        Inferred Attributes
-        -------------------
-            - `thetalims`
-                - `Tuple[float,float]`
-                - axis limits applied to `theta`
-                    - i.e., in azimuthal direction
-                    - `thetalims[0]` corresponds to the lowest value of `theta` that will be plotted
-                    - `thetalims[1]` corresponds to the highest value of `theta` that will be plotted
-            - `xlims`
-                - `Tuple[float,float]`
-                - axis limits applied to `x`
-                    - i.e., in radial direction
-                    - `xlims[0]` corresponds to the value plotted at the end of `xlimdeadzone`
-                    - `xlims[----------1]` corresponds to the value plotted at the outer bound of the LStein plot
-            - `xlimrange`
-                - `float`
-                - range of x-values
-                - convenience field for relative definitions of plot elements
-            - `Panels`
-                - `List[LSteinPanel]`
-                - collection of panels associated with `LSteinCanvas` instance
-            - `canvas_drawn`
-                - `bool`
-                - flag denoting if the canvas has been drawn alrady
-                - to prevent drawing the canvas several times when plotting
-
-        Methods
-        -------
-            - `compute_xaxis()`
-            - `compute_thetaaxis()`
-            - `compute_ylabel()`
-            - `add_panel()`
-            - `get_thetas()`
-            - `get_panel()`
-            - `plot()`
-
-        Dependencies
-        ------------
-            - `matplotlib`
-            - `numpy`
-            - `typing`
-
-        Comments
-        --------
-    """
-    def __init__(self,
-        thetaticks:Union[Tuple[List[float],List[Any]],List[float]], xticks:Union[Tuple[List[float],List[Any]],List[float]], yticks:Union[Tuple[List[float],List[Any]],List[float]],
-        thetaguidelims:Tuple[float,float]=None, thetaplotlims:Tuple[float,float]=None, xlimdeadzone:float=0.3, panelsize:float=np.pi/8,
-        thetalabel:str=None, xlabel:str=None, ylabel:str=None,
-        thetaarrowpos_th:float=None, ylabpos_th:float=None,
-        thetatickkwargs:dict=None, thetaticklabelkwargs:dict=None, thetalabelkwargs:dict=None,
-        xtickkwargs:dict=None, xticklabelkwargs:dict=None, xlabelkwargs:dict=None,
-        ylabelkwargs:dict=None,
-        ):
+        """        
 
         self.thetaticks     = (thetaticks, thetaticks) if isinstance(thetaticks, (list, np.ndarray)) else thetaticks
         self.xticks         = (np.array(xticks), xticks) if isinstance(xticks, (list, np.ndarray)) else xticks
@@ -744,46 +760,36 @@ class LSteinCanvas:
     #canvas methods
     def compute_xaxis(self,
         ) -> Tuple[Any]:
-        """
-            - method to add the x-axis to the canvas
+        """computes and returns various elements necessary for adding the x-axis to the canvas
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`, optional
-                    - axis to draw into
-                    - the default is `None`
-                        - will draw into parent axis of `LSteinCanvas`
+        Parameters
 
-            Raises
-            ------
+        Raises
 
-            Returns
-            -------
-                - `circles_x`
-                    - `np.ndarray`
-                    - x-values to draw circles denoting x-ticks
-                - `circles_y`
-                    - `np.ndarray`
-                    - y-values to draw circles denoting x-ticks
-                - `xtickpos_x`
-                    - `np.ndarray`
-                    - x-values to place x-ticklabels at
-                - `xtickpos_y`
-                    - `np.ndarray`
-                    - y-values to place x-ticklabels at
-                - `xticklabs`
-                    - `np.ndarray`
-                    - text to be displayed as x-ticklabels
-                - `xlabpos_x`
-                    - `float`
-                    - x-value to place x-label at
-                - `xlabpos_y`
-                    - `float`
-                    - y-value to place x-label at
+        Returns
+            - `circles_x`
+                - `np.ndarray`
+                - x-values to draw circles denoting x-ticks
+            - `circles_y`
+                - `np.ndarray`
+                - y-values to draw circles denoting x-ticks
+            - `xtickpos_x`
+                - `np.ndarray`
+                - x-values to place x-ticklabels at
+            - `xtickpos_y`
+                - `np.ndarray`
+                - y-values to place x-ticklabels at
+            - `xticklabs`
+                - `np.ndarray`
+                - text to be displayed as x-ticklabels
+            - `xlabpos_x`
+                - `float`
+                - x-value to place x-label at
+            - `xlabpos_y`
+                - `float`
+                - y-value to place x-label at
 
-            Comments
-            --------
+        Comments
         """
 
         #default parameters
@@ -811,62 +817,53 @@ class LSteinCanvas:
     
     def compute_thetaaxis(self,
         ) -> Tuple[Any]:
-        """
-            - method to add the theta-axis (azimuthal) to the canvas
+        """computes and returns various elements necessary for adding the theta-axis (azimuthal) to the canvas
+            
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`, optional
-                    - axis to draw into
-                    - the default is `None`
-                        - will draw into parent axis of `LSteinCanvas`
+        Parameters
 
-            Raises
-            ------
+        Raises
 
-            Returns
-            -------
-                - `thetatickpos_xi`
-                    - `np.ndarray`
-                    - inner bound of theta ticks
-                    - in cartesian coordinates
-                - `thetatickpos_yi`
-                    - `np.ndarray`
-                    - inner bound of theta ticks
-                    - in cartesian coordinates 
-                - `thetatickpos_xo`
-                    - `np.ndarray`
-                    - outer bound of theta ticks
-                    - in cartesian coordinates
-                - `thetatickpos_yo`
-                    - `np.ndarray`
-                    - outer bound of theta ticks
-                    - in cartesian coordinates             
-                - `thetaticklabelpos_x`
-                    - `np.ndarray`
-                    - x-values of position of theta ticklabels
-                - `thetaticklabelpos_y`
-                    - `np.ndarray`
-                    - y-values of position of theta ticklabels
-                - `thetaticklabs`
-                    - `np.ndarray`
-                    - text to be displayed as x-ticklabels
-                - `thlabpos_x`
-                    - `float`
-                    - x-value to place theta-label at
-                - `thlabpos_y`
-                    - `float`
-                    - y-value to place theta-label at
-                - `x_arrow`
-                    - `float`
-                    - x-value to place indicator arrow at
-                - `x_arrow`
-                    - `float`
-                    - y-value to place indicator arrow at
+        Returns
+            - `thetatickpos_xi`
+                - `np.ndarray`
+                - inner bound of theta ticks
+                - in cartesian coordinates
+            - `thetatickpos_yi`
+                - `np.ndarray`
+                - inner bound of theta ticks
+                - in cartesian coordinates 
+            - `thetatickpos_xo`
+                - `np.ndarray`
+                - outer bound of theta ticks
+                - in cartesian coordinates
+            - `thetatickpos_yo`
+                - `np.ndarray`
+                - outer bound of theta ticks
+                - in cartesian coordinates             
+            - `thetaticklabelpos_x`
+                - `np.ndarray`
+                - x-values of position of theta ticklabels
+            - `thetaticklabelpos_y`
+                - `np.ndarray`
+                - y-values of position of theta ticklabels
+            - `thetaticklabs`
+                - `np.ndarray`
+                - text to be displayed as x-ticklabels
+            - `thlabpos_x`
+                - `float`
+                - x-value to place theta-label at
+            - `thlabpos_y`
+                - `float`
+                - y-value to place theta-label at
+            - `x_arrow`
+                - `float`
+                - x-value to place indicator arrow at
+            - `x_arrow`
+                - `float`
+                - y-value to place indicator arrow at
 
-            Comments
-            --------
+        Comments
         """
         #default parameters
 
@@ -908,31 +905,21 @@ class LSteinCanvas:
 
     def compute_ylabel(self,
         ) -> Tuple[Any]:
-        """
-            - method to add the y-label to the canvas
+        """computes and returns coordinates of for positioning the ylabel
 
-            Parameters
-            ----------
-                - `ax`
-                    - `plt.Axes`, optional
-                    - axis to draw into
-                    - the default is `None`
-                        - will draw into parent axis of `LSteinCanvas`
+        Parameters
 
-            Raises
-            ------
+        Raises
 
-            Returns
-            -------
-                - `ylabpos_x`
-                    - `float`
-                    - x-value to place y-label at
-                - `ylabpos_y`
-                    - `float`
-                    - y-value to place y-label at            
+        Returns
+            - `ylabpos_x`
+                - `float`
+                - x-value to place y-label at
+            - `ylabpos_y`
+                - `float`
+                - y-value to place y-label at            
 
-            Comments
-            --------
+        Comments
         """
         #default parameters
 
@@ -960,84 +947,81 @@ class LSteinCanvas:
         yticklabelkwargs:dict=None,
         panelboundskwargs:dict=None,
         ) -> LSteinPanel:
-        """
-            - method to add a `LSteinPanel` to the canvas
-            - similar to matplotlibs `fig.add_subplot()`
+        """returns created `LSteinPanel`
 
-            Parameters
-            ----------
-                - `theta`
-                    - `float`
-                    - theta value the panel is associated with
-                    - equivalent to 2.5th dimension of the dataset
-                    - determines where on the canvas the panel will be located
-                        - created panel will be centered around `theta`
-                - `yticks`
-                    `Tuple[List[float],List[Any]]`, `List[float]`, optional
-                    - ticks to draw for the y-axis
-                    - also defines axis limits applied to `y`
-                        - i.e., bounds of the respective panel
-                        - `np.min(yticks[0])` corresponds to the start of the panel
-                        - `np.max(yticks[0])` corresponds to the end of the panel
-                    - if `List[float]`
-                        - will use `yticks` as ticklabels as well
-                    - if `Tuple[List[float],List[Any]]`
-                        - will use `yticks[1]` as ticklabels
-                    - overrides `self.yticks`
-                    - the default is `None`
-                        - will fall back to `self.yticks`
-                - `panelsize`
-                    - `float`, optional
-                    - (angular) space the created panel will occupy
-                    - in radians
-                    - the entire canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
-                    - overrides `self.panelsize`
-                    - the default is `None`
-                        - will fall back to `self.panelsize`
-                - `show_panelbounds`
-                    - `bool`, optional
-                    - whether to show bounds of the individual panels when rendering
-                    - the default is `False`
-                - `show_yticks`
-                    - `bool`, optional
-                    - whether to show ticks and gridlines for y-values
-                    - the default is `True`
-                - `y_projection_mode`
-                    - `Literal["theta","y"]`, optioal
-                    - method to use for the projection
-                    - the default is `theta`
-                        - uses `LSteinPanel.project_xy_theta()`
-                - `ytickkwargs`
-                    - `dict`, optional
-                    - kwargs to pass to `ax.plot()` when drawing yticks (lines in radial direction)
-                    - used for styling
-                    - the default is `None`
-                        - will be set to `dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"])`
-                - `yticklabelkwargs`
-                    - `dict`, optional
-                    - kwargs to pass to `ax.annotate()` calls used for defining the ticklabels of the y-axis
-                    - used for styling
-                    - `pad` determines the padding w.r.t. the ticks        
-                    - the default is `None`
-                        - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.1)`
-                - `panelboundskwargs`
-                    - `dict`, optional
-                    - kwargs to pass to `ax.plot()` when drawing bounds of each panel
-                    - used for styling
-                    - the default is `None`
-                        - will be set to `dict(c=plt.rcParams["axes.edgecolor"])`
-                    
-            Raises
-            ------
+        - method to add a `LSteinPanel` to the canvas
+        - similar to matplotlibs `fig.add_subplot()`
 
-            Returns
-            -------
-                - `LSP`
-                    - `LSteinPanel`
-                    - created panel
+        Parameters
+            - `theta`
+                - `float`
+                - theta value the panel is associated with
+                - equivalent to 2.5th dimension of the dataset
+                - determines where on the canvas the panel will be located
+                    - created panel will be centered around `theta`
+            - `yticks`
+                `Tuple[List[float],List[Any]]`, `List[float]`, optional
+                - ticks to draw for the y-axis
+                - also defines axis limits applied to `y`
+                    - i.e., bounds of the respective panel
+                    - `np.min(yticks[0])` corresponds to the start of the panel
+                    - `np.max(yticks[0])` corresponds to the end of the panel
+                - if `List[float]`
+                    - will use `yticks` as ticklabels as well
+                - if `Tuple[List[float],List[Any]]`
+                    - will use `yticks[1]` as ticklabels
+                - overrides `self.yticks`
+                - the default is `None`
+                    - will fall back to `self.yticks`
+            - `panelsize`
+                - `float`, optional
+                - (angular) space the created panel will occupy
+                - in radians
+                - the entire canvas can allocate `(thetaguidelims[1]-thetaguidelims[0])/panelsize` evenly distributed, nonoverlapping panels
+                - overrides `self.panelsize`
+                - the default is `None`
+                    - will fall back to `self.panelsize`
+            - `show_panelbounds`
+                - `bool`, optional
+                - whether to show bounds of the individual panels when rendering
+                - the default is `False`
+            - `show_yticks`
+                - `bool`, optional
+                - whether to show ticks and gridlines for y-values
+                - the default is `True`
+            - `y_projection_mode`
+                - `Literal["theta","y"]`, optioal
+                - method to use for the projection
+                - the default is `theta`
+                    - uses `LSteinPanel.project_xy_theta()`
+            - `ytickkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.plot()` when drawing yticks (lines in radial direction)
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["grid.color"], ls=plt.rcParams["grid.linestyle"], lw=plt.rcParams["grid.linewidth"])`
+            - `yticklabelkwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.annotate()` calls used for defining the ticklabels of the y-axis
+                - used for styling
+                - `pad` determines the padding w.r.t. the ticks        
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.labelcolor"], ha="center", va="center", pad=0.1)`
+            - `panelboundskwargs`
+                - `dict`, optional
+                - kwargs to pass to `ax.plot()` when drawing bounds of each panel
+                - used for styling
+                - the default is `None`
+                    - will be set to `dict(c=plt.rcParams["axes.edgecolor"])`
+                
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `LSP`
+                - `LSteinPanel`
+                - created panel
+
+        Comments
         """
         #default parameters
         if isinstance(yticks, (list, np.ndarray)):
@@ -1065,23 +1049,20 @@ class LSteinCanvas:
     
     #get methods
     def get_thetas(self) -> List[float]:
-        """
-            - method to get `theta` of all currently added panels
+        """returns `theta` of all currently added panels
 
-            Parameters
-            ----------
+        - helper method to get `theta` of all currently added panels
 
-            Raises
-            ------
+        Parameters
 
-            Returns
-            -------
-                - `thetas`
-                    - `List[float]`
-                    - theta values associated with each panel in `self.Panels`
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `thetas`
+                - `List[float]`
+                - theta values associated with each panel in `self.Panels`
+
+        Comments
         """        
         thetas = [P.theta for P in self.Panels]
 
@@ -1090,28 +1071,25 @@ class LSteinCanvas:
     def get_panel(self,
         theta:float,
         ) -> LSteinPanel:
-        """
-            - method to get panel associated with `theta`
-            - only returns the first match
+        """returns a panel associated with `theta`
 
-            Parameters
-            ----------
-                - `theta`
-                    - `float`
-                    - theta-value to extract panel of
+        - method to get panel associated with `theta`
+        - only returns the first match
 
-            Raises
-            ------
+        Parameters
+            - `theta`
+                - `float`
+                - theta-value to extract panel of
 
-            Returns
-            -------
-                - `panel`
-                    - `LSteinPanel`, `None`
-                    - panel associated with `theta`
-                    - `None` if no panel associated with `theta`
+        Raises
 
-            Comments
-            --------
+        Returns
+            - `panel`
+                - `LSteinPanel`, `None`
+                - panel associated with `theta`
+                - `None` if no panel associated with `theta`
+
+        Comments
         """  
 
         for P in self.Panels:
@@ -1127,59 +1105,56 @@ class LSteinCanvas:
         panel_kwargs:Union[List[Dict],Dict]=None,
         series_kwargs:Union[List[Dict],Dict]=None,
         ):
-        """
-            - convenience function to plot a set of series
-            - will add all of the passed series to respective panels
+        """adds all series defined in `theta`, `X`, `Y` to respective panels for plotting
 
-            Parameters
-            ----------
-                - `theta`
-                    - `np.ndarray`
-                    - theta values associated for to each series in `zip(X,Y)`
-                    - 2.5th dimension
-                - `X`
-                    - `List[np.ndarray]`
-                    - set of x-values of each series
+        - convenience function to plot a set of series
+        - will add all of the passed series to respective panels
+
+        Parameters
+            - `theta`
+                - `np.ndarray`
+                - theta values associated for to each series in `zip(X,Y)`
+                - 2.5th dimension
+            - `X`
+                - `List[np.ndarray]`
+                - set of x-values of each series
+                - has to have same length as `theta`
+                - can contain arrays of different lengths
+                    - have to have same length as corresponding entries in `Y`
+                - each series will be plotted in it's own panel associated with `theta`
+            - `Y`
+                - `List[np.ndarray]`
+                - set of y-values of each series
+                - has to have same length as `theta`
+                - can contain arrays of different lengths
+                    - have to have same length as corresponding entries in `y`
+                - each series will be plotted in it's own panel associated with `theta`
+            - `panel_kwargs`
+                - `List[Dict]`, `Dict` optional
+                - kwargs to pass to `self.add_panel()`
+                - if `List[Dict]`
                     - has to have same length as `theta`
-                    - can contain arrays of different lengths
-                        - have to have same length as corresponding entries in `Y`
-                    - each series will be plotted in it's own panel associated with `theta`
-                - `Y`
-                    - `List[np.ndarray]`
-                    - set of y-values of each series
+                    - the panel created for each `theta` will use the respective specifications
+                - if `Dict`
+                    - specifications will be applied to all created panels
+                - the default is `None`
+                    - will be set to `dict()` for all panels
+            - `plot_kwargs`
+                - `List[Dict]`, `Dict`, optional
+                - kwargs to pass to `LSteinPanel.plot()`
+                - if `List[Dict]`
                     - has to have same length as `theta`
-                    - can contain arrays of different lengths
-                        - have to have same length as corresponding entries in `y`
-                    - each series will be plotted in it's own panel associated with `theta`
-                - `panel_kwargs`
-                    - `List[Dict]`, `Dict` optional
-                    - kwargs to pass to `self.add_panel()`
-                    - if `List[Dict]`
-                        - has to have same length as `theta`
-                        - the panel created for each `theta` will use the respective specifications
-                    - if `Dict`
-                        - specifications will be applied to all created panels
-                    - the default is `None`
-                        - will be set to `dict()` for all panels
-                - `plot_kwargs`
-                    - `List[Dict]`, `Dict`, optional
-                    - kwargs to pass to `LSteinPanel.plot()`
-                    - if `List[Dict]`
-                        - has to have same length as `theta`
-                        - the series plotted for each `theta` will use the respective specifications
-                    - if `Dict`
-                        - specifications will be applied to all plotted series                    
-                    - the default is `None`
-                        - will be set to `dict()` for all panels
-            
-            Raises
-            ------
+                    - the series plotted for each `theta` will use the respective specifications
+                - if `Dict`
+                    - specifications will be applied to all plotted series                    
+                - the default is `None`
+                    - will be set to `dict()` for all panels
+        
+        Raises
 
-            Returns
-            -------
+        Returns
 
-            Comments
-            --------
+        Comments
         """
         #default parameters
         if isinstance(seriestype,str): seriestype = [seriestype]*len(theta)
@@ -1213,23 +1188,20 @@ class LSteinCanvas:
 
     def reset(self,
         ):
-        """
-            - method to reset all flags related to plotting
-            - ensures that upon a new call
-                - canvas is drawn (again)
-                - panels are drawn (again)
+        """resets all plotting-related flags in `LSteinCanvas`
 
-            Parameters
-            ----------
+        - method to reset all flags related to plotting
+        - ensures that upon a new call
+            - canvas is drawn (again)
+            - panels are drawn (again)
 
-            Raises
-            ------
+        Parameters
 
-            Returns
-            -------
+        Raises
 
-            Comments
-            --------
+        Returns
+
+        Comments
         """
         self.canvas_drawn = False
         for LSP in self.Panels: LSP.panel_drawn = False
