@@ -4,16 +4,18 @@ WELCOME
 
 .. image:: /_gfx/lstein_logo.svg
 
-.. contents::
-   :local:
-   :depth: 1
+.. rubric:: Table of Contents
+   .. contents::
+      :local:
+      :depth: 1
 
-.. toctree::
-   :glob:
-   :maxdepth: 2
+   .. toctree::
+      :glob:
+      :maxdepth: 2
 
-   pages/*
-   pages/*/*
+      pages/*
+      pages/*/*
+
 
 
 Installation
