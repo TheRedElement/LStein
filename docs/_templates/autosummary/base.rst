@@ -4,6 +4,7 @@
 
 .. autosummary::
     :signatures: none
+    :toctree: generated/
 
 .. automodule:: {{ module }}
    :members:

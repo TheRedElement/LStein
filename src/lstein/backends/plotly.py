@@ -13,38 +13,39 @@ logger = logging.getLogger(__name__)
 
 #%%definitions
 class LSteinPlotly:
-    """
-        - matplotlib backend to show an `LSteinCanvas` with all its `LSteinPanel` elements
+    """represents plotly backend for plotting LStein
 
-        Attributes
-        ----------
-            - `LSC`
-                - `LSteinCanvas`
-                - canvas to display
+    - plotly backend to show an `LSteinCanvas` with all its `LSteinPanel` elements
 
-        Infered Attributes
-        ------------------
+    Attributes
+    ----------
+        - `LSC`
+            - `LSteinCanvas`
+            - canvas to display
 
-        Methods
-        -------
-            - `add_xaxis()`
-            - `add_thetaaxis()`
-            - `add_yaxis()`
-            - `add_ylabel()`
-            - `add_yaxis()`
-            - `scatter_()`
-            - `plot_()`
-            - `show()`
+    Infered Attributes
+    ------------------
 
-        Dependencies
-        ------------
-            - `logging`
-            - `matplotlib`
-            - `numpy`
+    Methods
+    -------
+        - `add_xaxis()`
+        - `add_thetaaxis()`
+        - `add_yaxis()`
+        - `add_ylabel()`
+        - `add_yaxis()`
+        - `scatter_()`
+        - `plot_()`
+        - `show()`
 
-        Comments
-        --------
-            - `ax` as method argument to ensure signature equivalence of different backends
+    Dependencies
+    ------------
+        - `logging`
+        - `matplotlib`
+        - `numpy`
+
+    Comments
+    --------
+        - `ax` as method argument to ensure signature equivalence of different backends
     """
     
     def __init__(self,
