@@ -2,10 +2,20 @@
 LSteinCanvas
 ============
 
-.. contents::
-   :local:
 
-.. currentmodule:: lstein.lstein.py
+.. currentmodule:: lstein.lstein.LSteinCanvas
+
+
+Methods
+-------
+
+.. autosummary::
+   :toctree: generated/
+   :recursive:
+   :signatures: short
+
+   LSteinCanvas.add_panel
+
 
 
 
@@ -15,11 +25,3 @@ LSteinCanvas
    :show-inheritance:
    :exclude-members: __init__, __repr__, _private
    :member-order: alphabetical
-
-Methods
--------
-
-.. autosummary::
-   :toctree: generated/
-   :recursive:
-   :signatures: short
