@@ -4,8 +4,6 @@ WELCOME
 
 .. image:: /_gfx/lstein_logo.svg
 
-.. rubric::
-
 .. toctree::
    :glob:
    :maxdepth: 2
@@ -18,7 +16,7 @@ WELCOME
 .. contents:: Table of Contents
    :local:
    :depth: 1
-   :
+
 
 
 
