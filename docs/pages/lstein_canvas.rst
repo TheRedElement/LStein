@@ -11,11 +11,10 @@ Methods
 
 .. autosummary::
    :toctree: generated/
-   :recursive:
    :members:
-   :signatures: short
+   :nosignatures:
 
-   LSteinCanvas
+   lstein.lstein.LSteinCanvas
 
 
 
