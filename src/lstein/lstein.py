@@ -1,6 +1,17 @@
-"""main package for creating LStein plots
+"""main module for creating LStein plots
 
+- combines all relevant classes to be accessible from one interface
 
+Classes
+    - `LSteinCanvas`  -- canvas to draw onto
+    - `LSteinPanel`   -- panel to plot data into
+    - `LSteinMPL`     -- matplotlib backend
+    - `LSteinPlotly`  -- plotly backend
+
+Functions
+    - `draw()`  -- convenience function to draw an `LSteinCanvas`
+
+Other Objects
 
 """
 
@@ -24,46 +35,39 @@ def draw(
     reset:bool=True,
     **kwargs
     ) -> Any:
-    """
-        - convenience function to draw an existing instance of `LSteinCanvas` using some `backend`
-        
-        Parameters
-        ----------
-            - `LSC`
-                - `LSteinCanvas`
-                - instance of `LSteinCanvas` to be drawn
-            - `backend`
-                - `Literal["matplotlib"]`, optional
-                - backend to use for plotting
-                - the default is "matplotlib"
-            - `reset`
-                - `bool`, optional
-                - whether to clear all flags
-                - ensures that
-                    - canvas is drawn (again)
-                    - panels are drawn (again)
-            - `kwargs`
-                - kwargs to be passed to figure instantiation methods of `backend`
-                    - `"matplotlib"`: `plt.subplots()`
-                    - `"plotly"`: `make_subplots()`
-        
-        Raises
-        ------
+    """draws an `LSteinCanvas` using some `backend`
 
+    - convenience function to draw an existing instance of `LSteinCanvas` using some `backend`
+    
+    Parameters
+        - `LSC`
+            - `LSteinCanvas`
+            - instance of `LSteinCanvas` to be drawn
+        - `backend`
+            - `Literal["matplotlib"]`, optional
+            - backend to use for plotting
+            - the default is "matplotlib"
+        - `reset`
+            - `bool`, optional
+            - whether to clear all flags
+            - ensures that
+                - canvas is drawn (again)
+                - panels are drawn (again)
+        - `kwargs`
+            - kwargs to be passed to figure instantiation methods of `backend`
+                - `"matplotlib"`: `plt.subplots()`
+                - `"plotly"`: `make_subplots()`
+    
+    Raises
 
-        Returns
-        -------
-            - `fig`
-                - type depends on `backend`
-                - created figure that can be displayed
+    Returns
+        - `fig`
+            - type depends on `backend`
+            - created figure that can be displayed
 
-        Dependencies
-        ------------
-            - `matplotlib`
-            - `typing`
-
-        Comments
-        --------
+    Dependencies
+        - `matplotlib`
+        - `typing`
     """
 
     backends = ["matplotlib", "plotly"]

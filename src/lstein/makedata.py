@@ -1,40 +1,51 @@
+"""module to create artificial data
+
+- functions to create artificial data
+- used for demonstrations
+
+Classes
+
+Functions
+    - `gaussian_pdf()`  -- gaussian probability density function
+    - `lc_sim()`        -- rudimentary non-physical lightcurve simulation
+    - `sin_sim()`       -- simulation of sinusoidal signal
+    - `simulate()`      -- interface to simulate data for LStein demos
+
+Other Objects
+
+"""
+
 #%%imports
 import numpy as np
 from typing import Dict, Literal, Tuple
 
 #%%definitions
 def gaussian_pdf(x:float, mu:float, sigma:float) -> float:
-    """
-        - function defining a gaussian normal distribution
+    """evaluates gaussian normal distribution at `x`
 
-        Parameters
-        ----------
-            - `x`
-                - `float`
-                - x-value to evaluate the gaussian at
-            - `mu`
-                - `float`
-                - mean of the gaussian
-            - `sigma`
-                - `float`
-                - standard deviation of the gaussian
+    - function defining a gaussian normal distribution
 
-        Raises
-        ------
+    Parameters
+        - `x`
+            - `float`
+            - x-value to evaluate the gaussian at
+        - `mu`
+            - `float`
+            - mean of the gaussian
+        - `sigma`
+            - `float`
+            - standard deviation of the gaussian
 
-        Returns
-        -------
-            - `y`
-                - `float`
-                - result when evaluating the gaussian with mean `mu` and standard deviation `sigma` at `x`
-        
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
-        
-        Comments
-        --------
+    Raises
+
+    Returns
+        - `y`
+            - `float`
+            - result when evaluating the gaussian with mean `mu` and standard deviation `sigma` at `x`
+    
+    Dependencies
+        - `numpy`
+        - `typing`
     """    
     y = 1/(sigma*np.sqrt(2*np.pi)) * np.exp(-(x - mu)**2 / (2*sigma**2))
     return y
@@ -45,51 +56,45 @@ def lc_sim(
     stretch0:float, stretch1:float, stretch2:float,
     noiselevel:float=0.0,
     ) -> np.ndarray:
-    """
-        - function to define a very simplistic phenomenological LC
+    """returns rudimentary (nonphysical) lightcurve
 
-        Parameters
-        ----------
-            - `t`
-                - `np.ndarray`
-                - time i.e., x-values
-            - `t_peak`
-                - `float`
-                - time of maximum flux
-            - `f_peak`
-                - `float`
-                - maximum flux
-            - `stretch0`
-                - `float`
-                - width of the entire peak
-                - width between the two gaussians used to model in- and decreasing phase
-            - `stretch1`
-                - `float`
-                - width of the gaussian used to model the increasing phase
-            - `stretch2`
-                - `float`
-                - width of the gaussian used to model the decreasing phase
-            - `noiselevel`
-                - `float`, optional
-                - how much noise to add to the generated dataseries
-                - the default is `0.0`
+    - function to define a very simplistic phenomenological LC
 
-        Raises
-        ------
+    Parameters
+        - `t`
+            - `np.ndarray`
+            - time i.e., x-values
+        - `t_peak`
+            - `float`
+            - time of maximum flux
+        - `f_peak`
+            - `float`
+            - maximum flux
+        - `stretch0`
+            - `float`
+            - width of the entire peak
+            - width between the two gaussians used to model in- and decreasing phase
+        - `stretch1`
+            - `float`
+            - width of the gaussian used to model the increasing phase
+        - `stretch2`
+            - `float`
+            - width of the gaussian used to model the decreasing phase
+        - `noiselevel`
+            - `float`, optional
+            - how much noise to add to the generated dataseries
+            - the default is `0.0`
 
-        Returns
-        -------
-            - `f`
-                - `np.ndarray`
-                - simulated flux values of the LC
+    Raises
 
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
-        
-        Comments
-        --------        
+    Returns
+        - `f`
+            - `np.ndarray`
+            - simulated flux values of the LC
+
+    Dependencies
+        - `numpy`
+        - `typing`
     """
     f = (gaussian_pdf(t, t_peak - stretch0/2, stretch1) + gaussian_pdf(t, t_peak + stretch0/2, stretch2))
     f = f_peak * f / np.max(f) + noiselevel * np.random.randn(*t.shape)
@@ -101,45 +106,39 @@ def sin_sim(
     p:float, offset:float=0.0,
     noiselevel:float=0.0
     ) -> float:
-    """
-        - function to evaluate a sin with period `p` and `offset`
+    """returns sin with period `p` and some `offset`
 
-        Parameters
-        ----------
-            - `t`
-                - `np.ndarray`
-                - time i.e., x-values
-            - `f_minmax`
-                - `float`
-                - amplitude of minimum and maximum of the generated curve
-            - `p`
-                - `float`
-                - period of the sine wave
-            - `offset`
-                - `float`, optional
-                - offset of the sine wave
-                - the default is `0.0`
-            - `noiselevel`
-                - `float`, optional
-                - how much noise to add to the generated dataseries
-                - the default is `0.0`
+    - function to evaluate a sin with period `p` and `offset`
 
-        Raises
-        ------
+    Parameters
+        - `t`
+            - `np.ndarray`
+            - time i.e., x-values
+        - `f_minmax`
+            - `float`
+            - amplitude of minimum and maximum of the generated curve
+        - `p`
+            - `float`
+            - period of the sine wave
+        - `offset`
+            - `float`, optional
+            - offset of the sine wave
+            - the default is `0.0`
+        - `noiselevel`
+            - `float`, optional
+            - how much noise to add to the generated dataseries
+            - the default is `0.0`
 
-        Returns
-        -------
-            - `f`
-                - `np.ndarray`
-                - sine wave with period `p` and offset `offset`
+    Raises
 
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
-        
-        Comments
-        --------
+    Returns
+        - `f`
+            - `np.ndarray`
+            - sine wave with period `p` and offset `offset`
+
+    Dependencies
+        - `numpy`
+        - `typing`
     """
     f = f_minmax * np.sin(t * 2*np.pi/p + offset) + noiselevel * np.random.randn(*t.shape)
     return f
@@ -149,49 +148,42 @@ def simulate(
     opt:Literal["lc","sin"]="lc",
     theta:np.ndarray=None,
     ) -> Tuple[Dict,Dict]:
-    """
-        - function to simulate `nobjects` objects using the method specified in `opt`
+    """simulates `nobjects` objects using `opt`
 
-        Parameters
-        ----------
-            - `nobjects`
-                - `int`, optional
-                - how many objects to generate
-            - `opt`
-                - `Literal["lc","sin"]`, optional
-                - method to use for generating the data
-                - `"lc"` uses `lc_sim()`
-                - `"sin"` uses `sin_sim()`
-            - `theta`
-                - `np.ndarrray`, optional
-                - theta-values to use for generating the curves
-                - setting `theta` overrides `nobjects`
-                - the default is `None`
-                    - will be randomly generated
+    - function to simulate `nobjects` objects using the method specified in `opt`
 
-        Raises
-        ------
+    Parameters
+        - `nobjects`
+            - `int`, optional
+            - how many objects to generate
+        - `opt`
+            - `Literal["lc","sin"]`, optional
+            - method to use for generating the data
+            - `"lc"` uses `lc_sim()`
+            - `"sin"` uses `sin_sim()`
+        - `theta`
+            - `np.ndarrray`, optional
+            - theta-values to use for generating the curves
+            - setting `theta` overrides `nobjects`
+            - the default is `None`
+                - will be randomly generated
 
-        Returns
-        -------
-            - `raw`
-                - `Dict`
-                - contains simulated raw data
-                    - noisy
-            - `pro`
-                - `Dict`
-                - contains simulated processed data
-                    - no noise
+    Raises
+
+    Returns
+        - `raw`
+            - `Dict`
+            - contains simulated raw data
+                - noisy
+        - `pro`
+            - `Dict`
+            - contains simulated processed data
+                - no noise
 
 
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
-        
-        Comments
-        --------
-
+    Dependencies
+        - `numpy`
+        - `typing`
     """
     res = 500
     if theta is None:
