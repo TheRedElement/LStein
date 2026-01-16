@@ -1,3 +1,20 @@
+"""utility functions
+
+- set of utility functions used to make LStein work
+- also useful for users in specific cases (i.e., ticklabel-rotations)
+
+Classes
+
+Functions
+- `cart2polar`              -- converts cartesian coordinates to polar coordinates
+- `polar2cart`              -- converts polar coordinates to cartesian coordinates
+- `minmaxscale`             -- applies min-max-scaling to input
+- `correct_labelrotation`   -- corrects label-rotation to always be readable
+- `get_colors`              -- returns set of unique colors following some colormap
+
+Other Objects
+
+"""
 
 #%%imports
 import matplotlib.pyplot as plt
@@ -9,37 +26,31 @@ from typing import Tuple, Union
 def cart2polar(
     x:float, y:float    
     ) -> Tuple[float, float]:
-    """
-        - function to convert cartesian coordinates into polar coordinates
+    """converts cartesian coordinates to polar coordinates
+        
+    - function to convert cartesian coordinates into polar coordinates
 
-        Parameters
-        ----------
-            - `x`
-                - `float`
-                - cartesian x-coordinate
-            - `y`
-                - `float`
-                - cartesian y-coordinate
+    Parameters
+        - `x`
+            - `float`
+            - cartesian x-coordinate
+        - `y`
+            - `float`
+            - cartesian y-coordinate
 
-        Raises
-        ------
+    Raises
 
-        Returns
-        -------
-            - `r`
-                - `float`
-                - radius
-            - `theta`
-                - `float`
-                - azimuthal angle
+    Returns
+        - `r`
+            - `float`
+            - radius
+        - `theta`
+            - `float`
+            - azimuthal angle
 
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
-
-        Comments
-        --------
+    Dependencies
+        - `numpy`
+        - `typing`
     """
     
     r = np.sqrt(x**2 + y**2)
@@ -50,37 +61,31 @@ def cart2polar(
 def polar2cart(
     r:float, theta:float
     ) -> Tuple[float, float]:
-    """
-        - function to convert polar coordinates into cartesian coordinates
+    """converts polar coordinates to cartesian coordinates
+        
+    - function to convert polar coordinates into cartesian coordinates
 
-        Parameters
-        ----------
-            - `r`
-                - `float`
-                - radius
-            - `theta`
-                - `float`
-                - azimuthal angle
+    Parameters
+        - `r`
+            - `float`
+            - radius
+        - `theta`
+            - `float`
+            - azimuthal angle
 
-        Raises
-        ------
+    Raises
 
-        Returns
-        -------
-            - `x`
-                - `float`
-                - cartesian x-coordinate
-            - `y`
-                - `float`
-                - cartesian y-coordinate
+    Returns
+        - `x`
+            - `float`
+            - cartesian x-coordinate
+        - `y`
+            - `float`
+            - cartesian y-coordinate
 
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
-
-        Comments
-        --------
+    Dependencies
+        - `numpy`
+        - `typing`
     """    
     x = r * np.cos(theta)
     y = r * np.sin(theta)
@@ -91,54 +96,47 @@ def minmaxscale(
     xmin:float, xmax:float,
     xmin_ref:float=None, xmax_ref:float=None,
     ) -> np.ndarray:
-    """
-        - function to apply min-max-scaling onto `x`
-        - will rescale `x` to the interval `xmin`, `xmax`
-        - considers `xmin_ref`, `xmax_ref` as reference boundaries of the original dataset that `x` is a part of
-        - similar to [`sklearn.processing.MinMaxScaler()`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html)
-        
-        Parameters
-        ----------
-            - `x`
-                - `np.ndarray`
-                - feature to be transformed
-            - `xmin`
-                - `float` 
-                - lower bound of the target range
-            - `xmax`
-                - `float` 
-                - upper bound of the target range
-            - `xmin_ref`
-                - `float`, optional
-                - lower bound of the original range
-                - the default is `None`
-                    - will consider `x` to be representing the original range
-                    - will be set to `np.nanmin(x)`
-            - `xmax_ref`
-                - `float`, optional
-                - upper bound of the original range
-                - the default is `None`
-                    - will consider `x` to be representing the original range
-                    - will be set to `np.nanmax(x)`
+    """applies min-max-scaling to `x`
 
-        Raises
-        ------
+    - function to apply min-max-scaling onto `x`
+    - will rescale `x` to the interval `xmin`, `xmax`
+    - considers `xmin_ref`, `xmax_ref` as reference boundaries of the original dataset that `x` is a part of
+    - similar to [`sklearn.processing.MinMaxScaler()`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html)
+    
+    Parameters
+        - `x`
+            - `np.ndarray`
+            - feature to be transformed
+        - `xmin`
+            - `float` 
+            - lower bound of the target range
+        - `xmax`
+            - `float` 
+            - upper bound of the target range
+        - `xmin_ref`
+            - `float`, optional
+            - lower bound of the original range
+            - the default is `None`
+                - will consider `x` to be representing the original range
+                - will be set to `np.nanmin(x)`
+        - `xmax_ref`
+            - `float`, optional
+            - upper bound of the original range
+            - the default is `None`
+                - will consider `x` to be representing the original range
+                - will be set to `np.nanmax(x)`
 
-        Returns
-        -------
-            - `x_scaled`
-                - `np.ndarray`
-                - same shape as `x`
-                - `x` after the transformation
+    Raises
 
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
+    Returns
+        - `x_scaled`
+            - `np.ndarray`
+            - same shape as `x`
+            - `x` after the transformation
 
-        Comments
-        --------
-
+    Dependencies
+        - `numpy`
+        - `typing`
     """
     if xmin_ref is None: xmin_ref = np.nanmin(x)
     if xmax_ref is None: xmax_ref = np.nanmax(x)
@@ -149,33 +147,27 @@ def minmaxscale(
     return x_scaled
 
 def correct_labelrotation(theta:float) -> float:
-    """
-        - function to make labels always face the right way up
-        - rotates any text that is upside down by 180 degrees
-            - upside down meaning it has a rotation in the interval $(90,270)$
+    """corrects label-rotation to always be readable
+    
+    - function to make labels always face the right way up
+    - rotates any text that is upside down by 180 degrees
+        - upside down meaning it has a rotation in the interval $(90,270)$
 
-        Parameters
-        ----------
-            - `theta`
-                - `float`
-                - rotation angle in degrees
-        
-        Raises
-        ------
+    Parameters
+        - `theta`
+            - `float`
+            - rotation angle in degrees
+    
+    Raises
 
-        Returns
-        -------
-            - `theta`
-                - `float`
-                - `theta` after correcting upside down angles
+    Returns
+        - `theta`
+            - `float`
+            - `theta` after correcting upside down angles
 
-        Dependencies
-        ------------
-            - `numpy`
-            - `typing`
-
-        Comments
-        --------
+    Dependencies
+        - `numpy`
+        - `typing`
     """
     
     if np.sin(np.radians(theta)) < 0:   #use `sin` to also account for negative values
@@ -188,49 +180,39 @@ def get_colors(
     cmap:Union[str,mcolors.Colormap]=None, norm=mcolors.Normalize,
     **kwargs
     ) -> np.ndarray:
-    """
-        - function to generate an array of colors mapping `x` onto `cmap`
+    """returns array of colors mapping `x` onto `cmap`
 
-        Parameters
-        ----------
-            - `x`
-                - `np.ndarray`
-                - data-series to be mapped onto `cmap`
-            - `cmap`
-                - `str`, `mcolors.Colormap`, optional
-                - colormap to use
-                - the default is `None`
-                    - will use `plt.rcParams["image.cmap"]`
-            - `norm`
-                - `mcolors Norm`, optional
-                - some instance of a `matplotlib.colors` Norm
-                - normalization to use when mapping `x` to `cmap`
-                - the default is `mcolors.Normalize`
-            - `as_hex`
-                - `bool`, optional
-                - whether to output a list of hex strings instead of an array of rgb arrays
-                - the default is `False`
-            - `**kwargs`
-                - kwargs to to pass to `norm()`
+    - function to generate an array of colors mapping `x` onto `cmap`
+
+    Parameters
+        - `x`
+            - `np.ndarray`
+            - data-series to be mapped onto `cmap`
+        - `cmap`
+            - `str`, `mcolors.Colormap`, optional
+            - colormap to use
+            - the default is `None`
+                - will use `plt.rcParams["image.cmap"]`
+        - `norm`
+            - `mcolors Norm`, optional
+            - some instance of a `matplotlib.colors` Norm
+            - normalization to use when mapping `x` to `cmap`
+            - the default is `mcolors.Normalize`
+        - `**kwargs`
+            - kwargs to to pass to `norm()`
 
 
-        Raises
-        ------
+    Raises
 
-        Returns
-        -------
-            - `colors`
-                - `np.ndarray`
-                - has length `x.shape[0]`
-                    - one hex-value for each value in `x`
+    Returns
+        - `colors`
+            - `np.ndarray`
+            - has length `x.shape[0]`
+                - one hex-value for each value in `x`
 
-        Dependencies
-        ------------
-            - `matplotlib`
-            - `typing`
-        
-        Comments
-        --------
+    Dependencies
+        - `matplotlib`
+        - `typing`
     """
     
     #default parameters
