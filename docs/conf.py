@@ -88,11 +88,16 @@ def setup(app):
     """makes some global setups pre build
     """
 
-    #copy gfx to html
-    src = os.path.abspath("../gfx")
-    dst = os.path.join(app.outdir, "_gfx")
-    if os.path.exists(src):
-        shutil.copytree(src, dst, dirs_exist_ok=True)
+    paths = [
+        {"../gfx":"_gfx"},
+        {"../demo":"_demo"},
+    ]
+    #copy some paths to html
+    for path in paths.keys():
+        src = os.path.abspath(path)
+        dst = os.path.join(app.outdir, paths[path])
+        if os.path.exists(src):
+            shutil.copytree(src, dst, dirs_exist_ok=True)
 
     # app.connect("autodoc-process-docstring", modify_docstrings)
 
