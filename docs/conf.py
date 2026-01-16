@@ -111,6 +111,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     #custom extensions
+    "nbsphinx",
     "sphinx_copybutton",    #adds copy button to all code-blocks
 ]
 

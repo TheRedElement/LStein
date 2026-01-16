@@ -35,6 +35,7 @@ dev = [
     "polars>=1.32.3",
 ]
 docs = [
+    "nbsphinx>=0.9.8",
     "sphinx>=9.0.4",
     "sphinx-copybutton>=0.5.2",
 ]
