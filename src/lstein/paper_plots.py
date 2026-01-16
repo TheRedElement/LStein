@@ -1,3 +1,22 @@
+"""module defining basic function for creating plots of the paper
+
+- base-functions used to create plots for the traditional methods in the paper
+- not relevant for user => no details in docstrings
+
+Classes
+
+Functions
+    - `make_mesh()`                     -- creates components for plotting with `np.meshgrid()`
+    - `plot_scatter_onepanel()`         -- scatter of different series in one panel
+    - `plot_scatter_onepanel_offset()`  -- scatter of different series in one panel (series have offset)
+    - `plot_scatter_multipanel()`       -- scatter of different series in one panel per series
+    - `plot_scatter_multipanel_group()` -- scatter of different series (multiple panels, similar series grouped in a single panel)
+    - `plot_heatmap()`                  -- heatmap of a set of series
+    - `plot_3dsurface()`                -- 3d surface of a set of series
+
+Other Objects
+
+"""
 
 #%%imports
 import matplotlib.pyplot as plt
@@ -10,12 +29,13 @@ def make_mesh(
     th:np.ndarray, x:List[np.ndarray], y:List[np.ndarray],
     res=100
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-        - function to create components for plotting with `np.meshgrid()` (`tt`, `xx`, `yy`)
-        - will
-            - generate `xx`: regularly spaced grid-values spanning from global min(x) to global max(x)
-            - generate `tt`: same as `th` except spanning the grid
-            - interpolate `y` to match the grid-shape spanned by `xx` and `tt` (fills with `np.nan` where out of interpolation range)
+    """returns components for plotting with `np.meshgrid`
+
+    - function to create components for plotting with `np.meshgrid()` (`tt`, `xx`, `yy`)
+    - will
+        - generate `xx`: regularly spaced grid-values spanning from global min(x) to global max(x)
+        - generate `tt`: same as `th` except spanning the grid
+        - interpolate `y` to match the grid-shape spanned by `xx` and `tt` (fills with `np.nan` where out of interpolation range)
     """
     xmin = np.min([x_.min() for x_ in x])
     xmax = np.max([x_.max() for x_ in x])
@@ -42,8 +62,7 @@ def plot_scatter_onepanel(
     thetalab, xlab, ylab,
     ax=None,
     ):
-    """
-        - function to plot a scatter with all passbands in the same panel
+    """plots a scatter with all passbands in the same panel
     """    
     if ax is None:
         fig = plt.figure(figsize=(9,5))
@@ -67,7 +86,8 @@ def plot_scatter_onepanel_offset(
     thetalab, xlab, ylab,
     ax=None,
     ):
-    """
+    """plots a scatter with all passbands in the same panel
+        
         - function to plot a scatter with all passbands in the same panel
         - passbands get offset
     """    
@@ -94,8 +114,7 @@ def plot_scatter_multipanel(
     thetalab, xlab, ylab,
     axs=None
     ):
-    """
-        - function to plot a scatter with each passband in one panel
+    """plots a scatter with each passband in its own panel
     """
     if axs is None:
         fig = plt.figure(figsize=(9,5))
@@ -114,6 +133,7 @@ def plot_scatter_multipanel(
         axs[i].plot(x_pro[i], y_pro[i], c=colors[i])
         
     return axs
+
 def plot_scatter_multipanel_group(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
@@ -122,8 +142,7 @@ def plot_scatter_multipanel_group(
     thetalab, xlab, ylab,
     axs=None
     ):
-    """
-        - function to plot a scatter with each passband in one panel
+    """plots a scatter with similar passbands grouped in same panel
     """
     if axs is None:
         fig = plt.figure(figsize=(9,5))
@@ -156,8 +175,7 @@ def plot_heatmap(
     ax=None,
     cmap=None, vmin=None, vmax=None,
     ):
-    """
-        - function to plot as a heatmap
+    """plots series as a heatmap
     """
 
     if ax is None:
@@ -190,8 +208,7 @@ def plot_3dsurface(
     ax=None,
     cmap=None,
     ):
-    """
-        - function to plot data as 3d surface
+    """plots data as 3d surface
     """
     if ax is None:
         fig = plt.figure(figsize=(9,5))
