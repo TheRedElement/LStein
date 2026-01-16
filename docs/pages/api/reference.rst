@@ -80,3 +80,17 @@ Backends
     LSteinPlotly.add_ylabel
     LSteinPlotly.show
     LSteinPlotly.translate_kwargs
+
+Utils
+-----
+
+.. autosummary::
+    :signatures: none
+    :recursive:
+    :toctree: tocUtils/
+
+    lstein.utils.cart2polar
+    lstein.utils.correct_labelrotation
+    lstein.utils.get_colors
+    lstein.utils.minmaxscale
+    lstein.utils.polar2cart
