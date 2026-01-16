@@ -11,7 +11,7 @@ WELCOME
    :hidden:
 
    pages/*
-   /_demo/*.ipynb
+   demo/*.ipynb
 
 .. local table of contents
 .. contents:: Table of Contents
