@@ -11,7 +11,6 @@ WELCOME
    :hidden:
 
    pages/*
-   Demo <https://github.com/TheRedElement/LStein/blob/main/demo/LStein_demo.ipynb>
 
 .. local table of contents
 .. contents:: Table of Contents
