@@ -111,7 +111,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     #custom extensions
-    # "sphinx_copybutton",
+    "sphinx_copybutton",    #adds copy button to all code-blocks
 ]
 
 autodoc_default_options = {

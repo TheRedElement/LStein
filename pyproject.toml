@@ -36,6 +36,7 @@ dev = [
 ]
 docs = [
     "sphinx>=9.0.4",
+    "sphinx-copybutton>=0.5.2",
 ]
 paper = [
     "lustcodesnippets-py",
