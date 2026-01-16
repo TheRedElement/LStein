@@ -83,14 +83,15 @@ Backends
 
 Utils
 -----
+.. currentmodule:: lstein
 
 .. autosummary::
     :signatures: none
     :recursive:
     :toctree: tocUtils/
 
-    lstein.utils.cart2polar
-    lstein.utils.correct_labelrotation
-    lstein.utils.get_colors
-    lstein.utils.minmaxscale
-    lstein.utils.polar2cart
+    utils.cart2polar
+    utils.correct_labelrotation
+    utils.get_colors
+    utils.minmaxscale
+    utils.polar2cart
