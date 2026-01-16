@@ -549,8 +549,8 @@ class LSteinCanvas:
                     - only affects the background grid
                 - in radians
                 - the default is `None`
-                    - will be set to `(0,2*np.pi)`
-                    - an entire circle will be plotted
+                    - will be set to `(0,np.pi)`
+                    - an semi-circle will be plotted
             - `thetaplotlims`
                 - `Tuple[float,float]`, optional
                 - range to be populated by with theta-panels
@@ -559,7 +559,7 @@ class LSteinCanvas:
                     - `np.max(thetaticks[0])` will be plotted at `thetaplotlims[1]`
                 - in radians
                 - the default is `None`
-                    - will be set to `thetaguidelims`
+                    - will be set to `thetaguidelims` with extra padding of `panelsize/2`
             - `xlimdeadzone`
                 - `float`, optional
                 - amount of space to leave empty in the center of the plot
@@ -658,8 +658,8 @@ class LSteinCanvas:
         self.xticks         = (np.array(xticks), xticks) if isinstance(xticks, (list, np.ndarray)) else xticks
         self.yticks         = (np.array(yticks), yticks) if isinstance(yticks, (list, np.ndarray)) else yticks
         
-        self.thetaguidelims = (0,2*np.pi) if thetaguidelims is None else thetaguidelims
-        self.thetaplotlims  = self.thetaguidelims if thetaplotlims is None else thetaplotlims
+        self.thetaguidelims = (0,np.pi) if thetaguidelims is None else thetaguidelims
+        self.thetaplotlims  = (self.thetaguidelims[0]+panelsize/2,self.thetaguidelims[1]-panelsize/2) if thetaplotlims is None else thetaplotlims
         self.xlimdeadzone   = xlimdeadzone
         self.panelsize      = panelsize
 
