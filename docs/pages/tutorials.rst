@@ -4,9 +4,9 @@ Tutorials
 
 .. toctree::
 
- :titlesonly:
+   :titlesonly:
 
- :maxdepth: 1
+   :maxdepth: 1
 
    Quickstart <https://github.com/TheRedElement/LStein/blob/main/demo/quickstart.ipynb>
    Customizing LSteinCanvas <https://github.com/TheRedElement/LStein/blob/main/demo/customizing_LSteinCanvas.ipynb>
