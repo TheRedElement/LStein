@@ -1,3 +1,9 @@
+"""main package for creating LStein plots
+
+
+
+"""
+
 #%%imports
 import matplotlib.pyplot as plt
 from plotly.subplots import make_subplots
