@@ -88,10 +88,10 @@ def setup(app):
     """makes some global setups pre build
     """
 
-    paths = [
-        {"../gfx":"_gfx"},
-        {"../demo":"_demo"},
-    ]
+    paths = {
+        "../gfx":"_gfx",
+        "../demo":"_demo",
+    }
     #copy some paths to html
     for path in paths.keys():
         src = os.path.abspath(path)
