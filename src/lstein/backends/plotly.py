@@ -101,60 +101,60 @@ class LSteinPlotly:
 
         #modifications to local copies to make suitable for backend in use
         ##thetatickkwargs
-        c, ls, lw = (self.thetatickkwargs.pop(k) for k in ["c", "ls", "lw"])
+        c, ls, lw = (self.thetatickkwargs.pop(k) if k in self.thetatickkwargs.keys() else None for k in ["c", "ls", "lw"])
         if ls in ls2plotly.keys(): ls = ls2plotly[ls]
         if c in c2plotly.keys(): c = c2plotly[c]
         if "line" not in self.thetatickkwargs.keys(): self.thetatickkwargs["line"] = dict(color=c, dash=ls, width=lw,)
         ##thetaticklabelkwargs
-        c, ha, va = (self.thetaticklabelkwargs.pop(k) for k in ["c", "ha", "va"])
+        c, ha, va, rotation = (self.thetaticklabelkwargs.pop(k) if k in self.thetaticklabelkwargs.keys() else None for k in ["c", "ha", "va", "rotation"])
         if c in c2plotly.keys(): c = c2plotly[c]
         if va in va2plotly.keys(): va = va2plotly[va]
         if "font" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["font"] = dict(color=c,)
         if "xanchor" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["xanchor"] = ha
         if "yanchor" not in self.thetaticklabelkwargs.keys(): self.thetaticklabelkwargs["yanchor"] = va
         ##thetalabelkwargs
-        c, ha, va = (self.thetalabelkwargs.pop(k) for k in ["c", "ha", "va"])
+        c, ha, va, rotation = (self.thetalabelkwargs.pop(k)  if k in self.thetalabelkwargs.keys() else None for k in ["c", "ha", "va", "rotation"])
         if c in c2plotly.keys(): c = c2plotly[c]
         if va in va2plotly.keys(): va = va2plotly[va]
         if "font" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["font"] = dict(color=c,)
         if "xanchor" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["xanchor"] = ha
         if "yanchor" not in self.thetalabelkwargs.keys(): self.thetalabelkwargs["yanchor"] = va
         ##xtickkwargs
-        c, ls, lw = (self.xtickkwargs.pop(k) for k in ["c", "ls", "lw"])
+        c, ls, lw = (self.xtickkwargs.pop(k) if k in self.xtickkwargs.keys() else None  for k in ["c", "ls", "lw"])
         if ls in ls2plotly.keys(): ls = ls2plotly[ls]
         if "line" not in self.xtickkwargs.keys(): self.xtickkwargs["line"] = dict(color=c, dash=ls, width=lw,)
         ##xticklabelkwargs
-        c, xytext, textcoords = (self.xticklabelkwargs.pop(k) for k in ["c", "xytext", "textcoords"])
+        c, xytext, textcoords = (self.xticklabelkwargs.pop(k) if k in self.xticklabelkwargs.keys() else None  for k in ["c", "xytext", "textcoords"])
         if c in c2plotly.keys(): c = c2plotly[c]
         if "font" not in self.xticklabelkwargs.keys(): self.xticklabelkwargs["font"] = dict(color=c,)
         if "xshift" not in self.xticklabelkwargs.keys(): self.xticklabelkwargs["xshift"] = xytext[0]    #will be interpreted as pixels!
         if "yshift" not in self.xticklabelkwargs.keys(): self.xticklabelkwargs["yshift"] = xytext[1]    #will be interpreted as pixels!
         ##xlabelkwargs
-        c, xytext, textcoords = (self.xlabelkwargs.pop(k) for k in ["c", "xytext", "textcoords"])
+        c, xytext, textcoords = (self.xlabelkwargs.pop(k) if k in self.xlabelkwargs.keys() else None  for k in ["c", "xytext", "textcoords"])
         if c in c2plotly.keys(): c = c2plotly[c]
         if "font" not in self.xlabelkwargs.keys(): self.xlabelkwargs["font"] = dict(color=c,)
         if "xshift" not in self.xlabelkwargs.keys(): self.xlabelkwargs["xshift"] = xytext[0]    #will be interpreted as pixels!
         if "yshift" not in self.xlabelkwargs.keys(): self.xlabelkwargs["yshift"] = xytext[1]    #will be interpreted as pixels!
         ##ylabelkwargs
-        c, = (self.ylabelkwargs.pop(k) for k in ["c"])
+        c, = (self.ylabelkwargs.pop(k) if k in self.ylabelkwargs.keys() else None  for k in ["c"])
         if c in c2plotly.keys(): c = c2plotly[c]
         if "font" not in self.ylabelkwargs.keys(): self.ylabelkwargs["font"] = dict(color=c,)
 
         for pkwargs in self.panelkwargs:
             ##ytickkwargs
-            c, ls, lw = (pkwargs["ytickkwargs"].pop(k) for k in ["c", "ls", "lw"])
+            c, ls, lw = (pkwargs["ytickkwargs"].pop(k) if k in pkwargs["ytickkwargs"].keys() else None  for k in ["c", "ls", "lw"])
             if ls in ls2plotly.keys(): ls = ls2plotly[ls]
             if c in c2plotly.keys(): c = c2plotly[c]
             if "line" not in pkwargs["ytickkwargs"].keys(): pkwargs["ytickkwargs"]["line"] = dict(color=c, dash=ls, width=lw,)
             ##yticklabelkwargs
-            c, ha, va = (pkwargs["yticklabelkwargs"].pop(k) for k in ["c", "ha", "va"])
+            c, ha, va, rotation = (pkwargs["yticklabelkwargs"].pop(k) if k in pkwargs["yticklabelkwargs"].keys() else None  for k in ["c", "ha", "va", "rotation"])
             if c in c2plotly.keys(): c = c2plotly[c]
             if va in va2plotly.keys(): va = va2plotly[va]
             if "font" not in pkwargs["yticklabelkwargs"].keys(): pkwargs["yticklabelkwargs"]["font"] = dict(color=c,)
             if "xanchor" not in pkwargs["yticklabelkwargs"].keys(): pkwargs["yticklabelkwargs"]["xanchor"] = ha
             if "yanchor" not in pkwargs["yticklabelkwargs"].keys(): pkwargs["yticklabelkwargs"]["yanchor"] = va
             ##panelboundskwargs
-            c, = (pkwargs["panelboundskwargs"].pop(k) for k in ["c"])
+            c, = (pkwargs["panelboundskwargs"].pop(k) if k in pkwargs["panelboundskwargs"].keys() else None  for k in ["c"])
             if c in c2plotly.keys(): c = c2plotly[c]
             if "line" not in pkwargs["panelboundskwargs"].keys(): pkwargs["panelboundskwargs"]["line"] = dict(color=c, dash="solid")
         return
@@ -443,8 +443,8 @@ class LSteinPlotly:
         Returns
         """
         #translate kwargs
-        c, label,  = (kwargs.pop(k) if k in kwargs.keys() else None for k in ["c", "label"])
-        if "marker" not in kwargs.keys(): kwargs["marker"] = dict(color=c)
+        c, s, alpha, label,  = (kwargs.pop(k) if k in kwargs.keys() else None for k in ["c", "s", "alpha", "label"])
+        if "marker" not in kwargs.keys(): kwargs["marker"] = dict(color=c, size=s, opacity=alpha)
         if (label is None) and ("name" not in kwargs.keys()):
                 kwargs["showlegend"] = False
         elif "name" not in kwargs.keys():
@@ -497,7 +497,7 @@ class LSteinPlotly:
         Returns
         """    
         #translate kwargs
-        c, lw, label,  = (kwargs.pop(k) if k in kwargs.keys() else None for k in ["c", "lw", "label"])
+        c, lw, alpha, label,  = (kwargs.pop(k) if k in kwargs.keys() else None for k in ["c", "lw", "alpha", "label"])
         if "line" not in kwargs.keys(): kwargs["line"] = dict(color=c, width=lw)
         if (label is None) and ("name" not in kwargs.keys()):
                 kwargs["showlegend"] = False
