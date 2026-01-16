@@ -11,7 +11,6 @@ WELCOME
    :hidden:
 
    pages/*
-   pages/*/*
 
 .. local table of contents
 .. contents:: Table of Contents
@@ -39,3 +38,11 @@ If you find `LStein` useful in your work we would appreciate it if you cite it's
 Installation
 ------------
 
+You can easily install the package using [`pip`](https://pypi.org/project/pip/):
+
+.. code-block:: shell
+
+   pip3 install git+https://github.com/TheRedElement/LStein.git
+
+Quick Start
+-----------
