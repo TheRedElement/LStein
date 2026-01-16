@@ -26,7 +26,6 @@ def add_paths():
     html_static_path = [
         "assets",
         os.path.abspath("../gfx"),
-        os.path.abspath("../demo"),
     ]
     return
 
@@ -91,7 +90,6 @@ def setup(app):
 
     paths = {
         "../gfx":"_gfx",
-        "../demo":"_demo",
     }
     #copy some paths to html
     for path in paths.keys():
