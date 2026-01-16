@@ -26,6 +26,7 @@ def add_paths():
     html_static_path = [
         "assets",
         os.path.abspath("../gfx"),
+        os.path.abspath("../demo"),
     ]
     return
 
