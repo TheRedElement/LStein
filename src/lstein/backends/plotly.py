@@ -443,9 +443,13 @@ class LSteinPlotly:
         Returns
         """
         #translate kwargs
-        c, = (kwargs.pop(k) for k in ["c"])
+        c, label,  = (kwargs.pop(k) if k in kwargs.keys() else None for k in ["c", "label"])
         if "marker" not in kwargs.keys(): kwargs["marker"] = dict(color=c)
-        
+        if (label is None) and ("name" not in kwargs.keys()):
+                kwargs["showlegend"] = False
+        elif "name" not in kwargs.keys():
+            kwargs["name"] = label
+
         #plot series
         fig.add_trace(
             go.Scatter(x=x, y=y,
@@ -493,8 +497,13 @@ class LSteinPlotly:
         Returns
         """    
         #translate kwargs
-        c, = (kwargs.pop(k) for k in ["c"])
-        if "line" not in kwargs.keys(): kwargs["line"] = dict(color=c)
+        c, lw, label,  = (kwargs.pop(k) if k in kwargs.keys() else None for k in ["c", "lw", "label"])
+        if "line" not in kwargs.keys(): kwargs["line"] = dict(color=c, width=lw)
+        if (label is None) and ("name" not in kwargs.keys()):
+                kwargs["showlegend"] = False
+        elif "name" not in kwargs.keys():
+            kwargs["name"] = label
+
         
         #plot series        
         fig.add_trace(
