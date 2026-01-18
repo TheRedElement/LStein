@@ -125,7 +125,7 @@ autodoc_default_options = {
 }
 # autoclass_content = "both"
 autosummary_generate = True
-# html_theme = "sphinx_rtd_theme"
+html_theme = "alabaster"
 html_static_path = ["_static"]
 html_css_files = [
     "/styles/lstein.css",
