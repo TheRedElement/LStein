@@ -4,6 +4,7 @@
 :root {
     --c_bg: #000000;
     --c_body_text: #ffffff;
+    --c_link: #c80000;
 }
 
 body {
@@ -32,4 +33,11 @@ div.footer a {
 div.sphinxsidebar {
   background-color: var(--c_bg);
   color: var(--c_body_text);
+}
+div.sphinxsidebar {
+    color: var(--c_body_text);
+}
+
+a {
+    color: var(--c_link);
 }
