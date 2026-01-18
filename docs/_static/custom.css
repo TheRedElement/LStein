@@ -37,6 +37,10 @@ div.sphinxsidebar {
   background-color: var(--c_bg);
   color: var(--c_body_text);
 }
+div.sphinxsidebar :where(h1,h2,h3,h4,h5,h6) {
+  background-color: var(--c_bg);
+  color: var(--c_body_text);
+}
 div.sphinxsidebar p {
     color: var(--c_body_text);
 }
