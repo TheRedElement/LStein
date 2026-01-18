@@ -22,6 +22,9 @@ WELCOME
    Most functionalities should work, but changes will be implemented on a running basis and without notice.
    No test have been performed yet.
 
+.. note::
+   This page summarizes the most common characteristics, pitfalls etc.
+   Please refer to the paper for a more detailed list and `Tutorials <pages/tutorals.rst>`__ for solutions to some known issues/missing features.
 
 Reference
 ---------
@@ -67,7 +70,7 @@ Each dataset is a `.csv` file with the following columns:
 =====================   ===========
 Column                  Description
 =====================   ===========
-:math:`\theta-values`   values to be plotted as azimuthal offset of the panel
+:math:`\theta`-values   values to be plotted as azimuthal offset of the panel
 :math:`x`-values        values to be plotted radially
 :math:`y`-values        values to be plotted as an azimuthal offset constraint to a circle-sector
 :math:`y`-errors        errors assigned to :math:`y`-values
@@ -91,6 +94,27 @@ You can try your own data as well, but make sure to
 
 Example Plots
 -------------
+
+Advantages and Downsides
+------------------------
+
+Pros:
+
++ no overcrowded panels
++ similar :math:`\theta`-values (i.e., passbands) are plotted closer together
++ allows to preserve amplitude-differences across :math:`\theta`-values for same :math:`y`-values
++ allows to depict arbitrary number of :math:`\theta`-values (by means of reducing the angular size of each :math:`\theta`-panel) 
++ works for people with color-blindness due to relational display of information
++ can be applied to variety of data (not only lightcurves)
+	+ examples: spectra over time, different machine learning models
++ layout entirely customizable
+
+Cons:
+
+- projection effects close to `xmin`
+- does currently *not* support plotting errorbars
+	- workaround: plot another line if you want to indicate uncertainties
+
 
 Known Bugs
 ----------
