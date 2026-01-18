@@ -135,7 +135,7 @@ html_theme_options = {
     "github_banner": True,
     "github_button": True,
     "sidebar_collapse": True,
-    "body_text": "#FFFFFF",
+    # "body_text": "#FFFFFF",
 }
 todo_include_todos = True
 
