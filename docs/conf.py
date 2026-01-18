@@ -128,7 +128,7 @@ autosummary_generate = True
 html_theme = "alabaster"
 html_static_path = ["_static"]
 html_css_files = [
-    "lstein.css",
+    "custom.css",
 ]
 todo_include_todos = True
 
