@@ -19,10 +19,11 @@ WELCOME
 
 Reference
 ---------
-If you find `LStein` useful in your work we would appreciate it if you cite it's paper:
+If you find `LStein` useful in your work we would appreciate it if you cite its paper:
+
 .. todo::
    
-   update citation once published
+   paper coming soon, in the meantime you can use this citation once published
 
 .. code-block:: bibtex
 

@@ -17,7 +17,7 @@ div.document {
 div.body {
   background-color: var(--c_bg);
 }
-div :where(h1,h2,h3) {
+:is(h1,h2,h3) {
     color: var(--c_body_text);
 }
 
