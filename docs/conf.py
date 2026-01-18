@@ -125,6 +125,10 @@ autodoc_default_options = {
 }
 # autoclass_content = "both"
 autosummary_generate = True
+html_theme = "sphinx_rtd_theme"
+html_css_files = [
+    "https://raw.githubusercontent.com/TheRedElement/LuStCodeSnippets/refs/heads/dev/styles/tre_dark.css",
+]
 todo_include_todos = True
 
 
