@@ -18,17 +18,18 @@ div.body {
   background-color: var(--c_bg);
 }
 div :where(h1,h2,h3) {
-    color: #ffffff;
+    color: var(--c_body_text);
 }
 
 div.footer {
-    color: var(--c_bg);
+    color: var(--c_body_text);
 }
 
 div.footer a {
-    color: var(--c_bg);
+    color: var(--c_body_text);
 }
 
 div.sphinxsidebar {
   background-color: var(--c_bg);
+  color: var(--c_body_text);
 }
