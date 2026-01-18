@@ -64,20 +64,20 @@ Data used for `Tutorials <pages/tutorals.rst>`__ can be found in `data/ <https:/
 There are also a few other datasets so feel free to have a play around.
 Each dataset is a `.csv` file with the following columns:
 
-====================    ===========
+=====================   ===========
 Column                  Description
-====================    ===========
-$\theta$-values         values to be plotted as azimuthal offset of the panel
-$x$-values              values to be plotted radially
-$y$-values              values to be plotted as an azimuthal offset constraint to a circle-sector
-$y$-errors              errors assigned to $y$-values
+=====================   ===========
+:math:`\theta-values`   values to be plotted as azimuthal offset of the panel
+:math:`x`-values        values to be plotted radially
+:math:`y`-values        values to be plotted as an azimuthal offset constraint to a circle-sector
+:math:`y`-errors        errors assigned to :math:`y`-values
 `processing context`    which processing was used
-====================    ===========
+=====================   ===========
 
 
 `Tutorials <pages/tutorals.rst>`__ using the data will behave as follows:
 
-1. take the first 3 columns (in order) as $\theta$-, $x$-, $y$-values
+1. take the first 3 columns (in order) as :math:`\theta`-, :math:`x`-, :math:`y`-values
 2. take the column names as axis-labels
 3. plot a scatter for `processing context="raw"`
 4. plot a line for `processing context!="raw"`
@@ -95,8 +95,8 @@ Example Plots
 Known Bugs
 ----------
 
-* `y_projection_method="theta"` goes haywire for huge x-values (for sure $\ge10000$)
-    * the reason is the necessity to compute $\tan$ and $arc\tan$ when converting back and forth between coordinate systems
+* `y_projection_method="theta"` goes haywire for huge x-values (for sure :math:`\ge10000`)
+    * the reason is the necessity to compute :math:`\tan` and :math:`arc\tan` when converting back and forth between coordinate systems
     * workarounds
         * formulate your series relative to some value so you remain in a reasonable range
         * use `y_projection_method="y"`
