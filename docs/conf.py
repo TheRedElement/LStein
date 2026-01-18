@@ -131,12 +131,12 @@ add_paths()
 set_metadata()
 
 
-#%%customizing the theme
+#%%customizing the theme (order matters)
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 html_theme = "alabaster"
 html_theme_options = {
-    "description": description,
+    # "description": description,
     "logo": "../_gfx/lstein_logo.svg",
     "github_user": "TheRedElement",
     "github_repo": "LStein",
