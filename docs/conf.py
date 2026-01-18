@@ -125,11 +125,11 @@ autodoc_default_options = {
 }
 # autoclass_content = "both"
 autosummary_generate = True
-html_theme = "classic"
-# html_static_path = ["_static"]
-# html_css_files = [
-#     "lstein.css",
-# ]
+html_theme = "alabaster"
+html_static_path = ["_static"]
+html_css_files = [
+    "lstein.css",
+]
 todo_include_todos = True
 
 
