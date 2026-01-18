@@ -125,9 +125,11 @@ autodoc_default_options = {
 }
 # autoclass_content = "both"
 autosummary_generate = True
+
+#customizing the theme
 html_static_path = ["_static"]
-html_theme = "custom.css"
-# html_css_files = ["custom.css"]
+html_css_files = ["custom.css"]
+html_theme = "alabaster"
 html_theme_options = {
     "logo": "../_gfx/lstein_logo.svg",
     "github_user": "TheRedElement",
