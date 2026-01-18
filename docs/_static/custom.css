@@ -1,4 +1,5 @@
 /* overrides alabaster (https://github.com/sphinx-doc/alabaster/blob/master/alabaster/static/alabaster.css_t) */
+@import 'alabaster.css_t';
 
 :root {
     --c_bg: #000000;
