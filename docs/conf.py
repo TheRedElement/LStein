@@ -59,6 +59,42 @@ def set_metadata():
 
     return
 
+def override_style():
+    """overrides `html_theme` with custom theme
+        
+    - overrides `html_theme` with custom theme
+    - depends on `/docs/_static/custom.css`
+
+    """
+    global html_theme
+    global html_static_path
+    global html_css_files
+
+    c_bg = "#000000"
+    c_body_text = "#ffffff"
+    c_link = "#c80000"
+    c_hover = "#c94242"
+    c_code_bg = "#414141"
+    html_theme = "alabaster"
+    html_theme_options = {
+        # "description": description,
+        "logo": "../_gfx/lstein_logo.svg",
+        "github_user": "TheRedElement",
+        "github_repo": "LStein",
+        "github_banner": True,
+        "github_button": True,
+        "sidebar_collapse": True,
+        "body_text": c_body_text,
+        "gray_1": c_body_text,
+        "gray_2": "#646464",
+        "gray_3": "#535353",
+        "link_hover": c_hover,
+        "link": c_link,
+        "pre_bg": c_code_bg,
+    }
+    html_static_path = ["_static"]
+    html_css_files = ["custom.css"]
+    return
 # def modify_docstrings(app, what, name, obj, options, lines):
 #     """
 #         - function to apply modifications to docstrings
@@ -129,45 +165,6 @@ autosummary_generate = True
 #executions (order matters)
 add_paths()
 set_metadata()
-
-
-#%%customizing the theme (order matters)
-def override_style():
-    """overrides `html_theme` with custom theme
-        
-    - overrides `html_theme` with custom theme
-    - depends on `/docs/_static/custom.css`
-
-    """
-    global html_theme
-    global html_static_path
-    global html_css_files
-
-    c_bg = "#000000"
-    c_body_text = "#ffffff"
-    c_link = "#c80000"
-    c_hover = "#c94242"
-    c_code_bg = "#414141"
-    html_theme = "alabaster"
-    html_theme_options = {
-        # "description": description,
-        "logo": "../_gfx/lstein_logo.svg",
-        "github_user": "TheRedElement",
-        "github_repo": "LStein",
-        "github_banner": True,
-        "github_button": True,
-        "sidebar_collapse": True,
-        "body_text": c_body_text,
-        "gray_1": c_body_text,
-        "gray_2": "#646464",
-        "gray_3": "#535353",
-        "link_hover": c_hover,
-        "link": c_link,
-        "pre_bg": c_code_bg,
-    }
-    html_static_path = ["_static"]
-    html_css_files = ["custom.css"]
-    return
 override_style()
 
 todo_include_todos = True
