@@ -142,6 +142,9 @@ html_theme_options = {
     "github_button": True,
     "sidebar_collapse": True,
     # "body_text": "#FFFFFF",
+    "gray_1": "#ffffff",
+    "gray_2": "#c7c7c7",
+    "gray_3": "#979797",
 }
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
