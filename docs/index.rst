@@ -60,18 +60,22 @@ More tutorals can be found in `Tutorials <pages/tutorals.rst>`__.
 Data For Texting
 ----------------
 
-Data used for `Tutorials <pages/tutorals.rst>`__ in `data/ <https://github.com/TheRedElement/LStein/blob/main/data/>`__.
+Data used for `Tutorials <pages/tutorals.rst>`__ can be found in `data/ <https://github.com/TheRedElement/LStein/blob/main/data/>`__.
+There are also a few other datasets so feel free to have a play around.
 Each dataset is a `.csv` file with the following columns:
 
-| Column | Description |
-| :- | :- |
-$\theta$-values | values to be plotted as azimuthal offset of the panel
-$x$-values      | values to be plotted radially
-$y$-values      | values to be plotted as an azimuthal offset constraint to a circle-sector
-$y$-errors      | errors assigned to $y$-values
-`processing context`  | which processing was used
+======                  ===========
+Column                  Description
+======                  ===========
+$\theta$-values         values to be plotted as azimuthal offset of the panel
+$x$-values              values to be plotted radially
+$y$-values              values to be plotted as an azimuthal offset constraint to a circle-sector
+$y$-errors              errors assigned to $y$-values
+`processing context`    which processing was used
+======                  ===========
 
-The demo will behave as follows:
+
+`Tutorials <pages/tutorals.rst>`__ using the data will behave as follows:
 1. take the first 3 columns (in order) as $\theta$-, $x$-, $y$-values
 2. take the column names as axis-labels
 3. plot a scatter for `processing context="raw"`
@@ -79,7 +83,6 @@ The demo will behave as follows:
 
 You can try your own data as well, but make sure to
 1. follow the above-mentioned conventions
-2. deposit your file in [data/](./data/)
 3. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
