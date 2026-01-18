@@ -126,11 +126,11 @@ autodoc_default_options = {
 # autoclass_content = "both"
 autosummary_generate = True
 html_theme = "alabaster"
-html_static_path = ["_static"]
-html_css_files = [
-    "/styles/lstein.css",
-    "https://raw.githubusercontent.com/TheRedElement/LuStCodeSnippets/refs/heads/dev/styles/tre_dark.css",
-]
+# html_static_path = ["_static"]
+# html_css_files = [
+#     "/styles/lstein.css",
+#     "https://raw.githubusercontent.com/TheRedElement/LuStCodeSnippets/refs/heads/dev/styles/tre_dark.css",
+# ]
 todo_include_todos = True
 
 
