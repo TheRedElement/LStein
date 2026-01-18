@@ -132,8 +132,6 @@ set_metadata()
 
 
 #%%customizing the theme (order matters)
-html_static_path = ["_static"]
-html_css_files = ["custom.css"]
 html_theme = "alabaster"
 html_theme_options = {
     # "description": description,
@@ -145,5 +143,7 @@ html_theme_options = {
     "sidebar_collapse": True,
     # "body_text": "#FFFFFF",
 }
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 todo_include_todos = True
 
