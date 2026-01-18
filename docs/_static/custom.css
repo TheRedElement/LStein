@@ -1,0 +1,15 @@
+/* Page background */
+body {
+  background-color: #000;
+  color: #eaeaea;   /* make text readable */
+}
+
+/* Main content area */
+div.document {
+  background-color: #000;
+}
+
+/* Sidebar (optional, but usually needed) */
+div.sphinxsidebar {
+  background-color: #000;
+}
