@@ -1,15 +1,17 @@
-/* Page background */
+/* overrides alabaster (https://github.com/sphinx-doc/alabaster/blob/master/alabaster/static/alabaster.css_t) */
+
 body {
   background: #000;
   color: #eaeaea;   /* make text readable */
 }
 
-/* Main content area */
 div.document {
   background-color: #000;
 }
+div.body {
+  background-color: #000;
+}
 
-/* Sidebar (optional, but usually needed) */
 div.sphinxsidebar {
   background-color: #000;
 }
