@@ -68,3 +68,8 @@ a.headerlink {
 a.headerlink:hover {
     color: color-mix(in srgb, var(--c_link) 80%, var(--c_body_text) 20%);
 }
+
+/* sphinx overrides */
+.sig .sig-object .py {
+    background-color: aqua;
+}
