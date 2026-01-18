@@ -70,6 +70,7 @@ a.headerlink:hover {
 }
 
 /* sphinx overrides */
-.sig .sig-object .py {
+dt.sig {
+    /* object signatures */
     background-color: aqua;
 }
