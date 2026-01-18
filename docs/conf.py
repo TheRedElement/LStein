@@ -136,6 +136,7 @@ c_body_text = "#ffffff"
 c_bg = "#000000"
 c_link = "#c80000"
 c_hover = "#c94242"
+c_code_bg = "#414141"
 html_theme = "alabaster"
 html_theme_options = {
     # "description": description,
@@ -151,6 +152,7 @@ html_theme_options = {
     "gray_3": "#979797",
     "link_hover": c_hover,
     "link": c_link,
+    "pre_bg": c_code_bg,
 }
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
