@@ -45,7 +45,7 @@ If you find `LStein` useful in your work we would appreciate it if you cite its 
 Installation
 ------------
 
-You can easily install the package using `pip <https://pypi.org/project/pip/>`:
+You can easily install the package using `pip <https://pypi.org/project/pip/>`__:
 
 .. code-block:: shell
 
@@ -54,8 +54,35 @@ You can easily install the package using `pip <https://pypi.org/project/pip/>`:
 Quick Start
 -----------
 
-Have a look at this notebook for a quick rundown: `Quickstart <https://github.com/TheRedElement/LStein/blob/main/demo/quickstart.ipynb>`.
-More tutorals can be found in `Tutorials <pages/tutorals.rst>`
+Have a look at this notebook for a quick rundown: `Quickstart <https://github.com/TheRedElement/LStein/blob/main/demo/quickstart.ipynb>`__.
+More tutorals can be found in `Tutorials <pages/tutorals.rst>`__.
+
+Data For Texting
+----------------
+
+Data used for `Tutorials <pages/tutorals.rst>`__ in `data/ <https://github.com/TheRedElement/LStein/blob/main/data/>`__.
+Each dataset is a `.csv` file with the following columns:
+
+| Column | Description |
+| :- | :- |
+$\theta$-values | values to be plotted as azimuthal offset of the panel
+$x$-values      | values to be plotted radially
+$y$-values      | values to be plotted as an azimuthal offset constraint to a circle-sector
+$y$-errors      | errors assigned to $y$-values
+`processing context`  | which processing was used
+
+The demo will behave as follows:
+1. take the first 3 columns (in order) as $\theta$-, $x$-, $y$-values
+2. take the column names as axis-labels
+3. plot a scatter for `processing context="raw"`
+4. plot a line for `processing context!="raw"`
+
+You can try your own data as well, but make sure to
+1. follow the above-mentioned conventions
+2. deposit your file in [data/](./data/)
+3. add at least one row with `processing context!="raw"`
+    1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
+
 
 Example Plots
 -------------

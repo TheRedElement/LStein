@@ -69,6 +69,7 @@ def override_style():
     global html_theme
     global html_static_path
     global html_css_files
+    global html_theme_options
 
     c_bg = "#000000"
     c_body_text = "#ffffff"
