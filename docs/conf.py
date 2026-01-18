@@ -132,6 +132,10 @@ set_metadata()
 
 
 #%%customizing the theme (order matters)
+c_body_text = "#ffffff"
+c_bg = "#000000"
+c_link = "#c80000"
+c_hover = "#c94242"
 html_theme = "alabaster"
 html_theme_options = {
     # "description": description,
@@ -141,10 +145,12 @@ html_theme_options = {
     "github_banner": True,
     "github_button": True,
     "sidebar_collapse": True,
-    # "body_text": "#FFFFFF",
-    "gray_1": "#ffffff",
+    "body_text": c_body_text,
+    "gray_1": c_body_text,
     "gray_2": "#c7c7c7",
     "gray_3": "#979797",
+    "link_hover": c_hover,
+    "link": c_link,
 }
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
