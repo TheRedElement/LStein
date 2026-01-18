@@ -1,10 +1,13 @@
 /* overrides alabaster (https://github.com/sphinx-doc/alabaster/blob/master/alabaster/static/alabaster.css_t) */
-@import 'alabaster.css_t';
+/* @import 'alabaster.css_t'; */
 
 :root {
     --c_bg: #000000;
     --c_body_text: #ffffff;
     --c_link: #c80000;
+    --c_hover: #c94242;
+    --c_visited: #a10000;
+    --c_code_bg: #414141;
 }
 
 /* base */
@@ -56,21 +59,21 @@ a {
     color: var(--c_link);
 }
 a:hover {
-    color: color-mix(in srgb, var(--c_link) 80%, var(--c_body_text) 20%);
+    color: var(--c_hover);
 }
 a:visited {
-    color: color-mix(in srgb, var(--c_link) 80%, var(--c_bg) 20%);
+    color: var(--c_visited);
 }
 
 a.headerlink {
     color: var(--c_link);
 }
 a.headerlink:hover {
-    color: color-mix(in srgb, var(--c_link) 80%, var(--c_body_text) 20%);
+    color: var(--c_hover);
 }
 
 /* sphinx overrides */
 dt.sig {
     /* object signatures */
-    background-color: aqua;
+    background-color: var(--c_code_bg);
 }

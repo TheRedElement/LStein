@@ -132,8 +132,8 @@ set_metadata()
 
 
 #%%customizing the theme (order matters)
-c_body_text = "#ffffff"
 c_bg = "#000000"
+c_body_text = "#ffffff"
 c_link = "#c80000"
 c_hover = "#c94242"
 c_code_bg = "#414141"
