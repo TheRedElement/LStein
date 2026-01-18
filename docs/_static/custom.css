@@ -7,11 +7,13 @@
     --c_link: #c80000;
 }
 
+/* base */
 body {
   background: var(--c_bg);
   color: var(--c_body_text);   /* make text readable */
 }
 
+/* main parts */
 div.document {
   background-color: var(--c_bg);
 }
@@ -30,6 +32,7 @@ div.footer a {
     color: var(--c_body_text);
 }
 
+/* sphinx */
 div.sphinxsidebar {
   background-color: var(--c_bg);
   color: var(--c_body_text);
@@ -38,6 +41,20 @@ div.sphinxsidebar {
     color: var(--c_body_text);
 }
 
+/* links */
 a {
     color: var(--c_link);
+}
+a:hover {
+    color: color-mix(in srgb, var(--c_link) 80%, var(--c_body_text) 20%);
+}
+a:visited {
+    color: color-mix(in srgb, var(--c_link) 80%, var(--c_bg) 20%);
+}
+
+a.headerlink {
+    color: var(--c_link);
+}
+a.headerlink:hover {
+    color: color-mix(in srgb, var(--c_link) 80%, var(--c_body_text) 20%);
 }
