@@ -126,10 +126,15 @@ autodoc_default_options = {
 # autoclass_content = "both"
 autosummary_generate = True
 html_theme = "alabaster"
-html_static_path = ["_static"]
-html_css_files = [
-    "custom.css",
-]
+html_theme_options = {
+    "logo": "../_gfx/lstein_logo.svg",
+    "github_user": "TheRedElement",
+    "github_repo": "LStein",
+    "github_banner": True,
+    "github_button": True,
+    "sidebar_collapse": True,
+    "body_text": "#FFFFFF",
+}
 todo_include_todos = True
 
 
