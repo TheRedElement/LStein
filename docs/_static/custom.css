@@ -40,6 +40,9 @@ div.sphinxsidebar {
 div.sphinxsidebar {
     color: var(--c_body_text);
 }
+div.sphinxsidebar hr {
+    color: var(--c_body_text);
+}
 
 /* links */
 a {
