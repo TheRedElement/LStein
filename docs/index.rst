@@ -98,19 +98,19 @@ Example Plots
 These some exemplary results when using `LStein`.
 For more examples have a look at the paper or play around with the tutorals, specifically `Real Data <https://github.com/TheRedElement/LStein/blob/main/demo/real_data.ipynb>`__.
 
-.. figure:: /_gfx/
+.. figure::
    :align: center
 
-   .. image:: 1189_snia_elasticc.png
+   .. image:: /_gfx/1189_snia_elasticc.png
       :width: 45%
 
-   .. image:: 2025_tde_elasticc.png
+   .. image:: /_gfx/2025_tde_elasticc.png
       :width: 45%
 
-   .. image:: 091_snii_elasticc.png
+   .. image:: /_gfx/091_snii_elasticc.png
       :width: 45%
 
-   .. image:: sin_simulated.png
+   .. image:: /_gfx/sin_simulated.png
       :width: 45%
 
    **Figure 1:**
