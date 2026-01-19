@@ -2,7 +2,7 @@
 WELCOME
 =======
 
-.. image:: _gfx/lstein_logo.svg
+.. image:: _static/_gfx/lstein_logo.svg
 
 .. :hidden: so it's just in navigation
 .. toctree::
@@ -101,12 +101,12 @@ For more examples take a look at the paper or play around with the tutorials, sp
 .. raw:: HTML
 
    <div style="display: flex; width: 50%">
-      <img src="_gfx/1189_snia_elasticc.png">
-      <img src="_gfx/2025_tde_elasticc.png">
+      <img src="_static/_gfx/1189_snia_elasticc.png">
+      <img src="_static/_gfx/2025_tde_elasticc.png">
    </div>
    <div style="display: flex; width: 50%">
-      <img src="_gfx/0901_snii_elasticc.png">
-      <img src="_gfx/sin_simulated.png">
+      <img src="_static/_gfx/0901_snii_elasticc.png">
+      <img src="_static/_gfx/sin_simulated.png">
    </div>
    <p>
       Examples comparing `LStein` (left panels) to traditional methods (left panels).
