@@ -99,14 +99,14 @@ These some exemplary results when using `LStein`.
 For more examples take a look at the paper or play around with the tutorials, specifically `Real Data <https://github.com/TheRedElement/LStein/blob/main/demo/real_data.ipynb>`__.
 
 .. raw:: HTML
-   
+
    <div style="display: flex">
-      <img src="/_gfx/1189_snia_elasticc.png">
-      <img src="/_gfx/2025_tde_elasticc.png">
+      <img src="_gfx/1189_snia_elasticc.png">
+      <img src="_gfx/2025_tde_elasticc.png">
    </div>
    <div style="display: flex">
-      <img src="/_gfx/091_snii_elasticc.png">
-      <img src="/_gfx/sin_simulated.png">
+      <img src="_gfx/091_snii_elasticc.png">
+      <img src="_gfx/sin_simulated.png">
    </div>
    <p>
       Examples comparing `LStein` (left panels) to traditional methods (left panels).
