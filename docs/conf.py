@@ -79,7 +79,7 @@ def override_style():
     html_theme = "alabaster"
     html_theme_options = {
         # "description": description,
-        "logo": "../_gfx/lstein_logo.svg",
+        "logo": "_static/_gfx/lstein_logo.svg",
         "github_user": "TheRedElement",
         "github_repo": "LStein",
         "github_banner": True,
