@@ -95,6 +95,29 @@ You can try your own data as well, but make sure to
 Example Plots
 -------------
 
+These some exemplary results when using `LStein`.
+For more examples have a look at the paper or play around with the tutorals, specifically `Real Data <https://github.com/TheRedElement/LStein/blob/main/demo/real_data.ipynb>`__.
+
+.. figure:: /_gfx/
+   :align: center
+
+   .. image:: 1189_snia_elasticc.png
+      :width: 45%
+
+   .. image:: 2025_tde_elasticc.png
+      :width: 45%
+
+   .. image:: 091_snii_elasticc.png
+      :width: 45%
+
+   .. image:: sin_simulated.png
+      :width: 45%
+
+   **Figure 1:**
+   Examples comparing `LStein` (left panels) to traditional methods (left panels).
+   (a)-(c) are simulated lightcurves from `ELAsTICC <https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/>`__ (SNIa, TDE, SNII).
+   (d) compares sinusoids of different frequencies.
+
 Advantages and Downsides
 ------------------------
 
