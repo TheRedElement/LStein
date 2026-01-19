@@ -96,9 +96,10 @@ Example Plots
 -------------
 
 These some exemplary results when using `LStein`.
-For more examples have a look at the paper or play around with the tutorals, specifically `Real Data <https://github.com/TheRedElement/LStein/blob/main/demo/real_data.ipynb>`__.
+For more examples take a look at the paper or play around with the tutorials, specifically `Real Data <https://github.com/TheRedElement/LStein/blob/main/demo/real_data.ipynb>`__.
 
 .. figure::
+   
    :align: center
 
    .. image:: /_gfx/1189_snia_elasticc.png
