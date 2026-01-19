@@ -100,12 +100,12 @@ For more examples take a look at the paper or play around with the tutorials, sp
 
 .. raw:: HTML
 
-   <div style="display: flex">
+   <div style="display: flex; height: 30%">
       <img src="_gfx/1189_snia_elasticc.png">
       <img src="_gfx/2025_tde_elasticc.png">
    </div>
-   <div style="display: flex">
-      <img src="_gfx/091_snii_elasticc.png">
+   <div style="display: flex; height: 30%">
+      <img src="_gfx/0901_snii_elasticc.png">
       <img src="_gfx/sin_simulated.png">
    </div>
    <p>
