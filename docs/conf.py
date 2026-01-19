@@ -126,7 +126,7 @@ def setup(app):
     """
 
     paths = {
-        "../gfx":"_gfx",
+        # "../gfx":"_gfx",
     }
     #copy some paths to html
     for path in paths.keys():

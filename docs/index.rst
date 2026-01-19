@@ -110,7 +110,7 @@ For more examples take a look at the paper or play around with the tutorials, sp
    </div>
    <p>
       Examples comparing `LStein` (left panels) to traditional methods (left panels).
-      (a)-(c) are simulated lightcurves from `ELAsTICC <https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/>`__ (SNIa, TDE, SNII).
+      (a)-(c) are simulated lightcurves from <a href="https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/">ELAsTICC</a> (SNIa, TDE, SNII).
       (d) compares sinusoids of different frequencies.
    </p>
 
