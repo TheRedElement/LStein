@@ -2,7 +2,7 @@
 WELCOME
 =======
 
-.. image:: /_gfx/lstein_logo.svg
+.. image:: _gfx/lstein_logo.svg
 
 .. :hidden: so it's just in navigation
 .. toctree::
