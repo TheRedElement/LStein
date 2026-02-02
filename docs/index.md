@@ -16,7 +16,7 @@
 ## Table of Contents
 ```{contents}
    :local:
-   :depth: 1
+   :depth: 2
 ```
 
 > [!WARNING]
