@@ -154,7 +154,13 @@ extensions = [
     #custom extensions
     "nbsphinx",
     "sphinx_copybutton",    #adds copy button to all code-blocks
+    "myst_parser",          #markdown support
 ]
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 autodoc_default_options = {
     "members": True,
@@ -162,6 +168,24 @@ autodoc_default_options = {
 }
 # autoclass_content = "both"
 autosummary_generate = True
+
+#myst_parser extensions
+myst_enable_extensions = [
+    "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
 
 #executions (order matters)
 add_paths()
