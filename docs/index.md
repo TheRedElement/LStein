@@ -18,8 +18,12 @@
 :depth: 3
 ```
 
-```{literalinclude} _static/custom.css
+```{literalinclude} _static/quickstart.ipynb
 ```
+<!-- ```{nbgallery}
+demo/quickstart.ipynb
+``` -->
+
 
 > [!WARNING]
 > Note, that this package is currently under development.
@@ -76,10 +80,6 @@ You can try your own data as well, but make sure to
 2. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
-
-```{nbgallery}
-demo/quickstart.ipynb
-```
 
 ## Example Plots
 |||
