@@ -12,7 +12,6 @@
    pages/*
 ```
 
-<!-- local table of contents -->
 ```{contents} Table of Contents
 :local:
 :depth: 2
