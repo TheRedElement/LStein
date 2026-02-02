@@ -76,6 +76,11 @@ You can try your own data as well, but make sure to
 2. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
+
+```{nbgallery}
+demo/quickstart.ipynb
+```
+
 ## Example Plots
 |||
 |:-|:-|
@@ -87,7 +92,7 @@ You can try your own data as well, but make sure to
 
 ## Advantages and Downsides
 
-### Pros:
+### Pros
 
 + no overcrowded panels
 + similar $\theta$-values (i.e., passbands) are plotted closer together
@@ -98,7 +103,7 @@ You can try your own data as well, but make sure to
 	+ examples: spectra over time, different machine learning models
 + layout entirely customizable
 
-### Cons:
+### Cons
 
 - projection effects close to `xmin`
 - does currently *not* support plotting errorbars
