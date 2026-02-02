@@ -3,7 +3,7 @@
 > [!WARNING]
 > Note, that this package is currently under development.
 > Most functionalities should work, but changes will be implemented on a running basis and without notice.
-> No test have been performed yet.
+> No tests have been performed yet.
 
 ## Installation
 You can easily install the package using [`pip`](https://pypi.org/project/pip/):
@@ -50,8 +50,7 @@ The demo will behave as follows:
 
 You can try your own data as well, but make sure to
 1. follow the above-mentioned conventions
-2. deposit your file in [data/](./data/)
-3. add at least one row with `processing context!="raw"`
+2. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
 ## Advantages and Downsides
