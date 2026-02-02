@@ -13,11 +13,11 @@
 ```
 
 <!-- local table of contents -->
+```md
 ## Table of Contents
 ```{contents}
-   :local:
-   :depth: 2
-```
+    :local:
+    :depth: 2
 
 > [!WARNING]
 > Note, that this package is currently under development.
