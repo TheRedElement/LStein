@@ -12,9 +12,13 @@
    pages/*
 ```
 
+<!-- local table of contents -->
 ```{contents} Table of Contents
 :local:
-:depth: 2
+:depth: 3
+```
+
+```{literalinclude} _static/custom.css
 ```
 
 > [!WARNING]
