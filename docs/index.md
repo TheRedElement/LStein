@@ -8,5 +8,5 @@
 pages/*
 ```
 
-```{include} _static_/README.md
+```{include} /README.md
 ```
