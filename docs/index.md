@@ -19,7 +19,7 @@ pages/*
 :depth: 3
 ```
 
-```{include} _static/quickstart.ipynb
+```{embed} _static/quickstart.ipynb
 ```
 
 
