@@ -113,7 +113,7 @@ def copy_files(app):
     dst.mkdir(parents=True, exist_ok=True)
     f = "README.md"
     text = (src / f).read_text("utf-8")
-    text = re.sub(r"^>\s", "", text)
+    text = re.sub(r"^>\s+", r"", text)
     text = re.sub(r"\[!(\w+)\]", r"{\1}", text)
     text = f"```{text}\n```"
 
