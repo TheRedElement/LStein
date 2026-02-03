@@ -19,15 +19,8 @@ def add_paths():
     - all paths are relative to `conf.py`
     - make sure to make the path absolute!
     """
-    global html_static_path
 
     sys.path.insert(0, os.path.abspath("../src"))   #default for uv `project/src/pkg` layout
-
-    #paths to custom static files
-    #loaded after builtin static files => will override => `default.css` overrides internal `default.css`
-    html_static_path = [
-        "assets",
-    ]
     return
 
 def make_themes():
@@ -94,7 +87,11 @@ def override_style():
         "link": c_link,
         "pre_bg": c_code_bg,
     }
-    html_static_path = ["_static", "gfx"]   #also make copied gfx static (for `html_theme_options["logo"]``)
+    html_static_path = [
+        "_static",
+        "assets",       
+        "gfx",  #also make copied gfx static (for `html_theme_options["logo"]``)
+    ]
     html_css_files = ["custom.css"]
     return
 
@@ -132,9 +129,6 @@ def setup(app):
     """
     app.connect("builder-inited", copy_files)
 
-    # app.connect("autodoc-process-docstring", modify_docstrings)
-
-
     
 #%%main
 #extensions
@@ -149,7 +143,6 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     #custom extensions
-    "nbsphinx",
     "sphinx_copybutton",    #adds copy button to all code-blocks
     "myst_parser",          #markdown support
 ]
@@ -157,7 +150,6 @@ extensions = [
 source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
-    # ".ipynb": "markdown",
 }
 
 autodoc_default_options = {

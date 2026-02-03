@@ -1,4 +1,5 @@
 
+<!-- generate navigation element -->
 <!-- :hidden: so it's just in navigation -->
 ```{toctree}
 :glob:
@@ -8,5 +9,6 @@
 pages/*
 ```
 
+<!-- just import README.md (setup as the front-page to have GitHub and readthedocs synched) -->
 ```{include} README.md
 ```

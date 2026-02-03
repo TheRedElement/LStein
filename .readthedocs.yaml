@@ -19,5 +19,6 @@ build:
       install:
          - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --frozen --group docs
       post_build:
+         # for debugging
          - tree .
          - head -n 30 docs/README.md
