@@ -9,7 +9,7 @@
 :glob:
 :maxdepth: 2
 
-pages/tutorial.md
+pages/*
 ```
 
 <!-- local table of contents -->
