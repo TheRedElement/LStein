@@ -80,7 +80,7 @@ def override_style():
     html_theme = "alabaster"
     html_theme_options = {
         # "description": description,
-        "logo": "lstein_logo.svg",  #nav does not work with copying for some reason
+        "logo": "lstein_logo.svg",  #nav does not work with copying for some reason, relative to `html_static_path`
         "github_user": "TheRedElement",
         "github_repo": "LStein",
         "github_banner": True,
@@ -94,7 +94,7 @@ def override_style():
         "link": c_link,
         "pre_bg": c_code_bg,
     }
-    html_static_path = ["_static"]
+    html_static_path = ["_static", "gfx"]   #also make copied gfx static (for `html_theme_options["logo"]``)
     html_css_files = ["custom.css"]
     return
 
