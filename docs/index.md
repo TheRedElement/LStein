@@ -3,13 +3,14 @@
 
 ![](_static/_gfx/lstein_logo.svg)
 
+```{eval-rst}
 .. toctree::
    :glob:
    :maxdepth: 2
    :hidden:
 
    pages/*
-   
+```
 
 <!-- :hidden: so it's just in navigation -->
 ```{toctree}
