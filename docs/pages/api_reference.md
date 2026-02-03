@@ -3,7 +3,8 @@
 
 # API Reference
 
-```{currentmodule} lstein.lstein
+```{eval-rst}
+.. currentmodule:: lstein.lstein
 ```
 
 ## LSteinCanvas
