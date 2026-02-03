@@ -4,15 +4,6 @@
 ![](docs/_static/_gfx/lstein_logo.svg)
 
 
-<!-- :hidden: so it's just in navigation -->
-```{toctree}
-:glob:
-:maxdepth: 2
-:hidden:
-
-pages/*
-```
-
 <!-- local table of contents -->
 ```{contents} Table of Contents
 :local:
@@ -20,9 +11,9 @@ pages/*
 ```
 
 :::warning
-Note, that this package is currently under development.
-Most functionalities should work, but changes will be implemented on a running basis and without notice.
-No tests have been performed yet.
+> Note, that this package is currently under development.
+> Most functionalities should work, but changes will be implemented on a running basis and without notice.
+> No tests have been performed yet.
 :::
 
 > [!INFO]
