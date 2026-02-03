@@ -98,48 +98,6 @@ def override_style():
     html_css_files = ["custom.css"]
     return
 
-def readme2index():
-    readme_path = "../README.md"
-
-    with open(readme_path, "r") as readme:
-        text = readme.read()
-    
-    # replacements = {
-    #     r"\[\!WARNING\]": "{warning}",
-    #     r"\[\!INFO\]": "{info}",
-    #     r"^\> ": ""
-    # }
-
-    # for ex, rep in replacements.items():
-    #     re.sub
-
-    with open("../index.md", "w") as f:
-        f.write(text)
-
-    return
-# def modify_docstrings(app, what, name, obj, options, lines):
-#     """
-#         - function to apply modifications to docstrings
-#     """
-
-#     #mapping to downgrade headings
-#     heading_mapping = {
-#         "=": "~",
-#         "-": "~",
-#         "~": '~',
-#         "^": '~',
-#     }
-
-#     for i, line in enumerate(lines[:-1]):
-#         next_line = lines[i + 1]
-        
-#         #downgrade headings
-#         for char in heading_mapping.keys():
-#             if set(next_line) == {char} and len(next_line) >= len(line):
-#                 lines[i + 1] = heading_mapping[char] * len(next_line)
-
-#     return
-
 def copy_files(app):
     """copies files before the build process starts
 
@@ -154,14 +112,17 @@ def copy_files(app):
     dst = docs
     dst.mkdir(parents=True, exist_ok=True)
     f = "README.md"
-    shutil.copy2(src / f, dst / f)
-    with open(dst / f, "r+") as outfile:
-        #deal with some markdown conversions ([!WARNING], [!INFO], ... blocks)
-        text = outfile.read()
-        text = re.sub(r"^>\s", "", text)
-        text = re.sub(r"\[!(\w+)\]", "\1", text)
-        text = f"```{text}\n```"
-        outfile.write(text)
+    text = (src / f).read_text("utf-8")
+    text = re.sub(r"^>\s", "", text)
+    text = re.sub(r"\[!(\w+)\]", "\1", text)
+    text = f"```{text}\n```"
+
+    (dst / f).write_text(text, encoding="utf-8")
+
+    # shutil.copy2(src / f, dst / f)
+    # with open(dst / f, "r+") as outfile:
+    #     #deal with some markdown conversions ([!WARNING], [!INFO], ... blocks)
+    #     outfile.write(text)
 
     #graphics
     src = root / "gfx"
