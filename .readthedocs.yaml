@@ -20,4 +20,4 @@ build:
          - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --frozen --group docs
       post_build:
          - tree .
-         - head -n 20 README.md
+         - head -n 20 docs/README.md
