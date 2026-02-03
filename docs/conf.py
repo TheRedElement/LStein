@@ -5,6 +5,7 @@
 #%%imports
 import importlib
 import os
+from pathlib import Path
 import re
 import sys
 import shutil
@@ -141,26 +142,38 @@ def readme2index():
 
 #     return
 
+def copy_files(app):
+    root = Path("../README.md")
+    docs = Path(app.outdir)
 
+    #README.md => index.md
+    dst = docs / "pages"
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in root.glob("README.md"):
+        shutil.copy2(f, dst / f.name)
+
+    return
 #%%sphinx internal functions
 def setup(app):
     """makes some global setups pre build
     """
 
-    paths = {
-        # "../gfx":"_gfx",
-        # "../README.md": "pages/README.md"
-    }
-    #copy some paths to html
-    for path in paths.keys():
-        src = os.path.abspath(path)
-        dst = os.path.join(app.outdir, paths[path])
-        if os.path.exists(src):
-            if os.path.isdir(src):
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-            else:
-                shutil.copyfile(src, dst)
 
+    # paths = {
+    #     # "../gfx":"_gfx",
+    #     # "../README.md": "pages/README.md"
+    # }
+    # #copy some paths to html
+    # for path in paths.keys():
+    #     src = os.path.abspath(path)
+    #     dst = os.path.join(app.outdir, paths[path])
+    #     if os.path.exists(src):
+    #         if os.path.isdir(src):
+    #             shutil.copytree(src, dst, dirs_exist_ok=True)
+    #         else:
+    #             shutil.copyfile(src, dst)
+
+    app.connect("builder-inited", copy_files)
     # app.connect("autodoc-process-docstring", modify_docstrings)
 
 
