@@ -17,4 +17,4 @@ build:
       install:
          - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --frozen --group docs
       post_build:
-         - tree   # If you prefer a tree structure         
+         - ls -R
