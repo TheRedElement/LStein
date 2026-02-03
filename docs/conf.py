@@ -80,7 +80,7 @@ def override_style():
     html_theme = "alabaster"
     html_theme_options = {
         # "description": description,
-        "logo": "_static/lstein_logo.svg",  #nav does not work with copying for some reason
+        "logo": "lstein_logo.svg",  #nav does not work with copying for some reason
         "github_user": "TheRedElement",
         "github_repo": "LStein",
         "github_banner": True,
@@ -131,21 +131,6 @@ def setup(app):
     """makes some global setups pre build
     """
     app.connect("builder-inited", copy_files)
-
-
-    # paths = {
-    #     # "../gfx":"_gfx",
-    #     # "../README.md": "pages/README.md"
-    # }
-    # #copy some paths to html
-    # for path in paths.keys():
-    #     src = os.path.abspath(path)
-    #     dst = os.path.join(app.outdir, paths[path])
-    #     if os.path.exists(src):
-    #         if os.path.isdir(src):
-    #             shutil.copytree(src, dst, dirs_exist_ok=True)
-    #         else:
-    #             shutil.copyfile(src, dst)
 
     # app.connect("autodoc-process-docstring", modify_docstrings)
 

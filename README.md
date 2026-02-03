@@ -18,9 +18,9 @@
 <!-- block -->
 
 <!-- block -->
-> [!INFO]
+> [!NOTE]
 > This page summarizes the most common characteristics, pitfalls etc.
-> Please refer to the paper for a more detailed list and [Tutorials](docs/pages/tutorals.rst) for solutions to some known issues/missing features.
+> Please refer to the paper (in prep) for a more detailed list and [Tutorials](docs/pages/tutorals.rst) for solutions to some known issues/missing features.
 <!-- block -->
 
 ## Reference
@@ -108,3 +108,9 @@ You can try your own data as well, but make sure to
     * workarounds
         * formulate your series relative to some value so you remain in a reasonable range
         * use `y_projection_method="y"`
+
+
+## TODO
+* update [README.md](./README.md) once paper published
+	* remove warning
+	* adjust note
