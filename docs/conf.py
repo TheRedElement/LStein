@@ -80,7 +80,7 @@ def override_style():
     html_theme = "alabaster"
     html_theme_options = {
         # "description": description,
-        "logo": "gfx/lstein_logo.svg",
+        "logo": "_static/lstein_logo.svg",  #nav does not work with copying for some reason
         "github_user": "TheRedElement",
         "github_repo": "LStein",
         "github_banner": True,
