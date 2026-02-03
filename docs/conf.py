@@ -158,10 +158,11 @@ def copy_files(app):
     f = "README.md"
     shutil.copy2(src / f, dst / f)
     with open(dst / f, "r+") as outfile:
+        #deal with some markdown conversions ([!WARNING], [!INFO], ... blocks)
         text = outfile.read()
-        text = re.sub(r">\s(\[!\w+\])", lambda m: "```" + m.group(2).lower(), text)
-        text = re.sub(r">\s(.+)", "\1", text)
-        text += "\n```"
+        text = re.sub(r"^>\s", "", text)
+        text = re.sub(r"\[!(\w+)\]", "\1", text)
+        text = f"```{text}\n```"
         outfile.write(text)
 
     #graphics
