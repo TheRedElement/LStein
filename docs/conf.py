@@ -153,10 +153,9 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     #custom extensions
-    # "nbsphinx",
+    "nbsphinx",
     "sphinx_copybutton",    #adds copy button to all code-blocks
     "myst_parser",          #markdown support
-    # "myst_nb",              #ipynb support (only use when `myst_parser` not used)
 ]
 
 source_suffix = {
