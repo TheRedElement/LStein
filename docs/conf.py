@@ -147,7 +147,7 @@ def copy_files(app):
     docs = Path(app.outdir)
 
     #README.md => index.md
-    dst = docs / "pages"
+    dst = docs / "_static"
     dst.mkdir(parents=True, exist_ok=True)
     for f in root.glob("README.md"):
         shutil.copy2(f, dst / f.name)
