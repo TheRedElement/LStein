@@ -37,6 +37,7 @@ dev = [
 docs = [
     "myst-parser>=5.0.0",
     "nbsphinx>=0.9.8",
+    "notebook>=7.5.3",
     "sphinx>=9.0.4",
     "sphinx-copybutton>=0.5.2",
 ]

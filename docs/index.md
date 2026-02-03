@@ -19,10 +19,6 @@ pages/*
 :depth: 3
 ```
 
-```{embed} _static/quickstart.ipynb
-```
-
-
 > [!WARNING]
 > Note, that this package is currently under development.
 > Most functionalities should work, but changes will be implemented on a running basis and without notice.
@@ -78,6 +74,8 @@ You can try your own data as well, but make sure to
 2. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
+
+<iframe src="notebooks/quickstart.html" width=100% height=100%></iframe>
 
 ## Example Plots
 |||
