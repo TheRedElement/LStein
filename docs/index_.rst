@@ -8,7 +8,7 @@ WELCOME
 .. toctree::
    :glob:
    :maxdepth: 2
-   .. :hidden:
+   :hidden:
 
    pages/*
    

@@ -7,10 +7,8 @@
 ```{toctree}
    :glob:
    :maxdepth: 2
-   :hidden:
 
    pages/*
-   <!-- assets/*.ipynb -->
 ```
 
 <!-- local table of contents -->
