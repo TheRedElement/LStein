@@ -161,8 +161,8 @@ extensions = [
 
 source_suffix = {
     ".rst": "restructuredtext",
-    ".md": "myst_nb",
-    ".ipynb": "myst_nb",
+    ".md": "mardown",
+    # ".ipynb": "myst_nb",
 }
 
 autodoc_default_options = {
