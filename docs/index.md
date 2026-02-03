@@ -18,7 +18,7 @@
 :depth: 3
 ```
 
-```{literalinclude} _static/quickstart.ipynb
+```{include} _static/quickstart.ipynb
 ```
 <!-- ```{nbgallery}
 demo/quickstart.ipynb
