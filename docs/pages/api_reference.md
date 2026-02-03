@@ -9,7 +9,6 @@
 ## LSteinCanvas
 
 ```{autosummary}
-:signatures: none
 :recursive:
 :toctree: tocLSC/
 
