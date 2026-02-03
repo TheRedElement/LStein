@@ -73,7 +73,7 @@ def override_style():
     html_theme = "alabaster"
     html_theme_options = {
         # "description": description,
-        "logo": "_static/lstein_logo.svg",  #nav does not work with copying for some reason, relative to `html_static_path`
+        "logo": "lstein_logo.svg",  #nav does not work with copying for some reason, relative to `html_static_path`
         "github_user": "TheRedElement",
         "github_repo": "LStein",
         "github_banner": True,
