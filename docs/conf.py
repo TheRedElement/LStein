@@ -153,7 +153,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     #custom extensions
-    "nbsphinx",
+    # "nbsphinx",
     "sphinx_copybutton",    #adds copy button to all code-blocks
     # "myst_parser",          #markdown support
     "myst_nb",              #ipynb support (only use when `myst_parser` not used)
@@ -162,7 +162,7 @@ extensions = [
 source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
-    # ".ipynb": "myst_nb",
+    # ".ipynb": "markdown",
 }
 
 autodoc_default_options = {
