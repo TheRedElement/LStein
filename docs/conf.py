@@ -149,8 +149,8 @@ def copy_files(app):
     #README.md => index.md
     dst = docs / "_static"
     dst.mkdir(parents=True, exist_ok=True)
-    
-    shutil.copy2(f, dst / "README.md")
+    f = "README.md"
+    shutil.copy2(f, dst / f)
 
     #graphics
     src = root / "gfx"
