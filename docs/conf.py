@@ -155,13 +155,14 @@ extensions = [
     #custom extensions
     "nbsphinx",
     "sphinx_copybutton",    #adds copy button to all code-blocks
-    "myst_parser",          #markdown support
+    # "myst_parser",          #markdown support
+    "myst_nb",              #ipynb support (only use when `myst_parser` not used)
 ]
 
 source_suffix = {
     ".rst": "restructuredtext",
-    ".md": "markdown",
-    ".ipynb": "markdown",
+    ".md": "myst_nb",
+    ".ipynb": "myst_nb",
 }
 
 autodoc_default_options = {
