@@ -10,14 +10,18 @@
 :depth: 3
 ```
 
+<!-- block -->
 > [!WARNING]
 > Note, that this package is currently under development.
 > Most functionalities should work, but changes will be implemented on a running basis and without notice.
 > No tests have been performed yet.
+<!-- block -->
 
+<!-- block -->
 > [!INFO]
 > This page summarizes the most common characteristics, pitfalls etc.
 > Please refer to the paper for a more detailed list and [Tutorials](docs/pages/tutorals.rst) for solutions to some known issues/missing features.
+<!-- block -->
 
 ## Reference
 If you use this code in your work please use this entry in your bibliography (for now):
