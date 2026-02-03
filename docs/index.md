@@ -75,8 +75,9 @@ You can try your own data as well, but make sure to
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
 ```{raw} html
-<iframe src="notebooks/quickstart.html" width=100% height=600px></iframe>
+<iframe src="https://raw.githubusercontent.com/TheRedElement/LStein/refs/heads/main/docs/notebooks/quickstart.html" width=100% height=600px></iframe>
 ```
+<iframe src="https://github.com/TheRedElement/LStein/blob/main/docs/notebooks/quickstart.html" width=100% height=600px></iframe>
 
 ## Example Plots
 |||
