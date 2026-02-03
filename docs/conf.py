@@ -143,11 +143,11 @@ def readme2index():
 #     return
 
 def copy_files(app):
-    root = Path("../README.md")
+    root = Path("../")
     docs = Path(app.outdir)
 
     #README.md => index.md
-    dst = docs / "_static"
+    dst = docs / "pages"
     dst.mkdir(parents=True, exist_ok=True)
     for f in root.glob("README.md"):
         shutil.copy2(f, dst / f.name)

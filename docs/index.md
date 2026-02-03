@@ -8,5 +8,5 @@
 pages/*
 ```
 
-```{include} ./README.md
+```{include} pages/README.md
 ```
