@@ -149,7 +149,7 @@ def setup(app):
 
     paths = {
         # "../gfx":"_gfx",
-        "../README.md": "pages/README.md"
+        # "../README.md": "pages/README.md"
     }
     #copy some paths to html
     for path in paths.keys():
