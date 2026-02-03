@@ -27,8 +27,6 @@ def add_paths():
     #loaded after builtin static files => will override => `default.css` overrides internal `default.css`
     html_static_path = [
         "assets",
-        os.path.abspath("../gfx"),
-        os.path.abspath("../README.md"),
     ]
     return
 
@@ -82,7 +80,7 @@ def override_style():
     html_theme = "alabaster"
     html_theme_options = {
         # "description": description,
-        "logo": "_gfx/lstein_logo.svg",
+        "logo": "gfx/lstein_logo.svg",
         "github_user": "TheRedElement",
         "github_repo": "LStein",
         "github_banner": True,
