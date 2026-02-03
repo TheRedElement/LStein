@@ -74,8 +74,9 @@ You can try your own data as well, but make sure to
 2. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
-
-<iframe src="notebooks/quickstart.html" width=100% height=100%></iframe>
+```{raw} html
+<iframe src="notebooks/quickstart.html" width=100% height=600px></iframe>
+```
 
 ## Example Plots
 |||
