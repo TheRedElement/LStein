@@ -115,7 +115,7 @@ def copy_files(app):
     text = (src / f).read_text("utf-8")
     text = re.sub(r"^\>\s+", r"", text, flags=re.MULTILINE)
     text = re.sub(r"\[!(\w+)\]", r"\{\1\}", text, flags=re.MULTILINE)
-    text = re.sub(r".+", "```" + text + "```", text, flags=re.DOTALL)
+    text = r"```" + text + r"```"
 
     (dst / f).write_text(text, encoding="utf-8")
 
