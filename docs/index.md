@@ -3,21 +3,13 @@
 
 ![](_static/_gfx/lstein_logo.svg)
 
-```{eval-rst}
-.. toctree::
-   :glob:
-   :maxdepth: 2
-   :hidden:
-
-   pages/*
-```
 
 <!-- :hidden: so it's just in navigation -->
 ```{toctree}
-   :glob:
-   :maxdepth: 2
+:glob:
+:maxdepth: 2
 
-   pages/tutorial.md
+pages/tutorial.md
 ```
 
 <!-- local table of contents -->
@@ -28,9 +20,6 @@
 
 ```{include} _static/quickstart.ipynb
 ```
-<!-- ```{nbgallery}
-demo/quickstart.ipynb
-``` -->
 
 
 > [!WARNING]
