@@ -1,33 +1,20 @@
+# LStein: Linking Series to envision information neatly
 
-# WELCOME
+> [!WARNING]
+> Note, that this package is currently under development.
+> Most functionalities should work, but changes will be implemented on a running basis and without notice.
+> No tests have been performed yet.
 
-![](docs/_static/_gfx/lstein_logo.svg)
+## Installation
+You can easily install the package using [`pip`](https://pypi.org/project/pip/):
 
-
-<!-- :hidden: so it's just in navigation -->
-```{toctree}
-:glob:
-:maxdepth: 2
-:hidden:
-
-pages/*
+```shell
+pip3 install git+https://github.com/TheRedElement/LStein.git
 ```
 
-<!-- local table of contents -->
-```{contents} Table of Contents
-:local:
-:depth: 3
-```
-
-```{warning}
-Note, that this package is currently under development.
-Most functionalities should work, but changes will be implemented on a running basis and without notice.
-No tests have been performed yet.
-```
-
-> [!INFO]
-> This page summarizes the most common characteristics, pitfalls etc.
-> Please refer to the paper for a more detailed list and [Tutorials](docs/pages/tutorals.rst) for solutions to some known issues/missing features.
+## Try It Yourself
+A jupyter notebook with a minimal working example (and options to use your own data) can be found in [LStein_demo_colab.ipynb](./demo/LStein_demo_colab.ipynb).
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/TheRedElement/LStein/blob/main/LStein_demo/LStein_demo_colab.ipynb) to try it out without local installations.
 
 ## Reference
 If you use this code in your work please use this entry in your bibliography (for now):
@@ -43,17 +30,8 @@ If you use this code in your work please use this entry in your bibliography (fo
 }
 ```
 
-
-## Installation
-You can easily install the package using [pip](https://pypi.org/project/pip/):
-
-```shell
-pip3 install git+https://github.com/TheRedElement/LStein.git
-```
-
-## Quick Start
-Data used for [Tutorials](docs/pages/tutorals.rst) can be found in [data/](https://github.com/TheRedElement/LStein/blob/main/data/).
-There are also a few other datasets so feel free to have a play around.
+## Data For Testing
+Data used for [demos](./demo/LStein_demo.ipynb) and [testing](./test) can be found in [data/](./data).
 Each dataset is a `.csv` file with the following columns:
 
 | Column | Description |
@@ -75,23 +53,9 @@ You can try your own data as well, but make sure to
 2. add at least one row with `processing context!="raw"`
     1. if you just have raw data, you can always just duplicate the rows and change half of the rows to `processing context!="raw"`
 
-```{raw} html
-<iframe src="_static/_notebooks/quickstart.html" width=100% height=600px></iframe>
-```
-
-## Example Plots
-|||
-|:-|:-|
-<a name=fig-lsteinsnia></a>
-|![](docs/_static/_gfx/1189_snia_elasticc.png)|![](docs/_static/_gfx/2025_tde_elasticc.png)|
-|Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN Ia. I compare `LStein` on the left to traditional displays on the right. | Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) TDE. I compare `LStein` on the left to traditional displays on the right. |
-|![](docs/_static/_gfx/0901_snii_elasticc.png)|![](docs/_static/_gfx/sin_simulated.png)|
-|Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN II. I compare `LStein` on the left to traditional displays on the right. | Example for visualizing a set of artificially simulated sine waves. I compare `LStein` on the left to traditional displays on the right. |
-
 ## Advantages and Downsides
 
-### Pros
-
+Pros:
 + no overcrowded panels
 + similar $\theta$-values (i.e., passbands) are plotted closer together
 + allows to preserve amplitude-differences across $\theta$-values for same $y$-values
@@ -101,15 +65,29 @@ You can try your own data as well, but make sure to
 	+ examples: spectra over time, different machine learning models
 + layout entirely customizable
 
-### Cons
-
+Cons:
 - projection effects close to `xmin`
 - does currently *not* support plotting errorbars
 	- workaround: plot another line if you want to indicate uncertainties
 
 
+## Example Figures
+
+|||
+|:-|:-|
+<a name=fig-lsteinsnia></a>
+|![](./gfx/1189_snia_elasticc.png)|![](./gfx/2025_tde_elasticc.png)|
+|Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN Ia. I compare LStein on the left to traditional displays on the right. | Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) TDE. I compare LStein on the left to traditional displays on the right. |
+|![](./gfx/0901_snii_elasticc.png)|![](./gfx/sin_simulated.png)|
+|Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN II. I compare LStein on the left to traditional displays on the right. | Example for visualizing a set of artificially simulated sine waves. I compare LStein on the left to traditional displays on the right. |
+
+
+## TODO
+* [ ] [testing](./test)
+* demo for label rotation (see spectra in [LStein_paper.py](./demo/LStein_paper.py))
+
 ## Known Bugs
-* `y_projection_method="theta"` goes haywire for huge $x$-values (for sure $x\ge10000$)
+* `y_projection_method="theta"` goes haywire for huge x-values (for sure $\ge10000$)
     * the reason is the necessity to compute $\tan$ and $arc\tan$ when converting back and forth between coordinate systems
     * workarounds
         * formulate your series relative to some value so you remain in a reasonable range

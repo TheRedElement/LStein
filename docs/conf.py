@@ -5,6 +5,7 @@
 #%%imports
 import importlib
 import os
+import re
 import sys
 import shutil
 
@@ -96,6 +97,26 @@ def override_style():
     html_static_path = ["_static"]
     html_css_files = ["custom.css"]
     return
+
+def readme2index():
+    readme_path = "../README.md"
+
+    with open(readme_path, "r") as readme:
+        text = readme.read()
+    
+    # replacements = {
+    #     r"\[\!WARNING\]": "{warning}",
+    #     r"\[\!INFO\]": "{info}",
+    #     r"^\> ": ""
+    # }
+
+    # for ex, rep in replacements.items():
+    #     re.sub
+
+    with open("../index.md", "w") as f:
+        f.write(text)
+
+    return
 # def modify_docstrings(app, what, name, obj, options, lines):
 #     """
 #         - function to apply modifications to docstrings
@@ -124,6 +145,9 @@ def override_style():
 def setup(app):
     """makes some global setups pre build
     """
+
+    #generate index.md from README
+    readme2index()
 
     paths = {
         # "../gfx":"_gfx",
