@@ -143,15 +143,26 @@ def readme2index():
 #     return
 
 def copy_files(app):
+    """copies files before the build process starts
+
+    - ensures that files are available for build process
+    - convenience since files only have to be present in one location
+    """
     root = Path("../")
     docs = Path(app.srcdir)
 
     #README.md => index.md
     src = root
-    dst = docs / "_static"
+    dst = docs
     dst.mkdir(parents=True, exist_ok=True)
     f = "README.md"
     shutil.copy2(src / f, dst / f)
+    with open(dst / f, "r+") as outfile:
+        text = outfile.read()
+        text = re.sub(r">\s(\[!\w+\])", lambda m: "```" + m.group(2).lower(), text)
+        text = re.sub(r">\s(.+)", "\1", text)
+        text += "\n```"
+        outfile.write(text)
 
     #graphics
     src = root / "gfx"
