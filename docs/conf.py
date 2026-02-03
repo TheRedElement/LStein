@@ -144,7 +144,7 @@ def readme2index():
 
 def copy_files(app):
     root = Path("../")
-    docs = Path(app.outdir)
+    docs = Path(app.srcdir)
 
     #README.md => index.md
     dst = docs / "_static"
@@ -157,6 +157,7 @@ def copy_files(app):
 def setup(app):
     """makes some global setups pre build
     """
+    app.connect("builder-inited", copy_files)
 
 
     # paths = {
@@ -173,7 +174,6 @@ def setup(app):
     #         else:
     #             shutil.copyfile(src, dst)
 
-    app.connect("builder-inited", copy_files)
     # app.connect("autodoc-process-docstring", modify_docstrings)
 
 
