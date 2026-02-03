@@ -149,15 +149,15 @@ def copy_files(app):
     #README.md => index.md
     dst = docs / "_static"
     dst.mkdir(parents=True, exist_ok=True)
-    for f in root.glob("README.md"):
-        shutil.copy2(f, dst / f.name)
+    
+    shutil.copy2(f, dst / "README.md")
 
     #graphics
     src = root / "gfx"
     dst = docs / "gfx"
     dst.mkdir(parents=True, exist_ok=True)
     for f in ["0901_snii_elasticc.png", "1189_snia_elasticc.png", "2025_tde_elasticc.png", "lstein_logo.svg", "sin_simulated.png"]:
-        shutil.copy2(src / f, dst / f.name)
+        shutil.copy2(src / f, dst / f)
 
     return
 #%%sphinx internal functions

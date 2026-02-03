@@ -1,7 +1,7 @@
 
 # WELCOME
 
-![](docs/_static/_gfx/lstein_logo.svg)
+![](gfx/lstein_logo.svg)
 
 
 <!-- local table of contents -->
@@ -73,9 +73,9 @@ You can try your own data as well, but make sure to
 |||
 |:-|:-|
 <a name=fig-lsteinsnia></a>
-|![](docs/_static/_gfx/1189_snia_elasticc.png)|![](docs/_static/_gfx/2025_tde_elasticc.png)|
+|![](gfx/1189_snia_elasticc.png)|![](gfx/2025_tde_elasticc.png)|
 |Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN Ia. I compare `LStein` on the left to traditional displays on the right. | Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) TDE. I compare `LStein` on the left to traditional displays on the right. |
-|![](docs/_static/_gfx/0901_snii_elasticc.png)|![](docs/_static/_gfx/sin_simulated.png)|
+|![](gfx/0901_snii_elasticc.png)|![](gfx/sin_simulated.png)|
 |Example for visualizing an [ELAsTICC](https://portal.nersc.gov/cfs/lsst/DESC_TD_PUBLIC/ELASTICC/) SN II. I compare `LStein` on the left to traditional displays on the right. | Example for visualizing a set of artificially simulated sine waves. I compare `LStein` on the left to traditional displays on the right. |
 
 ## Advantages and Downsides
