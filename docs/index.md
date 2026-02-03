@@ -8,6 +8,7 @@
 ```{toctree}
 :glob:
 :maxdepth: 2
+:hidden:
 
 pages/*
 ```
