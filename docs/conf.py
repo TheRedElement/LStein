@@ -27,6 +27,7 @@ def add_paths():
     html_static_path = [
         "assets",
         os.path.abspath("../gfx"),
+        os.path.abspath("../README.md"),
     ]
     return
 
@@ -145,9 +146,6 @@ def readme2index():
 def setup(app):
     """makes some global setups pre build
     """
-
-    #generate index.md from README
-    readme2index()
 
     paths = {
         # "../gfx":"_gfx",
