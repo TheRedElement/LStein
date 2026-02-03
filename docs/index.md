@@ -10,7 +10,7 @@
    :hidden:
 
    pages/*
-   assets/*.ipynb
+   <!-- assets/*.ipynb -->
 ```
 
 <!-- local table of contents -->
