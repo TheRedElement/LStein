@@ -1,6 +1,11 @@
 
 # Tutorials
+
+
 * [Quickstart](https://github.com/TheRedElement/LStein/blob/main/demo/quickstart.ipynb)
+```{literalinclude} https://github.com/TheRedElement/LStein/blob/main/demo/quickstart.ipynb
+```
+
 * [Customizing LSteinCanvas](https://github.com/TheRedElement/LStein/blob/main/demo/customizing_LSteinCanvas.ipynb)
 * [Customizing LSteinPanel](https://github.com/TheRedElement/LStein/blob/main/demo/customizing_LSteinPanel.ipynb)
 * [Projection Methods](https://github.com/TheRedElement/LStein/blob/main/demo/projection_methods.ipynb)
