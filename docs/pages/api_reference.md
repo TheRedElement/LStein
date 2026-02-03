@@ -85,7 +85,8 @@
 ```
 
 ## Utils
-```{currentmodule} lstein
+```{eval-rst}
+.. currentmodule:: lstein
 ```
 
 ```{eval-rst}
