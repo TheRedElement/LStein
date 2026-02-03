@@ -44,7 +44,7 @@ def set_metadata():
 
     #set metadata
     author = metadata["Author"]
-    copyright = f"2026, Lukas Steinwender"
+    copyright = f"2026, <a href='lukassteinwender.com'>Lukas Steinwender</a>"
     description = metadata["Description"]
     project = metadata["Name"]
     title = metadata["Name"]
