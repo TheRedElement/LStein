@@ -114,8 +114,8 @@ def copy_files(app):
     f = "README.md"
     text = (src / f).read_text("utf-8")
     text = re.sub(r"^\>\s+", r"", text, flags=re.MULTILINE)
-    text = re.sub(r"\[!(\w+)\]", r"{\1}", text, flags=re.MULTILINE)
-    text = re.sub(text, "```" + text + "```", text, flags=re.MULTILINE)
+    text = re.sub(r"\[!(\w+)\]", r"\{\1\}", text, flags=re.MULTILINE)
+    text = re.sub(r".+", "```" + text + "```", text, flags=re.DOTALL)
 
     (dst / f).write_text(text, encoding="utf-8")
 
