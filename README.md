@@ -10,11 +10,10 @@
 :depth: 3
 ```
 
-:::warning
+> [!WARNING]
 > Note, that this package is currently under development.
 > Most functionalities should work, but changes will be implemented on a running basis and without notice.
 > No tests have been performed yet.
-:::
 
 > [!INFO]
 > This page summarizes the most common characteristics, pitfalls etc.

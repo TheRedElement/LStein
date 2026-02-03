@@ -156,7 +156,10 @@ def setup(app):
         src = os.path.abspath(path)
         dst = os.path.join(app.outdir, paths[path])
         if os.path.exists(src):
-            shutil.copytree(src, dst, dirs_exist_ok=True)
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
+                shutil.copyfile(src, dst)
 
     # app.connect("autodoc-process-docstring", modify_docstrings)
 
