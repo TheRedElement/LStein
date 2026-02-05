@@ -43,6 +43,7 @@ docs = [
 paper = [
     "lustcodesnippets-py",
     "pandas>=2.3.3",
+    "sncosmo>=2.12.1",
 ]
 
 

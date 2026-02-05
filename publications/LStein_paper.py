@@ -589,7 +589,7 @@ def plot_spectra_pessi():
 def plot_spectra_mayall():
 
     datadir = "../data/wiserep_SN2023ixf_spectra/"
-    
+    lbda_factor = 1     #1/10  #convert AA -> nm
     #load data
     df_obs = (pl.read_csv(f"{datadir}wiserep_spectra.csv", comment_prefix="#")
         .select("IAU name", "Obs-date", "JD", "Ascii file", "Phase (days)", "Spec. ID")
@@ -614,7 +614,7 @@ def plot_spectra_mayall():
     flux_factor = 1e-3#1e15
     theta = df_obs["Phase (days)"]
     # theta = df_obs["index"]
-    X = [df["wavelength"].to_numpy().flatten() for df in dfs_spec]
+    X = [df["wavelength"].to_numpy().flatten()*lbda_factor for df in dfs_spec]
     Y = [df["flux"].to_numpy().flatten()*flux_factor for df in dfs_spec]
 
     #continuum removal
@@ -628,8 +628,8 @@ def plot_spectra_mayall():
     #     plt.plot(X_cont[i], Y_cont[i])
 
     # #wavelength constraint
-    Y = [Y[i][((5000<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
-    X = [X[i][((5000<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
+    Y = [Y[i][((5000*lbda_factor<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
+    X = [X[i][((5000*lbda_factor<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
 
     #sigma clipping
     sc_mask = lambda x, n=5: (np.median(x)-n*x.std()<x)&(x<np.median(x)+n*x.std())
@@ -647,8 +647,8 @@ def plot_spectra_mayall():
     #X as an offset (to ensure computation with smaller values => minimize projection effects)
     Xmin = np.min([np.min(xi) for xi in X])
     Xmax = np.max([np.max(xi) for xi in X])
-    Xmin = 5000
-    Xmax = 9500
+    Xmin = 5000*lbda_factor
+    Xmax = 9500*lbda_factor
     X = [lsu.minmaxscale(xi, 0, 10, Xmin, Xmax) for xi in X]
 
     thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
@@ -1284,6 +1284,27 @@ def plot_pulsar_combined():
 
     return
 
+def plot_filtercurve():
+
+    import sncosmo
+    df_pb = pl.read_csv(f"../data/passband_specs.csv").filter(pl.col("mission")=="lsst")
+    print(df_pb)
+
+    fig, axs = plt.subplots(1,1, subplot_kw=dict(
+        xlabel=r"Wavelength [nm]",
+        ylabel=r"Transmission []",
+    ))
+    for row in df_pb.iter_rows(named=True):
+        band = sncosmo.get_bandpass(f"lsst{row['name'].lower()}")
+        wavelength = np.linspace(3000, 11000, 10000)
+        transmission = band(wavelength)
+        mask = (transmission > 0)
+        wavelength = wavelength[mask] / 10
+        transmission = transmission[mask]
+        axs.plot(wavelength, transmission, c=row["plot_color"], ls=row["plot_ls"], label=f"LSST {row['name']}")
+    axs.legend(loc="upper right")
+    if SAVE: fig.savefig(f"../report/gfx/filtercurve.pdf")
+    return
 
 def main():
     #declare as global so no arguments have to be passed to nested functions
@@ -1319,10 +1340,10 @@ def main():
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
 
-    plot_projection_methods(context="theta")
-    plot_projection_methods(context="y")
+    # plot_projection_methods(context="theta")
+    # plot_projection_methods(context="y")
     # plot_spectra_pessi()
-    # plot_spectra_mayall()
+    plot_spectra_mayall()
     # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
@@ -1331,6 +1352,8 @@ def main():
     # plot_errorband()
 
     # plot_scatter_multipanel()
+
+    plot_filtercurve()
 
     # #plots with increased fontsize (one column)
     # plt.rcParams["font.size"] = 25
