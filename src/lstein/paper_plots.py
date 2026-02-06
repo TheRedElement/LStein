@@ -57,7 +57,7 @@ def make_mesh(
 def plot_scatter_onepanel(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
-    colors,
+    colors, markers, linestyles,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
     ax=None,
@@ -70,7 +70,7 @@ def plot_scatter_onepanel(
         ax = fig.add_subplot(111, xlabel=xlab, ylabel=ylab)
 
     for i in range(len(theta_raw)):
-        markers, caps, bars = ax.errorbar(x_raw[i], y_raw[i], yerr=y_raw_e[i], c=colors[i], ls="", marker="o", label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
+        markers_, caps, bars = ax.errorbar(x_raw[i], y_raw[i], yerr=y_raw_e[i], c=colors[i], marker=markers[i], ls=linestyles[i], label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
         for bar in bars: bar.set_alpha(0.1)
     for i in range(len(theta_pro)):
         ax.plot(x_pro[i], y_pro[i], c="w", lw=3)
@@ -81,7 +81,7 @@ def plot_scatter_onepanel(
 def plot_scatter_onepanel_offset(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
-    colors, offsets,
+    colors, markers, linestyles, offsets,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
     ax=None,
@@ -98,7 +98,7 @@ def plot_scatter_onepanel_offset(
 
     offsets = np.cumsum(offsets)
     for i in range(len(theta_raw)):
-        markers, caps, bars = ax.errorbar(x_raw[i], y_raw[i]+i*offsets[i], yerr=y_raw_e[i], c=colors[i], ls="", marker="o", label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
+        markers_, caps, bars = ax.errorbar(x_raw[i], y_raw[i]+i*offsets[i], yerr=y_raw_e[i], c=colors[i], marker=markers[i], ls=linestyles[i], label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
         for bar in bars: bar.set_alpha(0.1)
     for i in range(len(theta_pro)):
         ax.plot(x_pro[i], y_pro[i]+i*offsets[i], c="w", lw=3)
@@ -109,7 +109,7 @@ def plot_scatter_onepanel_offset(
 def plot_scatter_multipanel(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
-    colors,
+    colors, markers, linestyles,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
     axs=None
@@ -126,7 +126,7 @@ def plot_scatter_multipanel(
         axs = [fig.add_subplot(nrows, ncols, i+1, xlabel=xlab, ylabel=ylab) for i in range(len(theta_raw))]
 
     for i in range(len(theta_raw)):
-        markers, caps, bars = axs[i].errorbar(x_raw[i], y_raw[i],yerr=y_raw_e[i], c=colors[i], ls="", marker="o", label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
+        markers_, caps, bars = axs[i].errorbar(x_raw[i], y_raw[i],yerr=y_raw_e[i], c=colors[i], marker=markers[i], ls=linestyles[i], label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
         for bar in bars: bar.set_alpha(0.1)
     for i in range(len(theta_pro)):
         axs[i].plot(x_pro[i], y_pro[i], c="w", lw=3)
@@ -137,7 +137,7 @@ def plot_scatter_multipanel(
 def plot_scatter_multipanel_group(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
-    colors,
+    colors, markers, linestyles,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
     axs=None
@@ -152,13 +152,13 @@ def plot_scatter_multipanel_group(
         axs = [fig.add_subplot(nrows, ncols, i+1, xlabel=xlab, ylabel=ylab) for i in range(ncols*nrows)]
 
     for i in range(0,3):    #redder passbands
-        markers, caps, bars = axs[0].errorbar(x_raw[i], y_raw[i],yerr=y_raw_e[i], c=colors[i], ls="", marker="o", label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
+        markers_, caps, bars = axs[0].errorbar(x_raw[i], y_raw[i],yerr=y_raw_e[i], c=colors[i], marker=markers[i], ls=linestyles[i], label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
         for bar in bars: bar.set_alpha(0.1)
     for i in range(0,min(3,len(theta_pro))):    #redder passbands
         axs[0].plot(x_pro[i], y_pro[i], c="w", lw=3)
         axs[0].plot(x_pro[i], y_pro[i], c=colors[i])
     for i in range(3,len(theta_raw)):    #bluer passbands
-        markers, caps, bars = axs[1].errorbar(x_raw[i], y_raw[i],yerr=y_raw_e[i], c=colors[i], ls="", marker="o", label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
+        markers_, caps, bars = axs[1].errorbar(x_raw[i], y_raw[i],yerr=y_raw_e[i], c=colors[i], marker=markers[i], ls=linestyles[i], label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)")
         for bar in bars: bar.set_alpha(0.1)
     for i in range(min(3,len(theta_pro)),len(theta_pro)):    #bluer passbands
         axs[1].plot(x_pro[i], y_pro[i], c="w", lw=3)
@@ -169,7 +169,7 @@ def plot_scatter_multipanel_group(
 def plot_heatmap(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
-    colors,
+    colors, markers, linestyles,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
     ax=None,
@@ -202,7 +202,7 @@ def plot_heatmap(
 def plot_3dsurface(
     theta_raw, x_raw, y_raw, y_raw_e,
     theta_pro, x_pro, y_pro, y_pro_e,
-    colors,
+    colors, markers, linestyles,
     pb_mappings, otype, survey,
     thetalab, xlab, ylab,
     ax=None,

@@ -14,7 +14,8 @@ import numpy as np
 import pandas as pd
 import polars as pl
 import re
-from typing import Literal, Tuple
+import sncosmo
+from typing import List, Literal, Tuple
 from LuStCodeSnippets_py.Styles import PlotStyles
 
 from lstein import lstein, utils as lsu, makedata as md, paper_plots as pp
@@ -46,6 +47,10 @@ SURVEY_MAPPING:dict = {"elasticc":"ELAsTiCC", "des":"DES"}
 OTYPE_MAPPING:dict = {"snia":"SN Ia", "snii":"SN II", "snibc":"SN Ib/c", "tde":"TDE"}
 CMAP:str = "plasma"
 CMAP_BANDS:str = "nipy_spectral"
+COLORS_BANDS:List[str] = ["#0c71ff", "#49be61", "#c61c00", "#ffc200", "#f341a2", "#5d0000"]
+MARKERS:Tuple[str] = ("o","^","v","s","*","p")
+ERRORBARS:bool = False
+LINESTYLES:List[str] = [""]*6
 SAVE:bool = True
 YLIM:Tuple[int,int] = (-5,None)
 
@@ -190,11 +195,14 @@ def get_stats(theta_raw, x_raw, y_raw, fname,
     panelsize = np.pi/10
     vmin = 300 if ".py" not in fname else None
     colors = lsu.get_colors(theta_raw, cmap=CMAP_BANDS, vmin=vmin)
+    # colors = COLORS_BANDS
+    markers = MARKERS
+    linestyles = LINESTYLES
     return (
         unique_thetas,
         thetaticks, xticks, yticks,
         panelsize,
-        colors,
+        colors, markers, linestyles
     )
 
 def plot_lstein_snii(gp=True):
@@ -208,7 +216,7 @@ def plot_lstein_snii(gp=True):
     unique_thetas, \
     thetaticks, xticks, yticks, \
     panelsize, \
-    colors = get_stats(theta_raw, x_raw, y_raw, fname)
+    colors, markers, linestyles = get_stats(theta_raw, x_raw, y_raw, fname)
 
 
     # thetaguidelims=(0*np.pi/2,2*np.pi/2)
@@ -231,7 +239,7 @@ def plot_lstein_snii(gp=True):
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=1.0, c=colors[thidx], marker=markers[thidx]) for thidx in range(len(theta_raw))])
     if gp:
         LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=4, c="w"))
         LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
@@ -253,7 +261,7 @@ def plot_lstein_tde(gp=True):
     unique_thetas, \
     thetaticks, xticks, yticks, \
     panelsize, \
-    colors = get_stats(theta_raw, x_raw, y_raw, fname, nyticks=3)
+    colors, markers, linestyles = get_stats(theta_raw, x_raw, y_raw, fname, nyticks=3)
     
     thetaguidelims=(0.1*np.pi/4,2.5*np.pi/4)
 
@@ -270,7 +278,7 @@ def plot_lstein_tde(gp=True):
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta", show_panelbounds=True), series_kwargs=[dict(s=20, alpha=1.0, c=colors[thidx], marker=markers[thidx]) for thidx in range(len(theta_raw))])
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", series_kwargs=dict(lw=3, c="w"))
     LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=3, ls="-", c=colors[thidx]) for thidx in range(len(theta_raw))])
 
@@ -299,7 +307,7 @@ def plot_scatter_onepanel():
     ax = pp.plot_scatter_onepanel(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
-        colors,
+        colors, markers, linestyles,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,        
     )
@@ -319,11 +327,11 @@ def plot_scatter_onepanel_offset():
     ax = pp.plot_scatter_onepanel_offset(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
-        colors, offset,
+        colors, markers, linestyles, offset,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,        
     )
-    ax.legend()
+    ax.legend(loc="upper right")
     ax.set_ylim(YLIM)
     fig = ax.get_figure()
     fig.suptitle("")
@@ -337,7 +345,7 @@ def plot_scatter_multipanel():
     axs = pp.plot_scatter_multipanel(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
-        colors,
+        colors, markers, linestyles,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,        
     )
@@ -361,7 +369,7 @@ def plot_scatter_multipanel_group(
     axs = pp.plot_scatter_multipanel_group(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
-        colors,
+        colors, markers, linestyles,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,        
     )
@@ -381,7 +389,7 @@ def plot_heatmap(
     ax = pp.plot_heatmap(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
-        CMAP,
+        colors, markers, linestyles,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,
         cmap=CMAP, vmin=-1, vmax=None,
@@ -402,7 +410,7 @@ def plot_3dsurface(
     ax = pp.plot_3dsurface(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
-        colors,
+        colors, markers, linestyles,
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,
         ax=ax,
@@ -437,7 +445,7 @@ def plot_projection_methods(
     unique_thetas, \
     thetaticks, xticks, yticks, \
     panelsize, \
-    colors = get_stats(theta_raw, x_raw, y_raw, fname)
+    colors, markers, linestyles = get_stats(theta_raw, x_raw, y_raw, fname)
 
     thetaguidelims = (0*np.pi/2,1*np.pi/2)
     if context=="theta":
@@ -931,9 +939,9 @@ def plot_errorband():
     )
 
     #adding all the series (will initialize panels for you)
-    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(s=10, alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
-    LSC.plot(theta_raw, x_raw, [y-np.abs(ye) for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
-    LSC.plot(theta_raw, x_raw, [y+np.abs(ye) for y, ye in zip(y_raw, y_raw_e)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, y_raw, seriestype="scatter", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(s=10, alpha=1.0, c=colors[thidx], marker=markers[thidx]) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, [y-np.abs(ye) for y, ye in zip(y_raw, y_raw_e_errorband)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
+    LSC.plot(theta_raw, x_raw, [y+np.abs(ye) for y, ye in zip(y_raw, y_raw_e_errorband)], seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=[dict(lw=2, ls="--", c=colors[thidx], alpha=0.5) for thidx in range(len(theta_raw))])
     # LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="y"), seres_kwargs=[dict(alpha=1.0, c=colors[thidx]) for thidx in range(len(theta_raw))])
     
     # LSC.plot(theta_pro, x_pro, y_pro, seriestype="line", panel_kwargs=dict(y_projection_method="theta"), series_kwargs=dict(lw=3, c="w"))
@@ -1286,22 +1294,20 @@ def plot_pulsar_combined():
 
 def plot_filtercurve():
 
-    import sncosmo
     df_pb = pl.read_csv(f"../data/passband_specs.csv").filter(pl.col("mission")=="lsst")
-    print(df_pb)
 
     fig, axs = plt.subplots(1,1, subplot_kw=dict(
         xlabel=r"Wavelength [nm]",
         ylabel=r"Transmission []",
     ))
-    for row in df_pb.iter_rows(named=True):
+    for idx, row in enumerate(df_pb.iter_rows(named=True)):
         band = sncosmo.get_bandpass(f"lsst{row['name'].lower()}")
         wavelength = np.linspace(3000, 11000, 10000)
         transmission = band(wavelength)
         mask = (transmission > 0)
         wavelength = wavelength[mask] / 10
         transmission = transmission[mask]
-        axs.plot(wavelength, transmission, c=row["plot_color"], ls=row["plot_ls"], label=f"LSST {row['name']}")
+        axs.plot(wavelength, transmission, c=colors[idx], ls=row["plot_ls"], label=f"LSST {row['name']}")
     axs.legend(loc="upper right")
     if SAVE: fig.savefig(f"../report/gfx/filtercurve.pdf")
     return
@@ -1317,6 +1323,10 @@ def main():
     global thetaticks, xticks, yticks
     global panelsize
     global colors
+    global markers
+    global linestyles
+
+    global y_raw_e_errorband
 
     #global flags
     gp = False
@@ -1330,20 +1340,25 @@ def main():
     unique_thetas, \
     thetaticks, xticks, yticks, \
     panelsize, \
-    colors = get_stats(theta_raw, x_raw, y_raw, fname)
+    colors, markers, linestyles = get_stats(theta_raw, x_raw, y_raw, fname)
+
+    y_raw_e_errorband = y_raw_e.copy()
+    if not ERRORBARS:
+        #remove errorbars
+        y_raw_e = [None for _ in range(len(y_raw_e))]
 
     #plots
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    # LSCa = plot_lstein_snii(gp=gp)
-    # LSCb = plot_lstein_tde(gp=True)
-    # plot_graphical_abstract([LSCa,LSCb])
+    LSCa = plot_lstein_snii(gp=gp)
+    LSCb = plot_lstein_tde(gp=True)
+    plot_graphical_abstract([LSCa,LSCb])
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
     # plot_spectra_pessi()
-    plot_spectra_mayall()
+    # plot_spectra_mayall()
     # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
@@ -1353,7 +1368,7 @@ def main():
 
     # plot_scatter_multipanel()
 
-    plot_filtercurve()
+    # plot_filtercurve()
 
     # #plots with increased fontsize (one column)
     # plt.rcParams["font.size"] = 25
