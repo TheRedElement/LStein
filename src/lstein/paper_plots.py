@@ -230,3 +230,37 @@ def plot_3dsurface(
     # cbar.set_label(ylab)
 
     return ax
+def plot_3dscatter(
+    theta_raw, x_raw, y_raw, y_raw_e,
+    theta_pro, x_pro, y_pro, y_pro_e,
+    colors, markers, linestyles,
+    pb_mappings, otype, survey,
+    thetalab, xlab, ylab,
+    ax=None,
+    cmap=None,
+    ):
+    """plots data as 3d surface
+    """
+    if ax is None:
+        fig = plt.figure(figsize=(9,5))
+        fig.suptitle(f"{otype} ({survey})")
+        ax = fig.add_subplot(111, xlabel=xlab, ylabel=thetalab, zlabel=ylab, projection="3d")
+
+    print(theta_raw)
+
+    #ensure correct plotting order (so series furthest away is plotted on the bottom)
+    theta_raw = theta_raw[::-1]
+    x_raw = x_raw[::-1]
+    y_raw = y_raw[::-1]
+    colors = colors[::-1]
+    markers = markers[::-1]
+    linestyles = linestyles[::-1]
+    
+    #plot
+    for i in range(len(theta_raw)):
+        ax.plot(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], y_raw[i],
+            # c=colors[i], marker=markers[i], ls=linestyles[i],
+            c=colors[i], marker=markers[i], ls="-",
+        )
+
+    return ax

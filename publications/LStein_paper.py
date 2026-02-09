@@ -428,6 +428,31 @@ def plot_3dsurface(
 
     if SAVE: fig.savefig("../report/gfx/surface3d.pdf", bbox_inches="tight")
     return ax
+def plot_3dscatter(
+    ):
+
+    fig, ax = plt.subplots(1,1, figsize=(9,9), subplot_kw=dict(projection="3d", xlabel=xlab, ylabel=thetalab, zlabel=ylab))
+    ax = pp.plot_3dscatter(
+        theta_raw, x_raw, y_raw, y_raw_e,
+        theta_pro, x_pro, y_pro, y_pro_e,
+        colors, markers, linestyles,
+        pb_mappings, otype, survey,
+        thetalab, xlab, ylab,
+        ax=ax,
+        cmap=CMAP,
+    )
+    # ax.set_ylim(YLIM)
+    fig = ax.get_figure()
+    ax.set_box_aspect(None, zoom=0.89)
+    ax.xaxis.labelpad = 15
+    ax.yaxis.labelpad = 15
+    ax.zaxis.labelpad = 15
+    fig.suptitle("")
+    fig.subplots_adjust(left=0.0)
+    fig.tight_layout()
+
+    if SAVE: fig.savefig("../report/gfx/scatter3d.pdf", bbox_inches="tight")
+    return ax
 
 def plot_projection_methods(
     context:Literal["theta","y"]="theta"
@@ -1348,12 +1373,92 @@ def main():
         y_raw_e = [None for _ in range(len(y_raw_e))]
 
     #plots
+    def plot_projection():
+        thetaticks=(np.linspace(0,2,3), [r"$\theta_{\min}$", "", r"$\theta_{\max}$"])
+        xticks=(np.linspace(0,30,3), [r"$r_{\min}$", "", r"$r_{\max}$"])
+        yticks=(np.linspace(1,3,3), [r"$\delta\theta_{\min}$", "", r"$\delta\theta_{\max}$"])
+        thetaguidelims = (2*np.pi/2,np.pi/2)
+        thetaguidelims = (0*np.pi/2,1*np.pi/2)
+        panelsize = np.pi/12
+
+        theta = thetaticks[0]
+        x = []
+        y = []
+        for th in thetaticks [0]:
+            xi = np.linspace(5,20,2)
+            yi = np.sin(xi) + 2
+            x.append(xi)
+            y.append(yi)
+
+        
+        LSC = lstein.LSteinCanvas(
+            thetaticks, xticks[0], yticks,
+            # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
+            thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/1,thetaguidelims[1]-panelsize/1),                    
+            # thetalabel=r"$\theta$", thetalabelkwargs=dict(xytext=(2,2)),
+            # xlabel=r"$r$", xticklabelkwargs=dict(xytext=(0.1,-0.4)), xlabelkwargs=dict(xytext=(-2,-1.3)),
+            # ylabel=r"$\delta \theta$"
+        )
+        for i, th in enumerate(thetaticks[0]):
+            if i == 0:
+                LSP = LSC.add_panel(th,
+                    yticks=yticks[0],
+                    show_panelbounds=True,
+                    show_yticks=True,
+                    panelboundskwargs=(dict(c="#c80000")),
+                    y_projection_method="theta",
+                )
+                LSP.plot(x[i], y[i], seriestype="scatter")
+            else:
+                LSP = LSC.add_panel(th,
+                    yticks=(yticks[0]),
+                    # yticks=(yticks[0], [""]*len(yticks[0])),
+                    show_panelbounds=True,
+                    show_yticks=True,
+                )
+                
+
+        fig, axs = plt.subplots(1,2)
+        axs[0].scatter(x[0], y[0])
+        lstein.LSteinMPL(LSC).show(axs[1])
+        
+        axs[0].spines["top"].set_visible(True)
+        axs[0].spines[["top","bottom"]].set_color("#c80000")
+        axs[0].spines[["top","bottom"]].set_linewidth(2)
+        # axs[0].set_xticks(xticks[0], labels=[r"$x_{\min}$", "", r"$x_{\max}$"])
+        axs[0].set_xlim(0.95*xticks[0].min(), 1.05*xticks[0].max())
+        # axs[0].set_yticks(yticks[0], labels=[r"$y_{\min}$", "", r"$y_{\max}$"])
+        axs[0].set_ylim(0.95*yticks[0].min(), 1.05*yticks[0].max())
+        
+        """ #inverted
+        axs[1].set_ylim(axs[1].get_ylim()[0]-1, None)
+        # axs[1].annotate(r"$\theta_{\max, C}$", xy=(0,6), xytext=(0,4), va="top")
+        axs[1].annotate(r"$\theta_{\max, C}$", xy=(0,6), xytext=(1,3), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
+        # axs[1].annotate(r"$\theta_{\min, C}$", xy=(0,0), xytext=(-1,1.5), va="top")
+        axs[1].annotate(r"$\theta_{\min, C}$", xy=(-6,0), xytext=(1,0), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
+        axs[1].annotate(r"$x_\mathrm{DZ}$", xy=(0,-0.5), xytext=(-3,-1.5), color="gray", va="center", ha="center")
+        axs[1].annotate(r"", xy=(-3,-0.5), xytext=(-3,-1), arrowprops=dict(arrowstyle="-[, widthB=1.5, lengthB=0.3", facecolor="gray", color="gray", shrinkA=0.1))
+         """
+        
+        # axs[1].set_ylim(axs[1].get_ylim()[0]-1, None)
+        # axs[1].annotate(r"$\theta_{\max, C}$", xy=(0,6), xytext=(-4,4), va="top")
+        # axs[1].annotate(r"", xy=(0,6), xytext=(-3,4), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
+        # axs[1].annotate(r"$\theta_{\min, C}$", xy=(0,0), xytext=(-4,1.5), va="top")
+        # axs[1].annotate(r"", xy=(6,0.2), xytext=(0.5,0.2), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
+        # axs[1].annotate(r"$x_\mathrm{DZ}$", xy=(0,-0.5), xytext=(3.1,-1.5), color="gray", va="center", ha="center")
+        # axs[1].annotate(r"", xy=(3.1,-0.5), xytext=(3.1,-1), arrowprops=dict(arrowstyle="-[, widthB=1.5, lengthB=0.3", facecolor="gray", color="gray", shrinkA=0.1))
+        
+                
+        fig.tight_layout()
+        plt.show()
+        return
+    plot_projection()
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    LSCa = plot_lstein_snii(gp=gp)
-    LSCb = plot_lstein_tde(gp=True)
-    plot_graphical_abstract([LSCa,LSCb])
+    # LSCa = plot_lstein_snii(gp=gp)
+    # LSCb = plot_lstein_tde(gp=True)
+    # plot_graphical_abstract([LSCa,LSCb])
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
@@ -1377,6 +1482,7 @@ def main():
     # plot_scatter_multipanel_group()
     # plot_heatmap()
     # plot_3dsurface()
+    # plot_3dscatter()
     
 
     plt.show()
@@ -1384,3 +1490,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# %%
