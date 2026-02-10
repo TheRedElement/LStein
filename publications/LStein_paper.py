@@ -358,6 +358,8 @@ def plot_projection():
         axs[0].spines["top"].set_visible(True)
         axs[0].spines[["top","bottom"]].set_color("#c80000")
         axs[0].spines[["top","bottom"]].set_linewidth(2)
+        axs[0].set_xlabel(r"$x$")
+        axs[0].set_ylabel(r"$y$")
         axs[0].set_xticks(xticks[0], labels=[r"$x_{\min}$", "", r"$x_{\max}$"])
         axs[0].set_xlim(0.95*xticks[0].min(), 1.05*xticks[0].max())
         axs[0].set_yticks(yticks[0], labels=[r"$y_{\min}$", "", r"$y_{\max}$"])
@@ -374,12 +376,24 @@ def plot_projection():
          """
         
         axs[1].set_ylim(axs[1].get_ylim()[0]-0.2, None)
+        
+        arrowstyle = "-|>,head_width=.15"
+        x_dz = 0.4
+        th_panelsize = np.linspace(0, panelsize+np.pi/20, 10) + np.pi/70
+        c = "navy"
+        x_ps = x_dz * np.cos(th_panelsize)
+        y_ps = x_dz * np.sin(th_panelsize)
+        axs[1].plot(x_ps[2:-2], y_ps[2:-2], c=c)
+        axs[1].annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
+        axs[1].annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
+        axs[1].annotate(r"$\dots\Delta\theta$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
+
         axs[1].annotate(r"$\theta_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
-        axs[1].annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
+        axs[1].annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
         axs[1].annotate(r"$\theta_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
-        axs[1].annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
-        axs[1].annotate(r"$x_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.12), color="gray", va="center", ha="center")
-        axs[1].annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2, lengthB=0.4", facecolor="gray", color="gray", shrinkA=0.1))
+        axs[1].annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
+        axs[1].annotate(r"$x_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.12), color="mediumorchid", va="center", ha="center")
+        axs[1].annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2, lengthB=0.4", facecolor="mediumorchid", color="mediumorchid", shrinkA=0.1))
         axs[1].annotate(r"(a)", xy=(0.85, 0.12), xytext=(0.85, 0.12))
         axs[1].annotate(r"(b)", xy=(0.65, 0.55), xytext=(0.65, 0.55))
                 
