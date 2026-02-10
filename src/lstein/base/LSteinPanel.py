@@ -26,12 +26,21 @@ class LSteinPanel:
         - `panelboundskwargs` -- see `__init__()`
     
     Inferred Attributes
-        - `ylims`
+        - `ylims_data`
             - `Tuple[float,float]`
             - axis limits applied to `y`
-        - `ylimrange`
-            - `real`
+        - `ylimrange_data`
+            - `float`
             - range of y-values
+            - convenience field for relative definitions of plot elements       
+        - `ylims_plot`
+            - `Tuple[float,float]`
+            - limits used to plot the y-axis
+            - sets the frame of reference for plotting
+            - set to `(0,1)` for consistent results
+        - `ylimrange_data`
+            - `float`
+            - range of plot values
             - convenience field for relative definitions of plot elements
         - `panel_drawn`
             - `bool`
@@ -188,8 +197,10 @@ class LSteinPanel:
         if "c" not in self.panelboundskwargs.keys():self.panelboundskwargs["c"] = plt.rcParams["axes.edgecolor"]
 
         #inferred attributes
-        self.ylims = (self.yticks[0][0], self.yticks[0][-1])
-        self.ylimrange = np.max(self.yticks[0]) - np.min(self.yticks[0])
+        self.ylims_data = (self.yticks[0][0], self.yticks[0][-1])
+        self.ylimrange_data = np.max(self.yticks[0]) - np.min(self.yticks[0])
+        self.ylims_plot = (0, 1)
+        self.ylimrange_plot = 1.0
         self.panel_drawn = False
         self.dataseries = []  #init list of dataseries to plot (List[Dict[str,Any]])
 
@@ -213,11 +224,11 @@ class LSteinPanel:
             - `theta_lb`
                 - `float`
                 - lower bound of the panel as an angle in radians
-                - corresponds to `self.ylims[0]`
+                - corresponds to `self.ylims_plot[0]` and `self.ylims_data[0]`
             - `theta_ub`
                 - `float`
                 - upper bound of the panel as an angle in radians
-                - corresponds to `self.ylims[1]`
+                - corresponds to `self.ylims_plot[1]` and `self.ylims_data[1]`
             - `theta_offset`
                 - `float`
                 - offset of the panel w.r.t. the x-axis
@@ -246,18 +257,18 @@ class LSteinPanel:
             - `r_lb`
                 - `float`
                 - lower bound of the panel in x-direction (radially)
-                - located at `self.xlimdeadzone*self.LSC.xlimrange`
+                - located at `self.xlimdeadzone*self.LSC.xlimrange_plot`
                 - corresponds to `self.xlims[0]`
             - `r_ub`
                 - `float`
                 - upper bound of the panel in x-direction (radially)
-                - located at `self.LSC.xlimrange`
+                - located at `self.LSC.xlimrange_plot`
                 - corresponds to `self.xlims[1]`
 
         Comments
         """        
-        r_lb = self.LSC.xlimdeadzone*self.LSC.xlimrange
-        r_ub = self.LSC.xlimrange
+        r_lb = self.LSC.xlimdeadzone*self.LSC.xlimrange_plot
+        r_ub = self.LSC.xlimrange_plot
         return r_lb, r_ub
 
     def get_yticks(self,
@@ -271,11 +282,11 @@ class LSteinPanel:
             - `theta_lb`
                 - `float`
                 - lower bound of the panel as an angle in radians
-                - corresponds to `self.ylims[0]`
+                - corresponds to `self.ylims_plot[0]`
             - `theta_ub`
                 - `float`
                 - upper bound of the panel as an angle in radians
-                - corresponds to `self.ylims[1]`
+                - corresponds to `self.ylims_plot[1]`
 
         Raises
 
@@ -288,7 +299,7 @@ class LSteinPanel:
                 - labels assigned to each tick
                 - same length as `ytickpos_th` 
         """
-        ytickpos_th = minmaxscale(self.yticks[0], theta_lb, theta_ub, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
+        ytickpos_th = minmaxscale(self.yticks[0], theta_lb, theta_ub, xmin_ref=self.ylims_data[0], xmax_ref=self.ylims_data[1])  #no use of min/max to allow inverted axis
         yticklabs = self.yticks[1]
 
         return ytickpos_th, yticklabs
@@ -308,11 +319,11 @@ class LSteinPanel:
             - `x`
                 - `np.ndarray`
                 - x-values of the series to be plotted
-                - will serve as reference for enforcing `self.LSC.xlims`
+                - will serve as reference for enforcing `self.LSC.xlims_plot`
             - `y`
                 - `np.ndarray`
                 - y-values of the series to be plotted
-                - will serve as reference for enforcing `self.ylims`
+                - will serve as reference for enforcing `self.ylims_data`
             - `**kwargs`
                 - `kwargs` ultimately used when plotting `y` vs `x`
                 - also get modified accordingly i.e.,
@@ -334,8 +345,8 @@ class LSteinPanel:
                 - `**kwargs` after applying axis-limit cuts
         """
 
-        x_bool = (np.min(self.LSC.xlims)<=x)&(x<=np.max(self.LSC.xlims))
-        y_bool = (np.min(self.ylims)<=y)&(y<=np.max(self.ylims))
+        x_bool = (np.min(self.LSC.xlims_data)<=x)&(x<=np.max(self.LSC.xlims_data))
+        y_bool = (np.min(self.ylims_data)<=y)&(y<=np.max(self.ylims_data))
         limitbool = (x_bool&y_bool)
 
         x_cut = x[limitbool]
@@ -386,22 +397,32 @@ class LSteinPanel:
         #global variables
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
-        #convert ylims to theta-values
-        r_min, th_min = cart2polar(np.max(self.LSC.xlims), self.ylims[0])
-        r_max, th_max = cart2polar(np.max(self.LSC.xlims), self.ylims[1])
+        #convert ylims_plot to theta-values
+        r_min, th_min = cart2polar(self.LSC.xlims_plot[1], self.ylims_plot[0])
+        r_max, th_max = cart2polar(self.LSC.xlims_plot[1], self.ylims_plot[1])
+
+        #rescale to plotting range (0,1) for more consistent results
+        x_01 = minmaxscale(x,
+            self.LSC.xlims_plot[0], self.LSC.xlims_plot[1],                         #0, 1,
+            xmin_ref=self.LSC.xlims_data[0], xmax_ref=self.LSC.xlims_data[1],       #don't use min/max to allow for inverted axes
+        )
+        y_01 = minmaxscale(y,
+            self.ylims_plot[0], self.ylims_plot[1],                                 #0, 1,
+            xmin_ref=self.ylims_data[0], xmax_ref=self.ylims_data[1],               #don't use min/max to allow for inverted axes
+        )
 
         #project x to obey axis-limits
-        x_proj = minmaxscale(x,
-            self.LSC.xlimdeadzone*self.LSC.xlimrange, self.LSC.xlimrange,
-            xmin_ref=self.LSC.xlims[0], xmax_ref=self.LSC.xlims[1],
+        x_proj = minmaxscale(x_01,
+            self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, self.LSC.xlimrange_plot,
+            xmin_ref=self.LSC.xlims_plot[0], xmax_ref=self.LSC.xlims_plot[1],
         )
 
         #project y to fit into panel
         y_scaler = minmaxscale(x_proj,
             self.LSC.xlimdeadzone, 1,
-            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange, xmax_ref=self.LSC.xlimrange
+            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, xmax_ref=self.LSC.xlimrange_plot
         )
-        y_proj = y_scaler * y
+        y_proj = y_scaler * y_01
         
         #convert to polar coords for transformations
         r, theta = cart2polar(x_proj, y_proj)
@@ -452,23 +473,35 @@ class LSteinPanel:
         #global variables
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
+        #rescale to plotting range (0,1) for more consistent results
+        x_01 = minmaxscale(x,
+            self.LSC.xlims_plot[0], self.LSC.xlims_plot[1],                         #0, 1,
+            xmin_ref=self.LSC.xlims_data[0], xmax_ref=self.LSC.xlims_data[1],       #don't use min/max to allow for inverted axes
+        )
+        y_01 = minmaxscale(y,
+            self.ylims_plot[0], self.ylims_plot[1],                                 #0, 1,
+            xmin_ref=self.ylims_data[0], xmax_ref=self.ylims_data[1],               #don't use min/max to allow for inverted axes
+        )
+
         #project x to obey axis-limits
-        x_proj = minmaxscale(x,
-            self.LSC.xlimdeadzone*self.LSC.xlimrange, self.LSC.xlimrange,
-            xmin_ref=self.LSC.xlims[0], xmax_ref=self.LSC.xlims[1],
+        x_proj = minmaxscale(x_01,
+            self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, self.LSC.xlimrange_plot,
+            xmin_ref=self.LSC.xlims_plot[0], xmax_ref=self.LSC.xlims_plot[1],
         )
 
         #project y to fit into panel
         y_scaler = minmaxscale(x_proj,
             self.LSC.xlimdeadzone, 1,
-            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange, xmax_ref=self.LSC.xlimrange
+            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, xmax_ref=self.LSC.xlimrange_plot
         )
-        y_proj = minmaxscale(y, 0, 1, xmin_ref=self.ylims[0], xmax_ref=self.ylims[1])
-        y_proj = y_scaler * y_proj
+        y_proj = y_scaler * y_01
         
-        ##rescale to fill panel (considering bounds)
-        y_slice = x_proj * np.tan(self.panelsize)
-        y_proj = np.max(y_slice) * y_proj - y_slice/2
+        #project y to obey panel bounds
+        x_slice = x_proj                                                    #x-coordinate of slice at every datapoint
+        y_slice = x_slice * np.tan(self.panelsize)                          #y-coordinate of slice at every datapoint considering panel size
+        y_slice_ub_ylim = self.LSC.xlims_plot[1] * np.tan(self.panelsize)   #upper bound of the panel as defined by the y-limits
+        y_slice_ub = max(np.max(y_slice), y_slice_ub_ylim)                  #actual upper bound of the panel (also considers dataseries being out of bounds)
+        y_proj = y_slice_ub * y_proj - y_slice/2                            #adjust projection of datapoints in y #offset by half of the datapoints y_slice to make avoid overflows
         
         #convert to polar coords for transformations
         r, theta = cart2polar(x_proj, y_proj)
@@ -517,6 +550,8 @@ class LSteinPanel:
             x_proj, y_proj = self.project_xy_theta(x, y)
         elif y_projection_method == "y":
             x_proj, y_proj = self.project_xy_y(x, y)
+        else:
+            raise ValueError(f"`y_projection_method` has to be one of `'theta'`, `'y'` but got {y_projection_method}")
 
         return x_proj, y_proj
     

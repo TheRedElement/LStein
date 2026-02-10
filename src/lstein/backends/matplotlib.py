@@ -297,6 +297,8 @@ class LSteinMPL:
         #disable some default settings
         ax.set_aspect("equal")
         ax.set_axis_off()
+        # ax.set_xmargin(.1)
+        # ax.set_ymargin(.1)
 
         #add canvas elements
         self.add_xaxis(ax)

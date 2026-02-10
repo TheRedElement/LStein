@@ -42,8 +42,8 @@ class LSteinXAxis:
         xticks:Union[Tuple[List[float],List[Any]],List[float]],
         thetaguidelims:Tuple[float,float],
         xlimdeadzone:float,
-        xlims:Tuple[float,float],
-        xlimrange:float,
+        xlims_data:Tuple[float,float],
+        xlimrange_plot:float,
         ) -> Tuple[np.ndarray,np.ndarray]:
         """returns coordinates defining the circles for the x-axis
 
@@ -66,7 +66,7 @@ class LSteinXAxis:
         """
         th_circ = np.linspace(thetaguidelims[0], thetaguidelims[1], 100)
         r_circ = xticks[0]
-        r_circ = minmaxscale(r_circ, xlimrange * xlimdeadzone, xlimrange, xmin_ref=xlims[0], xmax_ref=xlims[1])  #scale to xlims
+        r_circ = minmaxscale(r_circ, xlimrange_plot * xlimdeadzone, xlimrange_plot, xmin_ref=xlims_data[0], xmax_ref=xlims_data[1])   #scale to xlims_data #no use min/max to allow inverted axis
         circles_x = r_circ.reshape(-1,1) @ np.cos(th_circ).reshape(1,-1)
         circles_y = r_circ.reshape(-1,1) @ np.sin(th_circ).reshape(1,-1)
 
@@ -178,7 +178,7 @@ class LSteinThetaAxis:
         thetaplotlims:Tuple[float,float],
         xlimdeadzone:float,
         th_pad:float,
-        xlimrange:Tuple[float,float],
+        xlimrange_plot:Tuple[float,float],
         ) -> Tuple[np.ndarray,np.ndarray,np.ndarray]:
         """returns coordinates defining the ticks of the theta-axis
 
@@ -224,8 +224,8 @@ class LSteinThetaAxis:
                 - outer bound of theta ticks
                 - in cartesian coordinates 
         """
-        thetatickpos_ri = th_pad * xlimdeadzone*xlimrange     #inner edge of theta ticks
-        thetatickpos_ro = xlimdeadzone*xlimrange              #outer edge of theta ticks
+        thetatickpos_ri = th_pad * xlimdeadzone*xlimrange_plot     #inner edge of theta ticks
+        thetatickpos_ro = xlimdeadzone*xlimrange_plot              #outer edge of theta ticks
         thetatickpos_th = minmaxscale(thetaticks[0], thetaplotlims[0], thetaplotlims[1])
 
         #convert to cartesian
@@ -389,7 +389,7 @@ class LSteinYAxis:
         thetaplotlims:Tuple[float,float],
         ylabpos_th:float,
         #infered
-        xlimrange:Tuple[float,float],
+        xlimrange_plot:Tuple[float,float],
         pad:float,
         ):
         """returns coordinates of the theta-label
@@ -417,7 +417,7 @@ class LSteinYAxis:
             xmin_ref=thetaticks[0][0], xmax_ref=thetaticks[0][-1],
         )
 
-        ylabpos_x, ylabpos_y = polar2cart((1+pad) * xlimrange, ylabpos)
+        ylabpos_x, ylabpos_y = polar2cart((1+pad) * xlimrange_plot, ylabpos)
 
         return ylabpos_x, ylabpos_y
 
@@ -458,15 +458,27 @@ class LSteinCanvas:
                 - i.e., in azimuthal direction
                 - `thetalims[0]` corresponds to the lowest value of `theta` that will be plotted
                 - `thetalims[1]` corresponds to the highest value of `theta` that will be plotted
-        - `xlims`
+        - `xlims_data`
             - `Tuple[float,float]`
             - axis limits applied to `x`
                 - i.e., in radial direction
-                - `xlims[0]` corresponds to the value plotted at the end of `xlimdeadzone`
-                - `xlims[1]` corresponds to the value plotted at the outer bound of the LStein plot
-        - `xlimrange`
+                - `xlims_data[0]` corresponds to the value plotted at the end of `xlimdeadzone`
+                - `xlims_data[1]` corresponds to the value plotted at the outer bound of the LStein plot
+        - `xlimrange_data`
             - `float`
             - range of x-values
+            - convenience field for relative definitions of plot elements
+        - `xlims_plot`
+            - `Tuple[float,float]`
+            - limits used to plot the x-axis
+            - sets the frame of reference for plotting
+            - set to `(0,1)` for consistent results
+                - i.e., in radial direction
+                - `xlims_plot[0]` corresponds to `xlims_data[0]`
+                - `xlims_plot[1]` corresponds to `xlims_data[1]`
+        - `xlimrange_data`
+            - `float`
+            - range of plot values
             - convenience field for relative definitions of plot elements
         - `Panels`
             - `List[LSteinPanel]`
@@ -703,8 +715,10 @@ class LSteinCanvas:
 
         #infered attributes
         self.thetalims = (np.min(self.thetaticks[0]), np.max(self.thetaticks[0]))
-        self.xlims = (self.xticks[0][0], self.xticks[0][-1])
-        self.xlimrange = np.max(self.xticks[0]) - np.min(self.xticks[0])
+        self.xlims_data = (self.xticks[0][0], self.xticks[0][-1])
+        self.xlimrange_data = np.max(self.xticks[0]) - np.min(self.xticks[0])
+        self.xlims_plot = (0, 1)
+        self.xlimrange_plot = 1.0
         self.Panels = []
         self.canvas_drawn = False
 
@@ -760,8 +774,8 @@ class LSteinCanvas:
             xticks=self.xticks,
             thetaguidelims=self.thetaguidelims,
             xlimdeadzone=self.xlimdeadzone,
-            xlims=self.xlims,
-            xlimrange=self.xlimrange,
+            xlims_data=self.xlims_data,
+            xlimrange_plot=self.xlimrange_plot,
         )
         xtickpos_x, xtickpos_y, xticklabs = lsxax.compute_ticklabs(
             xticks=self.xticks, 
@@ -836,7 +850,7 @@ class LSteinCanvas:
             thetaplotlims=self.thetaplotlims,              
             xlimdeadzone=self.xlimdeadzone,
             th_pad=th_pad,
-            xlimrange=self.xlimrange,
+            xlimrange_plot=self.xlimrange_plot,
         )
 
         thetaticklabelpos_x, thetaticklabelpos_y, thetaticklabs = lsthax.compute_ticklabs(
@@ -886,7 +900,7 @@ class LSteinCanvas:
             thetaticks=self.thetaticks,
             thetaplotlims=self.thetaplotlims,
             ylabpos_th=self.ylabpos_th,
-            xlimrange=self.xlimrange,            
+            xlimrange_plot=self.xlimrange_plot,            
             pad=pad,
         )
 
