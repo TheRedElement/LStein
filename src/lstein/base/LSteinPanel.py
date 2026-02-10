@@ -363,6 +363,53 @@ class LSteinPanel:
         return x_cut, y_cut, kwargs
     
     #projection methods
+    def projection_preprocessing_(self,
+        x:np.ndarray, y:np.ndarray,
+        ) -> Tuple[np.ndarray,np.ndarray]:
+        """returns `x` and `y` after applying transformations preceding all projection methods
+        
+        - method applying preprocessing to `x` and `y`
+        - applies transformation that precede all projection methods
+        - only called from within the projection methods
+
+        Parameters
+            - `x`
+                - `np.ndarray`
+                - x-values of the series to be projected into the panel
+            - `y`
+                - `np.ndarray`
+                - y-values of the series to be projected into the panel
+
+        Raises
+
+        Returns
+            - `x_prep`
+                - `np.ndarray`
+                - `x` after application of preprocessing
+            - `y_prep`
+                - `np.ndarray`
+                - `y` after application of preprocessing        
+        """
+
+        #rescale to plotting range (0,1) for more consistent results
+        x_01 = minmaxscale(x,
+            self.LSC.xlims_plot[0], self.LSC.xlims_plot[1],                         #0, 1,
+            xmin_ref=self.LSC.xlims_data[0], xmax_ref=self.LSC.xlims_data[1],       #don't use min/max to allow for inverted axes
+        )
+        y_01 = minmaxscale(y,
+            self.ylims_plot[0], self.ylims_plot[1],                                 #0, 1,
+            xmin_ref=self.ylims_data[0], xmax_ref=self.ylims_data[1],               #don't use min/max to allow for inverted axes
+        )
+
+        #project x to obey axis-limits
+        x_prep = minmaxscale(x_01,
+            self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, self.LSC.xlimrange_plot,
+            xmin_ref=self.LSC.xlims_plot[0], xmax_ref=self.LSC.xlims_plot[1],
+        )
+        #y dealt with in each method differently
+        y_prep = y_01
+
+        return x_prep, y_prep
     def project_xy_theta(self,
         x:np.ndarray, y:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray]:
@@ -401,28 +448,16 @@ class LSteinPanel:
         r_min, th_min = cart2polar(self.LSC.xlims_plot[1], self.ylims_plot[0])
         r_max, th_max = cart2polar(self.LSC.xlims_plot[1], self.ylims_plot[1])
 
-        #rescale to plotting range (0,1) for more consistent results
-        x_01 = minmaxscale(x,
-            self.LSC.xlims_plot[0], self.LSC.xlims_plot[1],                         #0, 1,
-            xmin_ref=self.LSC.xlims_data[0], xmax_ref=self.LSC.xlims_data[1],       #don't use min/max to allow for inverted axes
-        )
-        y_01 = minmaxscale(y,
-            self.ylims_plot[0], self.ylims_plot[1],                                 #0, 1,
-            xmin_ref=self.ylims_data[0], xmax_ref=self.ylims_data[1],               #don't use min/max to allow for inverted axes
-        )
-
-        #project x to obey axis-limits
-        x_proj = minmaxscale(x_01,
-            self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, self.LSC.xlimrange_plot,
-            xmin_ref=self.LSC.xlims_plot[0], xmax_ref=self.LSC.xlims_plot[1],
-        )
+        #preprocessing (applied to all projection methods)
+        x_prep, y_prep = self.projection_preprocessing_(x, y)
+        x_proj = x_prep
 
         #project y to fit into panel
         y_scaler = minmaxscale(x_proj,
             self.LSC.xlimdeadzone, 1,
             xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, xmax_ref=self.LSC.xlimrange_plot
         )
-        y_proj = y_scaler * y_01
+        y_proj = y_scaler * y_prep
         
         #convert to polar coords for transformations
         r, theta = cart2polar(x_proj, y_proj)
@@ -473,28 +508,16 @@ class LSteinPanel:
         #global variables
         theta_offset, theta_lb, theta_ub = self.get_thetabounds()
 
-        #rescale to plotting range (0,1) for more consistent results
-        x_01 = minmaxscale(x,
-            self.LSC.xlims_plot[0], self.LSC.xlims_plot[1],                         #0, 1,
-            xmin_ref=self.LSC.xlims_data[0], xmax_ref=self.LSC.xlims_data[1],       #don't use min/max to allow for inverted axes
-        )
-        y_01 = minmaxscale(y,
-            self.ylims_plot[0], self.ylims_plot[1],                                 #0, 1,
-            xmin_ref=self.ylims_data[0], xmax_ref=self.ylims_data[1],               #don't use min/max to allow for inverted axes
-        )
-
-        #project x to obey axis-limits
-        x_proj = minmaxscale(x_01,
-            self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, self.LSC.xlimrange_plot,
-            xmin_ref=self.LSC.xlims_plot[0], xmax_ref=self.LSC.xlims_plot[1],
-        )
+        #preprocessing (applied to all projection methods)
+        x_prep, y_prep = self.projection_preprocessing_(x, y)
+        x_proj = x_prep
 
         #project y to fit into panel
         y_scaler = minmaxscale(x_proj,
             self.LSC.xlimdeadzone, 1,
             xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, xmax_ref=self.LSC.xlimrange_plot
         )
-        y_proj = y_scaler * y_01
+        y_proj = y_scaler * y_prep
         
         #project y to obey panel bounds
         x_slice = x_proj                                                    #x-coordinate of slice at every datapoint

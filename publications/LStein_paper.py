@@ -387,7 +387,7 @@ def plot_projection():
         axs[1].plot(x_ps[2:-2], y_ps[2:-2], c=c)
         axs[1].annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
         axs[1].annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
-        axs[1].annotate(r"$\dots\Delta y^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
+        axs[1].annotate(r"$\dots\Delta \theta^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
 
         axs[1].annotate(r"$\theta^\mathrm{(LS)}_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
         axs[1].annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
