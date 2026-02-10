@@ -304,9 +304,9 @@ def plot_graphical_abstract(LSCs):
     return
 
 def plot_projection():
-        thetaticks=(np.linspace(0,2,3), [r"$\theta_{\min}$", "", r"$\theta_{\max}$"])
-        xticks=(np.linspace(3,30,3), [r"$r_{\min}$", "", r"$r_{\max}$"])
-        yticks=(np.linspace(-1.0,1.0,3), [r"$\delta\theta_{\min}$", "", r"$\delta\theta_{\max}$"])
+        thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{(LS)}_{\min}$", "", r"$\theta^\mathrm{(LS)}_{\max}$"])
+        xticks=(np.linspace(3,30,3), [r"$x^\mathrm{(LS)}_{\min}$", "", r"$x^\mathrm{(LS)}_{\max}$"])
+        yticks=(np.linspace(-1.0,1.0,3), [r"$y^\mathrm{(LS)}_{\min}$", "", r"$y^\mathrm{(LS)}_{\max}$"])
         thetaguidelims = (2*np.pi/2,np.pi/2)
         thetaguidelims = (0*np.pi/2,1*np.pi/2)
         panelsize = np.pi/12
@@ -319,9 +319,9 @@ def plot_projection():
             thetaticks, xticks, yticks,
             # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
             thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/1,thetaguidelims[1]-panelsize/1),                    
-            thetalabel=r"$\theta$", thetalabelkwargs=dict(xytext=(0.1,0.1)),
-            xlabel=r"$r$", xticklabelkwargs=dict(xytext=(-0.0,-0.5)), xlabelkwargs=dict(xytext=(-2,-1.3)),
-            ylabel=r"$\delta \theta$",
+            thetalabel=r"$\theta^\mathrm{(LS)}$", thetalabelkwargs=dict(xytext=(0.05,0.05)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
+            xlabel=r"$x^\mathrm{(LS)}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-2,-1.3)),
+            ylabel=r"$y^\mathrm{(LS)}$",
             xlimdeadzone=0.4,
         )
         for i, th in enumerate(thetaticks[0]):
@@ -343,6 +343,7 @@ def plot_projection():
                 show_panelbounds=True,
                 show_yticks=True,
                 panelboundskwargs=panelboundskwargs,
+                yticklabelkwargs=dict(xytext=(0.0, 0.4), textcoords="offset fontsize"),
                 y_projection_method=y_projection_method,
             )
 
@@ -358,11 +359,11 @@ def plot_projection():
         axs[0].spines["top"].set_visible(True)
         axs[0].spines[["top","bottom"]].set_color("#c80000")
         axs[0].spines[["top","bottom"]].set_linewidth(2)
-        axs[0].set_xlabel(r"$x$")
-        axs[0].set_ylabel(r"$y$")
-        axs[0].set_xticks(xticks[0], labels=[r"$x_{\min}$", "", r"$x_{\max}$"])
+        axs[0].set_xlabel(r"$x^\mathrm{(C)}$")
+        axs[0].set_ylabel(r"$y^\mathrm{(C)}$")
+        axs[0].set_xticks(xticks[0], labels=[r"$x^\mathrm{(C)}_{\min}$", "", r"$x^\mathrm{(C)}_{\max}$"])
         axs[0].set_xlim(0.95*xticks[0].min(), 1.05*xticks[0].max())
-        axs[0].set_yticks(yticks[0], labels=[r"$y_{\min}$", "", r"$y_{\max}$"])
+        axs[0].set_yticks(yticks[0], labels=[r"$y^\mathrm{(C)}_{\min}$", "", r"$y^\mathrm{(C)}_{\max}$"])
         axs[0].set_ylim(1.05*yticks[0].min(), 1.05*yticks[0].max())
         
         """ #inverted
@@ -386,13 +387,13 @@ def plot_projection():
         axs[1].plot(x_ps[2:-2], y_ps[2:-2], c=c)
         axs[1].annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
         axs[1].annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
-        axs[1].annotate(r"$\dots\Delta\theta_P$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
+        axs[1].annotate(r"$\dots\Delta y^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
 
-        axs[1].annotate(r"$\theta_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
+        axs[1].annotate(r"$\theta^\mathrm{(LS)}_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
         axs[1].annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
-        axs[1].annotate(r"$\theta_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
+        axs[1].annotate(r"$\theta^\mathrm{(LS)}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
         axs[1].annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
-        axs[1].annotate(r"$x_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.12), color="mediumorchid", va="center", ha="center")
+        axs[1].annotate(r"$x^\mathrm{(LS)}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="mediumorchid", va="center", ha="center")
         axs[1].annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2, lengthB=0.4", facecolor="mediumorchid", color="mediumorchid", shrinkA=0.1))
         axs[1].annotate(r"(a)", xy=(0.85, 0.12), xytext=(0.85, 0.12))
         axs[1].annotate(r"(b)", xy=(0.65, 0.55), xytext=(0.65, 0.55))
