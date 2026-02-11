@@ -8,6 +8,7 @@ from brian2 import Gohm, ms, mV, pA, pF, second
 from cycler import cycler
 import glob
 import importlib
+import logging
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -20,6 +21,14 @@ from LuStCodeSnippets_py.Styles import PlotStyles
 
 from lstein import lstein, utils as lsu, makedata as md, paper_plots as pp
 importlib.reload(pp)
+
+
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(name)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger("lstein")
+logger.setLevel(logging.DEBUG)
 
 #setup plotting style
 _ = PlotStyles.tre_light()

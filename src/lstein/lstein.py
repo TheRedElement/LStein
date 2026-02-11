@@ -16,6 +16,7 @@ Other Objects
 """
 
 #%%imports
+import logging
 import matplotlib.pyplot as plt
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
@@ -27,6 +28,8 @@ from .base.LSteinPanel import LSteinPanel
 
 from .backends.matplotlib import LSteinMPL
 from .backends.plotly import LSteinPlotly
+
+logger = logging.getLogger(__name__)
 
 #%%definitions
 def draw(

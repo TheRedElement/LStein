@@ -8,6 +8,9 @@ from typing import Any, Dict, List, Literal, Tuple, Union
 from ..utils import minmaxscale, polar2cart, cart2polar, get_colors
 from .LSteinPanel import LSteinPanel
 
+import logging
+logger = logging.getLogger(__name__)
+
 #%%classes
 ###############
 #Child Classes#

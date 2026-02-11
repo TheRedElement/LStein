@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Literal, Tuple
 # from .LSteinCanvas import LSteinCanvas   #no import because leads to circular import
 from ..utils import minmaxscale, polar2cart, cart2polar
 
+import logging
+logger = logging.getLogger(__name__)
 
 #%%classes
 class LSteinPanel:
@@ -406,10 +408,16 @@ class LSteinPanel:
             self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, self.LSC.xlimrange_plot,
             xmin_ref=self.LSC.xlims_plot[0], xmax_ref=self.LSC.xlims_plot[1],
         )
-        #y dealt with in each method differently
-        y_prep = y_01
+
+        #project y to fit into panel/obey axis limits
+        y_scaler = minmaxscale(x_prep,  #essentially scales x to [xlimdeadzone,1] #only needed if `self.xlims_plot[1] != 1`
+            self.LSC.xlimdeadzone, 1,
+            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, xmax_ref=self.LSC.xlimrange_plot
+        )
+        y_prep = y_scaler * y_01
 
         return x_prep, y_prep
+    
     def project_xy_theta(self,
         x:np.ndarray, y:np.ndarray,
         ) -> Tuple[np.ndarray,np.ndarray]:
@@ -447,20 +455,15 @@ class LSteinPanel:
         #convert ylims_plot to theta-values
         r_min, th_min = cart2polar(self.LSC.xlims_plot[1], self.ylims_plot[0])
         r_max, th_max = cart2polar(self.LSC.xlims_plot[1], self.ylims_plot[1])
+        logger.debug(f"{th_min=}, {th_max=}")   #always np.pi+0 and np.pi+np.pi/4 since interval [0,1] chosen
+        logger.debug(f"{self.LSC.xlims_plot=}, {self.ylims_plot=}")
+
 
         #preprocessing (applied to all projection methods)
         x_prep, y_prep = self.projection_preprocessing_(x, y)
-        x_proj = x_prep
-
-        #project y to fit into panel
-        y_scaler = minmaxscale(x_proj,
-            self.LSC.xlimdeadzone, 1,
-            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, xmax_ref=self.LSC.xlimrange_plot
-        )
-        y_proj = y_scaler * y_prep
         
         #convert to polar coords for transformations
-        r, theta = cart2polar(x_proj, y_proj)
+        r, theta = cart2polar(x_prep, y_prep)
         
         ##rescale theta (i.e., make sure y obeys axis limits)
         theta = minmaxscale(theta,
@@ -469,8 +472,8 @@ class LSteinPanel:
         )
 
         #convert back to cartesian coords for plotting
-        #NOTE: use x_proj as radius because x is plotted in radial direction
-        x_proj, y_proj = polar2cart(x_proj, theta)
+        #NOTE: use x_prep as radius because x is plotted in radial direction
+        x_proj, y_proj = polar2cart(x_prep, theta)
 
         return x_proj, y_proj
     
@@ -510,24 +513,16 @@ class LSteinPanel:
 
         #preprocessing (applied to all projection methods)
         x_prep, y_prep = self.projection_preprocessing_(x, y)
-        x_proj = x_prep
-
-        #project y to fit into panel
-        y_scaler = minmaxscale(x_proj,
-            self.LSC.xlimdeadzone, 1,
-            xmin_ref=self.LSC.xlimdeadzone*self.LSC.xlimrange_plot, xmax_ref=self.LSC.xlimrange_plot
-        )
-        y_proj = y_scaler * y_prep
         
         #project y to obey panel bounds
-        x_slice = x_proj                                                    #x-coordinate of slice at every datapoint
+        x_slice = x_prep                                                    #x-coordinate of slice at every datapoint
         y_slice = x_slice * np.tan(self.panelsize)                          #y-coordinate of slice at every datapoint considering panel size
         y_slice_ub_ylim = self.LSC.xlims_plot[1] * np.tan(self.panelsize)   #upper bound of the panel as defined by the y-limits
         y_slice_ub = max(np.max(y_slice), y_slice_ub_ylim)                  #actual upper bound of the panel (also considers dataseries being out of bounds)
-        y_proj = y_slice_ub * y_proj - y_slice/2                            #adjust projection of datapoints in y #offset by half of the datapoints y_slice to make avoid overflows
+        y_prep = y_slice_ub * y_prep - y_slice/2                            #adjust projection of datapoints in y #offset by half of the datapoints y_slice to make avoid overflows
         
         #convert to polar coords for transformations
-        r, theta = cart2polar(x_proj, y_proj)
+        r, theta = cart2polar(x_prep, y_prep)
         theta += theta_offset + np.pi
 
         #convert back to cartesian coords for plotting
