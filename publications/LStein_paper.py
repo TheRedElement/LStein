@@ -317,6 +317,7 @@ def plot_projection():
     figs = []
 
     #global layout
+    figsize = (7,3)
     xlims = np.array([-0.05,1.05])
     ylims = np.array([-0.05,1.05])
     xticks = [np.array([0,0.3,1]),[0,r"$x^\mathrm{(LS)}_\mathrm{DZ}$",1]]
@@ -335,7 +336,7 @@ def plot_projection():
     
     #sine wave for illustration
     x = np.linspace(0,1,50)
-    y = np.sin(x * 10)
+    y = np.sin(x * 23)
     x_lines = np.linspace(0,2,5)
     y_lines_0 = -np.ones_like(x_lines)
     y_lines_1 = np.ones_like(x_lines)
@@ -349,7 +350,7 @@ def plot_projection():
     x_prep = x_01
     y_prep = y_01 * x_01
     
-    fig, axs = plt.subplots(1,3, subplot_kw=dict(aspect="equal"))
+    fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
     axs[0].scatter(x, y)
     axs[0].plot(x_lines, y_lines_0, c="C0")
@@ -385,7 +386,7 @@ def plot_projection():
     x_l0_2, y_l0_2 = lsu.polar2cart(x_lines_01, th_l0_2)
     x_l1_2, y_l1_2 = lsu.polar2cart(x_lines_01, th_l1_2)
     
-    fig, axs = plt.subplots(1,3, subplot_kw=dict(aspect="equal"))
+    fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
     axs[0].set_axis_off()   #replace with polar axis
     axs[1].set_axis_off()   #replace with polar axis
@@ -432,7 +433,7 @@ def plot_projection():
     x_l0_yproj, y_l0_yproj = lsu.polar2cart(r_l0_yproj, th_l0_yproj+theta + np.pi)
     x_l1_yproj, y_l1_yproj = lsu.polar2cart(r_l1_yproj, th_l1_yproj+theta + np.pi)
 
-    fig, axs = plt.subplots(1,3, subplot_kw=dict(aspect="equal"))
+    fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
     axs[0].scatter(x_yproj1, y_yproj1)
     axs[0].plot(x_lines, x_lines*np.tan(panelsize)*y_lines_01_0, c="C0")
