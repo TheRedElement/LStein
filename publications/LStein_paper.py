@@ -363,6 +363,8 @@ def plot_projection():
     axs[0].set_xlim(0,1)
     axs[0].set_aspect(0.5)
     
+    for i, num in enumerate("abc"):
+        axs[i].annotate(f"({num})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
     for ax in axs[1:]:
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
@@ -410,6 +412,9 @@ def plot_projection():
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
+    for i, num in enumerate("abc"):
+        axs[i].annotate(f"({num})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+
     fig.tight_layout()
     figs.append(fig)
     
@@ -444,6 +449,9 @@ def plot_projection():
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
+    for i, num in enumerate("abc"):
+        axs[i].annotate(f"({num})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+
     axs[0].set_xticks(*xticks)
     axs[1].set_xticks(*xticks)
     axs[1].set_ylim(-0.5, 0.5)
