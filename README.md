@@ -89,10 +89,10 @@ You can try your own data as well, but make sure to
 + no overcrowded panels
 + similar $\theta$-values (i.e., passbands) are plotted closer together
 + allows to preserve amplitude-differences across $\theta$-values for same $y$-values
-+ allows to depict arbitrary number of $\theta$-values (by means of reducing the angular size of each $\theta$-panel) 
++ allows depicting arbitrary number of $\theta$-values (by means of reducing the angular size of each $\theta$-panel) 
 + works for people with color-blindness due to relational display of information
 + can be applied to variety of data (not only lightcurves)
-	+ examples: spectra over time, different machine learning models
+	+ examples: spectra over time, different machine learning models, spiking neural networks
 + layout entirely customizable
 
 ### Cons
@@ -103,7 +103,10 @@ You can try your own data as well, but make sure to
 
 
 ## Known Bugs
-* `y_projection_method="theta"` goes haywire for huge $x$-values (for sure $x\ge10000$)
+### Open
+
+### Resolved
+- [x] `y_projection_method="theta"` goes haywire for huge $x$-values (for sure $x\ge10000$)
     * the reason is the necessity to compute $\tan$ and $arc\tan$ when converting back and forth between coordinate systems
     * workarounds
         * formulate your series relative to some value so you remain in a reasonable range

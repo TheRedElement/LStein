@@ -320,31 +320,29 @@ def plot_projection():
     figsize = (7,3)
     xlims = np.array([-0.05,1.05])
     ylims = np.array([-0.05,1.05])
-    xticks = [np.array([0,0.3,1]),[0,r"$x^\mathrm{(LS)}_\mathrm{DZ}$",1]]
+    xticks = [np.array([0,0.3,1]),[r"$0$",r"$x^\mathrm{(LS)}_\mathrm{DZ}$",r"$1$"]]
     yticks = (np.array([-1,1]),[r"$y_{\min}$", r"$y_{\max}$"])
     rlims = np.array([0,1.1])
-    rticks = ([0,0.3,1],["0",r"$x^\mathrm{(LS)}_\mathrm{DZ}$","1"])
+    rticks = ([0,0.3,1],["$0$",r"$x^\mathrm{(LS)}_\mathrm{DZ}$","$1$"])
     thlims = np.array([-0.05, np.pi/2])
     thticks = [[0, np.pi/4, np.pi/2], [r"$0$", r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]]
 
     #input
-    # xticks = (np.array([0,1]),[r"$x_{\min}$", r"$x_{\max}$"])
-    # yticks = (np.array([-1,1]),[r"$y_{\min}$", r"$y_{\max}$"])
     xdeadzone = 0.3
     panelsize = np.pi/8
     theta = 1*np.pi/4
     
     #sine wave for illustration
-    x = np.linspace(0,1,50)
-    y = np.sin(x * 23)
+    x = np.linspace(0,2,70)
+    y = 2*np.sin(x * 13)
     x_lines = np.linspace(0,2,5)
-    y_lines_0 = -np.ones_like(x_lines)
-    y_lines_1 = np.ones_like(x_lines)
+    y_lines_0 = np.ones_like(x_lines) * y.min()
+    y_lines_1 = np.ones_like(x_lines) * y.max()
     
     #preprocessing
-    x_01 = lsu.minmaxscale(x,xdeadzone,1, xticks[0].min(), xticks[0].max())
-    y_01 = lsu.minmaxscale(y,0,1, yticks[0].min(), yticks[0].max())
-    x_lines_01 = lsu.minmaxscale(x_lines,0,1, xticks[0].min(), xticks[0].max())
+    x_01 = lsu.minmaxscale(x,xdeadzone,1, x.min(), x.max())
+    y_01 = lsu.minmaxscale(y,0,1, y.min(), y.max())
+    x_lines_01 = lsu.minmaxscale(x_lines,0,1, x.min(), x.max())
     y_lines_01_0 = lsu.minmaxscale(y_lines_0,0,1,y.min(),y.max())
     y_lines_01_1 = lsu.minmaxscale(y_lines_1,0,1,y.min(),y.max())
     x_prep = x_01
@@ -361,15 +359,19 @@ def plot_projection():
     axs[2].scatter(x_prep, y_prep)
     axs[2].plot(x_lines, x_lines*y_lines_01_0, c="C0")
     axs[2].plot(x_lines, x_lines*y_lines_01_1, c="C0")
-    axs[0].set_xlim(0,1)
-    axs[0].set_aspect(0.5)
+    # axs[0].set_xlim(0,1)
+    axs[0].set_aspect(.5)
     
-    for i, num in enumerate("abc"):
-        axs[i].annotate(f"({num})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
-    for ax in axs[1:]:
-        ax.set_xlim(*xlims)
-        ax.set_ylim(*ylims)
-        ax.set_xticks(*xticks)
+    for i, ax in enumerate(axs):
+        axs[i].annotate(f"({'abc'[i]})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+        if i > 0:
+            ax.set_xlim(*xlims)
+            ax.set_ylim(*ylims)
+            ax.set_xticks(*xticks)
+        else:
+            ax.set_xlabel(r"$x^\mathrm{(C)}$")
+            ax.set_ylabel(r"$y^\mathrm{(C)}$")
+    fig.subplots_adjust(wspace=-0.2)
     fig.tight_layout()
     figs.append(fig)
 
@@ -377,8 +379,8 @@ def plot_projection():
     r_min, th_min = lsu.cart2polar(1, 0)
     r_max, th_max = lsu.cart2polar(1, 1)    
     r, th = lsu.cart2polar(x_prep, y_prep)
-    r_l0_1, th_l0_1 = lsu.cart2polar(x_lines, x_lines*y_lines_01_0)
-    r_l1_1, th_l1_1 = lsu.cart2polar(x_lines, x_lines*y_lines_01_1)
+    r_l0_1, th_l0_1 = lsu.cart2polar(x_lines_01, x_lines_01*y_lines_01_0)
+    r_l1_1, th_l1_1 = lsu.cart2polar(x_lines_01, x_lines_01*y_lines_01_1)
     th_thproj1 = lsu.minmaxscale(th, theta-panelsize/2, theta+panelsize/2, th_min, th_max)
     th_l0_2 = lsu.minmaxscale(th_l0_1, theta-panelsize/2, theta+panelsize/2, th_min, th_max)
     th_l1_2 = lsu.minmaxscale(th_l1_1, theta-panelsize/2, theta+panelsize/2, th_min, th_max)
@@ -402,20 +404,26 @@ def plot_projection():
     axs[2].plot(x_l0_2[x_lines_01<rlims.max()], y_l0_2[x_lines_01<rlims.max()] , c="C0")
     axs[2].plot(x_l1_2[x_lines_01<rlims.max()], y_l1_2[x_lines_01<rlims.max()] , c="C0")
 
-    for axp in [axp1, axp2]:
+    for i, axp in enumerate([axp1, axp2]):
         # axp.set_xticks(np.linspace(np.pi/4, 7*np.pi/4, 4), [r"$\frac{" + str(int(i)) + r"\pi}{4}$" for i in range(1,8,2)])
         axp.set_xlim(*thlims)
         axp.set_xticks(*thticks)
         axp.set_ylim(*rlims)
         axp.set_yticks(*rticks)
-    for ax in axs:
+        if i == 1:
+            axp.set_xticks(thticks[0], [thticks[1][0], r"$\theta^\mathrm{(LS)}$", thticks[1][2]])
+            
+
+    for i, ax in enumerate(axs):
         ax.set_xticks(xlims.round(0))
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
-    for i, num in enumerate("abc"):
-        axs[i].annotate(f"({num})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+        ax.set_xlabel(r"$x^\mathrm{(LS)}$")
+        ax.set_ylabel(r"$y^\mathrm{(LS)}$")
+        ax.annotate(f"({'abc'[i]})", xy=(1.0,1.0), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
 
+    fig.subplots_adjust(wspace=-0.5)
     fig.tight_layout()
     figs.append(fig)
     
@@ -423,40 +431,51 @@ def plot_projection():
     #projection = y
     #compute different steps
     x_yproj1 = x_prep
-    y_yproj1 = y_prep * np.max(x_prep * np.tan(panelsize))
+    y_slice     = x_yproj1 * np.tan(panelsize)
+    y_slice_ub  = max(np.max(y_slice), 1 * np.tan(panelsize))
+    y_yproj1 = y_prep * y_slice_ub
     x_yproj2 = x_prep
-    y_yproj2 = y_prep * np.max(x_prep * np.tan(panelsize)) - (x_prep * np.tan(panelsize))/2
+    y_yproj2 = y_yproj1 - y_slice/2
     r, th = lsu.cart2polar(x_yproj2, y_yproj2)
     x_yproj3, y_yproj3 = lsu.polar2cart(r, th+theta + np.pi)
-    r_l0_yproj, th_l0_yproj = lsu.cart2polar(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_0 - 0.5))
-    r_l1_yproj, th_l1_yproj = lsu.cart2polar(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_1 - 0.5))
+    r_l0_yproj, th_l0_yproj = lsu.cart2polar(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_0 - 0.5))
+    r_l1_yproj, th_l1_yproj = lsu.cart2polar(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_1 - 0.5))
     x_l0_yproj, y_l0_yproj = lsu.polar2cart(r_l0_yproj, th_l0_yproj+theta + np.pi)
     x_l1_yproj, y_l1_yproj = lsu.polar2cart(r_l1_yproj, th_l1_yproj+theta + np.pi)
 
     fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
     axs[0].scatter(x_yproj1, y_yproj1)
-    axs[0].plot(x_lines, x_lines*np.tan(panelsize)*y_lines_01_0, c="C0")
-    axs[0].plot(x_lines, x_lines*np.tan(panelsize)*y_lines_01_1, c="C0")
+    axs[0].plot(x_lines_01, x_lines_01*np.tan(panelsize)*y_lines_01_0, c="C0")
+    axs[0].plot(x_lines_01, x_lines_01*np.tan(panelsize)*y_lines_01_1, c="C0")
     axs[1].scatter(x_yproj2, y_yproj2)
-    axs[1].plot(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_0 - 0.5) , c="C0")
-    axs[1].plot(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_1 - 0.5) , c="C0")
+    axs[1].plot(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_0 - 0.5) , c="C0")
+    axs[1].plot(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_1 - 0.5) , c="C0")
     axs[2].scatter(x_yproj3, y_yproj3)
-    axs[2].plot(x_l0_yproj[r_l0_yproj<1.5], y_l0_yproj[r_l0_yproj<1.5] , c="C0")
-    axs[2].plot(x_l1_yproj[r_l1_yproj<1.5], y_l1_yproj[r_l1_yproj<1.5] , c="C0")
+    axs[2].plot(x_l0_yproj[r_l0_yproj<rlims[1]], y_l0_yproj[r_l0_yproj<rlims[1]] , c="C0")
+    axs[2].plot(x_l1_yproj[r_l1_yproj<rlims[1]], y_l1_yproj[r_l1_yproj<rlims[1]] , c="C0")
+    # axs[0].annotate(r"$\Delta y^\mathrm{(C)}$", xy=(0.,0.), xytext=(0.3,0.9), color="k", va="center", ha="center")
+    axs[0].annotate(r"$\dots\Delta y^\mathrm{(C)}$", xy=(-0.05,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor="navy", color="navy"), va="center", ha="left", color="navy")
+    axs[0].annotate(r"", xy=(1.0,0.0-0.05), xytext=(1.0,0.5-0.05), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor="navy", color="navy"))
+    # axs[0].annotate(r"", xy=(1.1,0.23), xytext=(1.2,0.23), arrowprops=dict(arrowstyle="-[, widthB=0.8, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1), xycoords="axes fraction")
+    # axs[0].annotate(r"$\Delta y^\mathrm{(C)}$", xy=(1.0,0.23), xytext=(1.2,0.23), xycoords="axes fraction", ha="left", va="center")
 
-    for ax in axs:
+    for i, ax in enumerate(axs):
         ax.set_xticks(xlims.round(0))
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
-    for i, num in enumerate("abc"):
-        axs[i].annotate(f"({num})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+        ax.annotate(f"({'abc'[i]})", xy=(1.0,1.0), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+
+        if i == 2:
+            ax.set_xlabel(r"$x^\mathrm{(LS)}$")
+            ax.set_ylabel(r"$y^\mathrm{(LS)}$")
 
     axs[0].set_xticks(*xticks)
     axs[1].set_xticks(*xticks)
     axs[1].set_ylim(-0.5, 0.5)
     axs[1].set_yticks([-0.5, 0.0, 0.5])
+    fig.subplots_adjust(wspace=-0.5)
     fig.tight_layout()
     figs.append(fig)
 
