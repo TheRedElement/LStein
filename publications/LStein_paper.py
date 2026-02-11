@@ -313,105 +313,213 @@ def plot_graphical_abstract(LSCs):
     return
 
 def plot_projection():
-        thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{(LS)}_{\min}$", "", r"$\theta^\mathrm{(LS)}_{\max}$"])
-        xticks=(np.linspace(3,30,3), [r"$x^\mathrm{(LS)}_{\min}$", "", r"$x^\mathrm{(LS)}_{\max}$"])
-        yticks=(np.linspace(-1.0,1.0,3), [r"$y^\mathrm{(LS)}_{\min}$", "", r"$y^\mathrm{(LS)}_{\max}$"])
-        thetaguidelims = (2*np.pi/2,np.pi/2)
-        thetaguidelims = (0*np.pi/2,1*np.pi/2)
-        panelsize = np.pi/12
 
-        theta = thetaticks[0]
-        x = np.array([7, 15, 28])
-        y = np.array([-0.5, 0.1, 0.7])
+    figs = []
 
-        LSC = lstein.LSteinCanvas(
-            thetaticks, xticks, yticks,
-            # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
-            thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/1,thetaguidelims[1]-panelsize/1),                    
-            thetalabel=r"$\theta^\mathrm{(LS)}$", thetalabelkwargs=dict(xytext=(0.05,0.05)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
-            xlabel=r"$x^\mathrm{(LS)}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-2,-1.3)),
-            ylabel=r"$y^\mathrm{(LS)}$",
-            xlimdeadzone=0.4,
+    #global layout
+    xlims = np.array([-0.05,1.05])
+    ylims = np.array([-0.05,1.05])
+    xticks = [np.array([0,0.3,1]),[0,r"$x^\mathrm{(LS)}_\mathrm{DZ}$",1]]
+    yticks = (np.array([-1,1]),[r"$y_{\min}$", r"$y_{\max}$"])
+    rlims = np.array([0,1.1])
+    rticks = ([0,0.3,1],["0",r"$x^\mathrm{(LS)}_\mathrm{DZ}$","1"])
+    thlims = np.array([-0.05, np.pi/2])
+    thticks = [[0, np.pi/4, np.pi/2], [r"$0$", r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]]
+
+    #input
+    # xticks = (np.array([0,1]),[r"$x_{\min}$", r"$x_{\max}$"])
+    # yticks = (np.array([-1,1]),[r"$y_{\min}$", r"$y_{\max}$"])
+    xdeadzone = 0.3
+    panelsize = np.pi/8
+    theta = 1*np.pi/4
+    
+    #sine wave for illustration
+    x = np.linspace(0,1,50)
+    y = np.sin(x * 10)
+    x_lines = np.linspace(0,2,5)
+    y_lines_0 = -np.ones_like(x_lines)
+    y_lines_1 = np.ones_like(x_lines)
+    
+    #preprocessing
+    x_01 = lsu.minmaxscale(x,xdeadzone,1, xticks[0].min(), xticks[0].max())
+    y_01 = lsu.minmaxscale(y,0,1, yticks[0].min(), yticks[0].max())
+    x_lines_01 = lsu.minmaxscale(x_lines,0,1, xticks[0].min(), xticks[0].max())
+    y_lines_01_0 = lsu.minmaxscale(y_lines_0,0,1,y.min(),y.max())
+    y_lines_01_1 = lsu.minmaxscale(y_lines_1,0,1,y.min(),y.max())
+    x_prep = x_01
+    y_prep = y_01 * x_01
+    
+    fig, axs = plt.subplots(1,3, subplot_kw=dict(aspect="equal"))
+    axs = axs.flatten()
+    axs[0].scatter(x, y)
+    axs[0].plot(x_lines, y_lines_0, c="C0")
+    axs[0].plot(x_lines, y_lines_1, c="C0")
+    axs[1].scatter(x_01, y_01)
+    axs[1].plot(x_lines_01, y_lines_01_0, c="C0")
+    axs[1].plot(x_lines_01, y_lines_01_1, c="C0")
+    axs[2].scatter(x_prep, y_prep)
+    axs[2].plot(x_lines, x_lines*y_lines_01_0, c="C0")
+    axs[2].plot(x_lines, x_lines*y_lines_01_1, c="C0")
+    axs[0].set_xlim(0,1)
+    axs[0].set_aspect(0.5)
+    
+    for ax in axs[1:]:
+        ax.set_xlim(*xlims)
+        ax.set_ylim(*ylims)
+        ax.set_xticks(*xticks)
+    fig.tight_layout()
+    figs.append(fig)
+
+    #projection = theta
+    r_min, th_min = lsu.cart2polar(1, 0)
+    r_max, th_max = lsu.cart2polar(1, 1)    
+    r, th = lsu.cart2polar(x_prep, y_prep)
+    r_l0_1, th_l0_1 = lsu.cart2polar(x_lines, x_lines*y_lines_01_0)
+    r_l1_1, th_l1_1 = lsu.cart2polar(x_lines, x_lines*y_lines_01_1)
+    th_thproj1 = lsu.minmaxscale(th, theta-panelsize/2, theta+panelsize/2, th_min, th_max)
+    th_l0_2 = lsu.minmaxscale(th_l0_1, theta-panelsize/2, theta+panelsize/2, th_min, th_max)
+    th_l1_2 = lsu.minmaxscale(th_l1_1, theta-panelsize/2, theta+panelsize/2, th_min, th_max)
+    x_thproj1, y_thproj1 = lsu.polar2cart(x_prep, th_thproj1)
+    x_l0_2, y_l0_2 = lsu.polar2cart(x_lines_01, th_l0_2)
+    x_l1_2, y_l1_2 = lsu.polar2cart(x_lines_01, th_l1_2)
+    
+    fig, axs = plt.subplots(1,3, subplot_kw=dict(aspect="equal"))
+    axs = axs.flatten()
+    axs[0].set_axis_off()   #replace with polar axis
+    axs[1].set_axis_off()   #replace with polar axis
+    axp1 = fig.add_subplot(1,3,1, projection="polar")
+    axp2 = fig.add_subplot(1,3,2, projection="polar")
+    axp1.scatter(th+np.pi, x_prep)
+    axp1.plot((th_l0_1+np.pi)[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
+    axp1.plot((th_l1_1+np.pi)[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
+    axp2.scatter(th_thproj1, x_prep)
+    axp2.plot(th_l0_2[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
+    axp2.plot(th_l1_2[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
+    axs[2].scatter(x_thproj1, y_thproj1)
+    axs[2].plot(x_l0_2[x_lines_01<rlims.max()], y_l0_2[x_lines_01<rlims.max()] , c="C0")
+    axs[2].plot(x_l1_2[x_lines_01<rlims.max()], y_l1_2[x_lines_01<rlims.max()] , c="C0")
+
+    for axp in [axp1, axp2]:
+        # axp.set_xticks(np.linspace(np.pi/4, 7*np.pi/4, 4), [r"$\frac{" + str(int(i)) + r"\pi}{4}$" for i in range(1,8,2)])
+        axp.set_xlim(*thlims)
+        axp.set_xticks(*thticks)
+        axp.set_ylim(*rlims)
+        axp.set_yticks(*rticks)
+    for ax in axs:
+        ax.set_xticks(xlims.round(0))
+        ax.set_yticks(ylims.round(0))
+        ax.set_xlim(*xlims)
+        ax.set_ylim(*ylims)
+    fig.tight_layout()
+    figs.append(fig)
+    
+
+    #projection = y
+    #compute different steps
+    x_yproj1 = x_prep
+    y_yproj1 = y_prep * np.max(x_prep * np.tan(panelsize))
+    x_yproj2 = x_prep
+    y_yproj2 = y_prep * np.max(x_prep * np.tan(panelsize)) - (x_prep * np.tan(panelsize))/2
+    r, th = lsu.cart2polar(x_yproj2, y_yproj2)
+    x_yproj3, y_yproj3 = lsu.polar2cart(r, th+theta + np.pi)
+    r_l0_yproj, th_l0_yproj = lsu.cart2polar(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_0 - 0.5))
+    r_l1_yproj, th_l1_yproj = lsu.cart2polar(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_1 - 0.5))
+    x_l0_yproj, y_l0_yproj = lsu.polar2cart(r_l0_yproj, th_l0_yproj+theta + np.pi)
+    x_l1_yproj, y_l1_yproj = lsu.polar2cart(r_l1_yproj, th_l1_yproj+theta + np.pi)
+
+    fig, axs = plt.subplots(1,3, subplot_kw=dict(aspect="equal"))
+    axs = axs.flatten()
+    axs[0].scatter(x_yproj1, y_yproj1)
+    axs[0].plot(x_lines, x_lines*np.tan(panelsize)*y_lines_01_0, c="C0")
+    axs[0].plot(x_lines, x_lines*np.tan(panelsize)*y_lines_01_1, c="C0")
+    axs[1].scatter(x_yproj2, y_yproj2)
+    axs[1].plot(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_0 - 0.5) , c="C0")
+    axs[1].plot(x_lines, x_lines*np.tan(panelsize) * (y_lines_01_1 - 0.5) , c="C0")
+    axs[2].scatter(x_yproj3, y_yproj3)
+    axs[2].plot(x_l0_yproj[r_l0_yproj<1.5], y_l0_yproj[r_l0_yproj<1.5] , c="C0")
+    axs[2].plot(x_l1_yproj[r_l1_yproj<1.5], y_l1_yproj[r_l1_yproj<1.5] , c="C0")
+
+    for ax in axs:
+        ax.set_xticks(xlims.round(0))
+        ax.set_yticks(ylims.round(0))
+        ax.set_xlim(*xlims)
+        ax.set_ylim(*ylims)
+    axs[0].set_xticks(*xticks)
+    axs[1].set_xticks(*xticks)
+    axs[1].set_ylim(-0.5, 0.5)
+    axs[1].set_yticks([-0.5, 0.0, 0.5])
+    fig.tight_layout()
+    figs.append(fig)
+
+    if SAVE:
+        for idx, fig in enumerate(figs):
+            fig.savefig(f"../report/gfx/projection_{['prep','theta','y'][idx]}.pdf")
+    return
+
+def plot_variables():
+    thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{(LS)}_{\min}$", "", r"$\theta^\mathrm{(LS)}_{\max}$"])
+    xticks=(np.linspace(3,30,3), [r"$x^\mathrm{(LS)}_{\min}$", "", r"$x^\mathrm{(LS)}_{\max}$"])
+    yticks=(np.linspace(-1.0,1.0,3), [r"$y^\mathrm{(LS)}_{\min}$", "", r"$y^\mathrm{(LS)}_{\max}$"])
+    thetaguidelims = (0*np.pi/2,1*np.pi/2)
+    panelsize = np.pi/12
+
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
+        thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/1,thetaguidelims[1]-panelsize/1),                    
+        thetalabel=r"$\theta^\mathrm{(LS)}$", thetalabelkwargs=dict(xytext=(0.05,0.05)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
+        xlabel=r"$x^\mathrm{(LS)}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-2,-1.3)),
+        ylabel=r"$y^\mathrm{(LS)}$",
+        xlimdeadzone=0.4,
+    )
+    for i, th in enumerate(thetaticks[0]):
+        if i == 0:
+            panelboundskwargs = dict(c="#c80000", ls="-")
+            yticks_use = yticks
+            y_projection_method = "theta"
+        else:
+            panelboundskwargs = dict()
+            yticks_use=(yticks[0], [""]*len(yticks[0]))
+            y_projection_method = "y"
+        
+        LSP = LSC.add_panel(th,
+            yticks=yticks_use,
+            show_panelbounds=True,
+            show_yticks=True,
+            panelboundskwargs=panelboundskwargs,
+            yticklabelkwargs=dict(xytext=(0.0, 0.4), textcoords="offset fontsize"),
+            y_projection_method=y_projection_method,
         )
-        for i, th in enumerate(thetaticks[0]):
-            if i == 0:
-                panelboundskwargs = dict(c="#c80000", ls="-")
-                yticks_use = yticks
-                y_projection_method = "theta"
-            elif i == 1:
-                panelboundskwargs = dict(c="#c80000", ls="-")
-                yticks_use=(yticks[0], [""]*len(yticks[0]))
-                y_projection_method = "y"
-            else:
-                panelboundskwargs = dict(ls="--")
-                yticks_use=(yticks[0], [""]*len(yticks[0]))
-                y_projection_method = "y"
+
+    fig, axs = plt.subplots(1,1, figsize=(5,5))
+    lstein.LSteinMPL(LSC).show(axs)
+    
+    # axs[1].set_ylim(axs[1].get_ylim()[0]-0.2, None)
+    
+    arrowstyle = "-|>,head_width=.15"
+    x_dz = 0.4
+    th_panelsize = np.linspace(0, panelsize+np.pi/20, 10) + np.pi/70
+    c = "navy"
+    x_ps = x_dz * np.cos(th_panelsize)
+    y_ps = x_dz * np.sin(th_panelsize)
+    axs.plot(x_ps[2:-2], y_ps[2:-2], c=c)
+    axs.annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
+    axs.annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
+    axs.annotate(r"$\dots\Delta \theta^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
+    # axs.annotate(r"$\theta^\mathrm{(LS)}_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
+    # axs.annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
+    # axs.annotate(r"$\theta^\mathrm{(LS)}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
+    # axs.annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
+    axs.annotate(r"$x^\mathrm{(LS)}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="k", va="center", ha="center")
+    axs.annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2.3, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1))
+    # axs.annotate(r"(a)", xy=(0.85, 0.12), xytext=(0.85, 0.12))
+    # axs.annotate(r"(b)", xy=(0.65, 0.55), xytext=(0.65, 0.55))
             
-            LSP = LSC.add_panel(th,
-                yticks=yticks_use,
-                show_panelbounds=True,
-                show_yticks=True,
-                panelboundskwargs=panelboundskwargs,
-                yticklabelkwargs=dict(xytext=(0.0, 0.4), textcoords="offset fontsize"),
-                y_projection_method=y_projection_method,
-            )
+    fig.tight_layout()
+    
+    if SAVE: fig.savefig(f"../report/gfx/lstein_variables.pdf")
 
-            if i < 2:
-                for i in range(len(x)):
-                    LSP.plot(x[i], y[i], seriestype="scatter", marker=markers[i], c=colors[i])
-
-        fig, axs = plt.subplots(1,2, figsize=(9,5), width_ratios=[1/3, 2/3])
-        for i in range(len(x)):
-            axs[0].scatter(x[i], y[i], marker=markers[i], color=colors[i])
-        lstein.LSteinMPL(LSC).show(axs[1])
-        
-        axs[0].spines["top"].set_visible(True)
-        axs[0].spines[["top","bottom"]].set_color("#c80000")
-        axs[0].spines[["top","bottom"]].set_linewidth(2)
-        axs[0].set_xlabel(r"$x^\mathrm{(C)}$")
-        axs[0].set_ylabel(r"$y^\mathrm{(C)}$")
-        axs[0].set_xticks(xticks[0], labels=[r"$x^\mathrm{(C)}_{\min}$", "", r"$x^\mathrm{(C)}_{\max}$"])
-        axs[0].set_xlim(0.95*xticks[0].min(), 1.05*xticks[0].max())
-        axs[0].set_yticks(yticks[0], labels=[r"$y^\mathrm{(C)}_{\min}$", "", r"$y^\mathrm{(C)}_{\max}$"])
-        axs[0].set_ylim(1.05*yticks[0].min(), 1.05*yticks[0].max())
-        
-        """ #inverted
-        axs[1].set_ylim(axs[1].get_ylim()[0]-1, None)
-        # axs[1].annotate(r"$\theta_{\max, C}$", xy=(0,6), xytext=(0,4), va="top")
-        axs[1].annotate(r"$\theta_{\max, C}$", xy=(0,6), xytext=(1,3), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
-        # axs[1].annotate(r"$\theta_{\min, C}$", xy=(0,0), xytext=(-1,1.5), va="top")
-        axs[1].annotate(r"$\theta_{\min, C}$", xy=(-6,0), xytext=(1,0), arrowprops=dict(arrowstyle="-|>,head_width=.15", facecolor="black", shrinkA=0.1))
-        axs[1].annotate(r"$x_\mathrm{DZ}$", xy=(0,-0.5), xytext=(-3,-1.5), color="gray", va="center", ha="center")
-        axs[1].annotate(r"", xy=(-3,-0.5), xytext=(-3,-1), arrowprops=dict(arrowstyle="-[, widthB=1.5, lengthB=0.3", facecolor="gray", color="gray", shrinkA=0.1))
-         """
-        
-        axs[1].set_ylim(axs[1].get_ylim()[0]-0.2, None)
-        
-        arrowstyle = "-|>,head_width=.15"
-        x_dz = 0.4
-        th_panelsize = np.linspace(0, panelsize+np.pi/20, 10) + np.pi/70
-        c = "navy"
-        x_ps = x_dz * np.cos(th_panelsize)
-        y_ps = x_dz * np.sin(th_panelsize)
-        axs[1].plot(x_ps[2:-2], y_ps[2:-2], c=c)
-        axs[1].annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
-        axs[1].annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
-        axs[1].annotate(r"$\dots\Delta \theta^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
-
-        axs[1].annotate(r"$\theta^\mathrm{(LS)}_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
-        axs[1].annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
-        axs[1].annotate(r"$\theta^\mathrm{(LS)}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
-        axs[1].annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
-        axs[1].annotate(r"$x^\mathrm{(LS)}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="mediumorchid", va="center", ha="center")
-        axs[1].annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2, lengthB=0.4", facecolor="mediumorchid", color="mediumorchid", shrinkA=0.1))
-        axs[1].annotate(r"(a)", xy=(0.85, 0.12), xytext=(0.85, 0.12))
-        axs[1].annotate(r"(b)", xy=(0.65, 0.55), xytext=(0.65, 0.55))
-                
-        fig.tight_layout()
-        
-        if SAVE: fig.savefig(f"../report/gfx/projection.pdf")
-
-        return
+    return
 
 def plot_scatter_onepanel():
     ax = pp.plot_scatter_onepanel(
@@ -1490,6 +1598,7 @@ def main():
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
     plot_projection()
+    # plot_variables()
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
