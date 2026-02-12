@@ -318,7 +318,7 @@ def plot_projection():
 
     #global layout
     c = "C1"
-    c_arrow = "orangered"
+    c_arrow = "black"
     ms = 5
     arrowstyle = "-|>,head_width=.15"
     figsize = (9,4)
@@ -414,7 +414,7 @@ def plot_projection():
     axp2.annotate("", xy=(th_ps[0], r_ps[0]), xytext=(th_ps[1], r_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
     axp2.annotate("", xy=(th_ps[-1], r_ps[-1]), xytext=(th_ps[-2], r_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
     axp2.annotate(r"$\dots\Delta \theta^\mathrm{LS'}$",
-        xy=(0.0,0.85), xytext=(0.35,0.85),
+        xy=(0.05,0.85), xytext=(0.4,0.85),
         arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
         va="center", ha="left", color=c_arrow, xycoords="axes fraction"
     )
@@ -470,7 +470,7 @@ def plot_projection():
     axs[2].plot(x_l0_yproj[r_l0_yproj<rlims[1]], y_l0_yproj[r_l0_yproj<rlims[1]] , c="C0")
     axs[2].plot(x_l1_yproj[r_l1_yproj<rlims[1]], y_l1_yproj[r_l1_yproj<rlims[1]] , c="C0")
     # axs[0].annotate(r"$\Delta y^\mathrm{C}$", xy=(0.,0.), xytext=(0.3,0.9), color="k", va="center", ha="center")
-    axs[0].annotate(r"$\dots\Delta y^\mathrm{C}$", xy=(-0.05,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow), va="center", ha="left", color=c_arrow)
+    axs[0].annotate(r"$\dots\Delta y^\mathrm{C}$", xy=(0.01,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow), va="center", ha="left", color=c_arrow)
     axs[0].annotate(r"", xy=(1.0,0.0-0.05), xytext=(1.0,0.5-0.05), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow))
     # axs[0].annotate(r"", xy=(1.1,0.23), xytext=(1.2,0.23), arrowprops=dict(arrowstyle="-[, widthB=0.8, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1), xycoords="axes fraction")
     # axs[0].annotate(r"$\Delta y^\mathrm{C}$", xy=(1.0,0.23), xytext=(1.2,0.23), xycoords="axes fraction", ha="left", va="center")
@@ -1671,8 +1671,8 @@ def main():
     # LSCa = plot_lstein_snii(gp=gp)
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
-    # plot_projection()
-    plot_variables()
+    plot_projection()
+    # plot_variables()
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
