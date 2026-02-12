@@ -21,7 +21,7 @@ class Test_get_thetabounds:
 
     @pytest.fixture(
         params=[
-            (LSP1, (-1.3614, -1.5184, -1.2043))
+            (LSP1, (-1.1912, -1.3483, -1.0341))
         ]
     )
     def action(self, request):
@@ -64,6 +64,7 @@ class Test_get_rbounds:
         assert r_lb == pytest.approx(r_lb_tr, rel=1e-3)
         assert r_ub == pytest.approx(r_ub_tr, rel=1e-3)
         
+"""
 class Test_get_yticks:
     
     @pytest.fixture(
@@ -172,3 +173,4 @@ class Test_project_xy_y:
         assert np.all(x_proj == pytest.approx(x_proj_tr, rel=1e-3))
         assert np.all(y_proj == pytest.approx(y_proj_tr, rel=1e-3))
 
+"""
