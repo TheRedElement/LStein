@@ -301,7 +301,7 @@ def plot_graphical_abstract(LSCs):
 
     fig = plt.figure(figsize=(16,9))
     axs = [
-        fig.add_axes([0.0,0.0,0.55,1.0]),
+        fig.add_axes([0.0,0.0,0.54,1.0]),
         fig.add_axes([0.55,0.0,0.45,1.0]),
     ]
     for (ax, LSC) in zip(axs, LSCs):
@@ -1668,10 +1668,10 @@ def main():
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    # LSCa = plot_lstein_snii(gp=gp)
-    # LSCb = plot_lstein_tde(gp=True)
-    # plot_graphical_abstract([LSCa,LSCb])
-    plot_projection()
+    LSCa = plot_lstein_snii(gp=gp)
+    LSCb = plot_lstein_tde(gp=True)
+    plot_graphical_abstract([LSCa,LSCb])
+    # plot_projection()
     # plot_variables()
 
     # plot_projection_methods(context="theta")
