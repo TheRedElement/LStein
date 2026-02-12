@@ -317,20 +317,21 @@ def plot_projection():
     figs = []
 
     #global layout
+    arrowstyle = "-|>,head_width=.15"
     figsize = (7,3)
     xlims = np.array([-0.05,1.05])
     ylims = np.array([-0.05,1.05])
-    xticks = [np.array([0,0.3,1]),[r"$0$",r"$x^\mathrm{(LS)}_\mathrm{DZ}$",r"$1$"]]
+    xticks = [np.array([0,0.3,1]),[r"$0$",r"$x^\mathrm{(LS')}_\mathrm{DZ}$",r"$1$"]]
     yticks = (np.array([-1,1]),[r"$y_{\min}$", r"$y_{\max}$"])
     rlims = np.array([0,1.1])
-    rticks = ([0,0.3,1],["$0$",r"$x^\mathrm{(LS)}_\mathrm{DZ}$","$1$"])
+    rticks = ([0,0.3,1],["$0$",r"$x^\mathrm{(LS')}_\mathrm{DZ}$","$1$"])
     thlims = np.array([-0.05, np.pi/2])
     thticks = [[0, np.pi/4, np.pi/2], [r"$0$", r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]]
 
     #input
     xdeadzone = 0.3
     panelsize = np.pi/8
-    theta = 1*np.pi/4
+    theta = 1*np.pi/8
     
     #sine wave for illustration
     x = np.linspace(0,2,70)
@@ -388,7 +389,7 @@ def plot_projection():
     x_l0_2, y_l0_2 = lsu.polar2cart(x_lines_01, th_l0_2)
     x_l1_2, y_l1_2 = lsu.polar2cart(x_lines_01, th_l1_2)
     
-    fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
+    fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"), width_ratios=[1/3.7,1/3.7,1/2.8])
     axs = axs.flatten()
     axs[0].set_axis_off()   #replace with polar axis
     axs[1].set_axis_off()   #replace with polar axis
@@ -404,6 +405,18 @@ def plot_projection():
     axs[2].plot(x_l0_2[x_lines_01<rlims.max()], y_l0_2[x_lines_01<rlims.max()] , c="C0")
     axs[2].plot(x_l1_2[x_lines_01<rlims.max()], y_l1_2[x_lines_01<rlims.max()] , c="C0")
 
+    r_ps = np.ones(20)*1
+    th_ps = np.linspace(theta-panelsize/2, theta+panelsize/2,20)
+    axp2.plot(th_ps[2:-2], r_ps[2:-2], c="navy")
+    axp2.annotate("", xy=(th_ps[0], r_ps[0]), xytext=(th_ps[1], r_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor="navy", color="navy"))
+    axp2.annotate("", xy=(th_ps[-1], r_ps[-1]), xytext=(th_ps[-2], r_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor="navy", color="navy"))
+    axp2.annotate(r"$\dots\Delta \theta^\mathrm{(LS')}$",
+        xy=(0.0,0.85), xytext=(0.35,0.85),
+        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor="navy", color="navy"),
+        va="center", ha="left", color="navy", xycoords="axes fraction"
+    )
+    axp2.annotate(r"$\theta^\mathrm{(LS')}$", xy=(theta, 1.1))
+
     for i, axp in enumerate([axp1, axp2]):
         # axp.set_xticks(np.linspace(np.pi/4, 7*np.pi/4, 4), [r"$\frac{" + str(int(i)) + r"\pi}{4}$" for i in range(1,8,2)])
         axp.set_xlim(*thlims)
@@ -411,7 +424,7 @@ def plot_projection():
         axp.set_ylim(*rlims)
         axp.set_yticks(*rticks)
         if i == 1:
-            axp.set_xticks(thticks[0], [thticks[1][0], r"$\theta^\mathrm{(LS)}$", thticks[1][2]])
+            axp.set_xticks((thticks[0][0],thticks[0][2]), (thticks[1][0],thticks[1][2]))
             
 
     for i, ax in enumerate(axs):
@@ -419,15 +432,14 @@ def plot_projection():
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
-        ax.set_xlabel(r"$x^\mathrm{(LS)}$")
-        ax.set_ylabel(r"$y^\mathrm{(LS)}$")
-        ax.annotate(f"({'abc'[i]})", xy=(1.0,1.0), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+        ax.set_xlabel(r"$x^\mathrm{(LS')}$")
+        ax.set_ylabel(r"$y^\mathrm{(LS')}$")
+        ax.annotate(f"({'abc'[i]})", xy=(1.1,1.1), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
 
     fig.subplots_adjust(wspace=-0.5)
     fig.tight_layout()
     figs.append(fig)
     
-
     #projection = y
     #compute different steps
     x_yproj1 = x_prep
@@ -468,8 +480,8 @@ def plot_projection():
         ax.annotate(f"({'abc'[i]})", xy=(1.0,1.0), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
 
         if i == 2:
-            ax.set_xlabel(r"$x^\mathrm{(LS)}$")
-            ax.set_ylabel(r"$y^\mathrm{(LS)}$")
+            ax.set_xlabel(r"$x^\mathrm{(LS')}$")
+            ax.set_ylabel(r"$y^\mathrm{(LS')}$")
 
     axs[0].set_xticks(*xticks)
     axs[1].set_xticks(*xticks)
