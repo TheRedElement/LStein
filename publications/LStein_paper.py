@@ -500,9 +500,12 @@ def plot_projection():
     return
 
 def plot_variables():
-    thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{LS}_{\min}$", "", r"$\theta^\mathrm{LS}_{\max}$"])
-    xticks=(np.linspace(0,2,3), [r"$x^\mathrm{LS}_{\min}$", "", r"$x^\mathrm{LS}_{\max}$"])
-    yticks=(np.linspace(-2.0,2.0,3), [r"$y^\mathrm{LS}_{\min}$", "", r"$y^\mathrm{LS}_{\max}$"])
+    # thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{LS}_{\min}$", r"$\theta^\mathrm{LS}$", r"$\theta^\mathrm{LS}_{\max}$"])
+    # xticks=(np.linspace(0,2,3), [r"$x^\mathrm{LS}_{\min}$", r"$x^\mathrm{LS}$", r"$x^\mathrm{LS}_{\max}$"])
+    # yticks=(np.linspace(-2.0,2.0,3), [r"$y^\mathrm{LS}_{\min}$", r"$y^\mathrm{LS}$", r"$y^\mathrm{LS}_{\max}$"])
+    thetaticks=(np.linspace(0,2,3), ["","",""])
+    xticks=(np.linspace(0,2,3), ["","",""])
+    yticks=(np.linspace(-2.0,2.0,3), ["","",""])
     thetaguidelims = (0*np.pi/2,1*np.pi/2)
     panelsize = np.pi/12
 
@@ -514,9 +517,9 @@ def plot_variables():
         thetaticks, xticks, yticks,
         # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
         thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+1*panelsize/1,thetaguidelims[1]-1*panelsize/1),                    
-        thetalabel=r"$\theta^\mathrm{LS}$", thetalabelkwargs=dict(xytext=(0.1,0.1)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
-        xlabel=r"$x^\mathrm{LS}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-4,-1.3)),
-        ylabel=r"$y^\mathrm{LS}$",
+        thetalabel=r"", thetalabelkwargs=dict(xytext=(0.1,0.1)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(-0.2,-0.1)),
+        xlabel=r"", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-4,-1.3)),
+        ylabel=r"",
         xlimdeadzone=0.4,
     )
     for i, th in enumerate(thetaticks[0]):
@@ -534,7 +537,7 @@ def plot_variables():
             show_panelbounds=True,
             show_yticks=True,
             panelboundskwargs=panelboundskwargs,
-            yticklabelkwargs=dict(xytext=(0.0, 0.4), textcoords="offset fontsize"),
+            yticklabelkwargs=dict(xytext=(0.0, 0.0), textcoords="offset fontsize"),
             y_projection_method=y_projection_method,
         )
         if i < 2:
@@ -560,10 +563,26 @@ def plot_variables():
     # axs.annotate(r"$\theta^\mathrm{LS}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
     # axs.annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
     axs.annotate(r"$x^\mathrm{LS}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="k", va="center", ha="center")
-    axs.annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2.3, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1))
+    axs.annotate(r"", xy=(0.2,-0.02), xytext=(0.2,-0.02-0.03), arrowprops=dict(arrowstyle="-[, widthB=2.2, lengthB=0.3", facecolor="k", color="k", shrinkA=0.1))
     axs.annotate(r"A", xy=(0.86, 0.34), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
     axs.annotate(r"B", xy=(0.58, 0.73), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
             
+    #customize ticks
+    xticklabs = [r"$x^\mathrm{LS}_{\min}$", r"$x^\mathrm{LS}$", r"$x^\mathrm{LS}_{\max}$"]
+    ha = ["left", "center", "right"]
+    for i, xi in enumerate(np.linspace(0.4,1,3)):
+        axs.annotate(xticklabs[i], xy=(xi,0), xytext=(xi,-0.06-(i==1)*0.005), va="center", ha=ha[i])
+    yticklabs = [r"$y^\mathrm{LS}_{\min}$", r"$y^\mathrm{LS}$", r"$y^\mathrm{LS}_{\max}$"]
+    xpos = [1.02,0.99,0.92]
+    ypos = [0.08,0.27,0.46]
+    for i in range(3):
+        axs.annotate(yticklabs[i], xy=(xpos[i],ypos[i]), xytext=(xpos[i],ypos[i]), va="center", ha="left")
+    thticklabs = [r"$\theta^\mathrm{LS}_{\min}$", r"$\theta^\mathrm{LS}$", r"$\theta^\mathrm{LS}_{\max}$"]
+    xpos = [0.35,0.26,0.17]
+    ypos = [0.08,0.17,0.27]
+    for i in range(3):
+        axs.annotate(thticklabs[i], xy=(xpos[i],ypos[i]), xytext=(xpos[i],ypos[i]), va="center", ha="right")
+        
     fig.tight_layout()
     
     if SAVE: fig.savefig(f"../report/gfx/lstein_variables.pdf")
