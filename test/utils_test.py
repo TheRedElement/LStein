@@ -7,7 +7,7 @@ from lstein import lstein
 from lstein import utils as lsu
 
 #%%tests
-class Test_carth2polar:
+class Test_cart2polar:
 
     @pytest.fixture(
         params=[
@@ -25,7 +25,7 @@ class Test_carth2polar:
         
         #act
         x, y, r, th  = request.param
-        pred = lsu.carth2polar(x, y)
+        pred = lsu.cart2polar(x, y)
 
         return pred, (r, th)
 
@@ -37,7 +37,7 @@ class Test_carth2polar:
         assert r== pytest.approx(r_tr, rel=1e-3)
         assert th == pytest.approx(th_tr, rel=1e-3)
 
-class Test_polar2carth:
+class Test_polar2cart:
 
     @pytest.fixture(
         params=[
@@ -55,7 +55,7 @@ class Test_polar2carth:
         
         #act
         r, th, x, y  = request.param
-        pred = lsu.polar2carth(r, th)
+        pred = lsu.polar2cart(r, th)
 
         return pred, (x, y)
 

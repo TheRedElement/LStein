@@ -33,6 +33,7 @@ dev = [
     "lustcodesnippets-py",
     "nbformat>=5.10.4",
     "polars>=1.32.3",
+    "pytest>=9.0.2",
 ]
 docs = [
     "myst-parser>=5.0.0",

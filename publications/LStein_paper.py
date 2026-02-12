@@ -561,8 +561,8 @@ def plot_variables():
     # axs.annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
     axs.annotate(r"$x^\mathrm{(LS)}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="k", va="center", ha="center")
     axs.annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2.3, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1))
-    # axs.annotate(r"(a)", xy=(0.85, 0.12), xytext=(0.85, 0.12))
-    # axs.annotate(r"(b)", xy=(0.65, 0.55), xytext=(0.65, 0.55))
+    axs.annotate(r"(a)", xy=(0.86, 0.34), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+    axs.annotate(r"(b)", xy=(0.58, 0.73), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
             
     fig.tight_layout()
     
@@ -1646,7 +1646,7 @@ def main():
     # LSCa = plot_lstein_snii(gp=gp)
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
-    plot_projection()
+    # plot_projection()
     plot_variables()
 
     # plot_projection_methods(context="theta")
