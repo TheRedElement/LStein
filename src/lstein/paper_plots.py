@@ -249,18 +249,20 @@ def plot_3dscatter(
     print(theta_raw)
 
     #ensure correct plotting order (so series furthest away is plotted on the bottom)
-    theta_raw = theta_raw[::-1]
-    x_raw = x_raw[::-1]
-    y_raw = y_raw[::-1]
-    colors = colors[::-1]
-    markers = markers[::-1]
-    linestyles = linestyles[::-1]
+    theta_raw = theta_raw
+    x_raw = x_raw
+    y_raw = y_raw
+    colors = colors
+    markers = markers
+    linestyles = linestyles
     
     #plot
     for i in range(len(theta_raw)):
         ax.plot(x_raw[i], np.ones_like(x_raw[i])*theta_raw[i], y_raw[i],
             # c=colors[i], marker=markers[i], ls=linestyles[i],
             c=colors[i], marker=markers[i], ls="-",
+            label=f"{pb_mappings[theta_raw[i]][0]} ({int(np.round(theta_raw[i], decimals=0))} nm)",
+            zorder=len(theta_raw)-i,
         )
 
     return ax

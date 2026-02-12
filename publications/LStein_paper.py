@@ -28,7 +28,7 @@ logging.basicConfig(
     format="%(name)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger("lstein")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 
 #setup plotting style
 _ = PlotStyles.tre_light()
@@ -39,7 +39,7 @@ prop_cycle = (
     cycler(linestyle=["-"]*len(color_cycle)) +
     cycler(color=color_cycle)
 )
-plt.rcParams["font.size"] = 20
+plt.rcParams["font.size"] = 22
 plt.rcParams["lines.markersize"] = 5
 plt.rcParams["legend.framealpha"] = 0.8
 plt.rcParams["legend.facecolor"] = "w"
@@ -125,17 +125,17 @@ def get_data(fidx:int, gp:bool=True,):
         df = pl.concat([pl.from_dict(raw), pl.from_dict(pro)])
         for t in df["period"].unique(): pb_mappings[t] = [np.round(t, 3)]
         legend = False
-        thetalab = "Maximum Amplitude"
-        xlab = "Time [d]"
-        ylab = "Amplitude []"
+        thetalab = r"Maximum Amplitude"
+        xlab = r"Time [d]"
+        ylab = r"Amplitude []"
     elif fname == "../data/sin_simulated.py":
         raw, pro = md.simulate(5, opt="sin", theta=np.linspace(10, 36, 3))
         df = pl.concat([pl.from_dict(raw), pl.from_dict(pro)])
         for t in df["period"].unique(): pb_mappings[t] = [np.round(t, 3)]
         legend = False
-        thetalab = "Period"
-        xlab = "Time"
-        ylab = "Amplitude"
+        thetalab = r"Period"
+        xlab = r"Time"
+        ylab = r"Amplitude"
     else:
         df = pl.read_csv(fname, comment_prefix="#")
         df = df.sort(pl.col(df.columns[1]))
@@ -143,9 +143,9 @@ def get_data(fidx:int, gp:bool=True,):
         # thetalab = "Wavelength [nm]"
         # xlab = "MJD-min(MJD) [d]" if "mjd" in df.columns else "Period [d]"
         # ylab = "m [mag]" if "mag" in df.columns else "Flux [FLUXCAL]"
-        thetalab = "Wavelength [nm]"
-        xlab = "Time [d]" if "mjd" in df.columns else "Period [d]"
-        ylab = "Flux [FLUXCAL]"
+        thetalab = r"Wavelength [nm]"
+        xlab = r"Time [d]" if "mjd" in df.columns else r"Period [d]"
+        ylab = r"Flux [FLUXCAL]"
 
     # df = df.drop_nans()
 
@@ -318,16 +318,16 @@ def plot_projection():
 
     #global layout
     c = "C1"
-    c_arrow = "purple"
+    c_arrow = "orangered"
     ms = 5
     arrowstyle = "-|>,head_width=.15"
-    figsize = (7,3)
+    figsize = (9,4)
     xlims = np.array([-0.05,1.05])
     ylims = np.array([-0.05,1.05])
-    xticks = [np.array([0,0.3,1]),[r"$0$",r"$x^\mathrm{(LS')}_\mathrm{DZ}$",r"$1$"]]
+    xticks = [np.array([0,0.3,1]),[r"$0$",r"$x^\mathrm{LS'}_\mathrm{DZ}$",r"$1$"]]
     yticks = (np.array([-1,1]),[r"$y_{\min}$", r"$y_{\max}$"])
     rlims = np.array([0,1.1])
-    rticks = ([0,0.3,1],["$0$",r"$x^\mathrm{(LS')}_\mathrm{DZ}$","$1$"])
+    rticks = ([0,0.3,1],["$0$",r"$x^\mathrm{LS'}_\mathrm{DZ}$","$1$"])
     thlims = np.array([-0.05, np.pi/2])
     thticks = [[0, np.pi/4, np.pi/2], [r"$0$", r"$\frac{\pi}{4}$", r"$\frac{\pi}{2}$"]]
 
@@ -367,14 +367,14 @@ def plot_projection():
     axs[0].set_aspect(.5)
     
     for i, ax in enumerate(axs):
-        axs[i].annotate(f"({'abc'[i]})", xy=(0.9,0.9), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+        axs[i].annotate(f"{'ABC'[i]}", xy=(0.95,0.95), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0.1", facecolor="w", linewidth=0), ha="center", va="center")
         if i > 0:
             ax.set_xlim(*xlims)
             ax.set_ylim(*ylims)
             ax.set_xticks(*xticks)
         else:
-            ax.set_xlabel(r"$x^\mathrm{(C)}$")
-            ax.set_ylabel(r"$y^\mathrm{(C)}$")
+            ax.set_xlabel(r"$x^\mathrm{C}$")
+            ax.set_ylabel(r"$y^\mathrm{C}$")
     fig.subplots_adjust(wspace=-0.2)
     fig.tight_layout()
     figs.append(fig)
@@ -392,7 +392,7 @@ def plot_projection():
     x_l0_2, y_l0_2 = lsu.polar2cart(x_lines_01, th_l0_2)
     x_l1_2, y_l1_2 = lsu.polar2cart(x_lines_01, th_l1_2)
     
-    fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"), width_ratios=[1/3.7,1/3.7,1/2.8])
+    fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"), width_ratios=[1/3.8,1/3.8,1/2.7])
     axs = axs.flatten()
     axs[0].set_axis_off()   #replace with polar axis
     axs[1].set_axis_off()   #replace with polar axis
@@ -413,12 +413,12 @@ def plot_projection():
     axp2.plot(th_ps[2:-2], r_ps[2:-2], c=c_arrow)
     axp2.annotate("", xy=(th_ps[0], r_ps[0]), xytext=(th_ps[1], r_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
     axp2.annotate("", xy=(th_ps[-1], r_ps[-1]), xytext=(th_ps[-2], r_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
-    axp2.annotate(r"$\dots\Delta \theta^\mathrm{(LS')}$",
+    axp2.annotate(r"$\dots\Delta \theta^\mathrm{LS'}$",
         xy=(0.0,0.85), xytext=(0.35,0.85),
         arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
         va="center", ha="left", color=c_arrow, xycoords="axes fraction"
     )
-    axp2.annotate(r"$\theta^\mathrm{(LS')}$", xy=(theta, 1.1))
+    axp2.annotate(r"$\theta^\mathrm{LS'}$", xy=(theta, 1.1))
 
     for i, axp in enumerate([axp1, axp2]):
         # axp.set_xticks(np.linspace(np.pi/4, 7*np.pi/4, 4), [r"$\frac{" + str(int(i)) + r"\pi}{4}$" for i in range(1,8,2)])
@@ -435,9 +435,9 @@ def plot_projection():
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
-        ax.set_xlabel(r"$x^\mathrm{(LS')}$")
-        ax.set_ylabel(r"$y^\mathrm{(LS')}$")
-        ax.annotate(f"({'abc'[i]})", xy=(1.1,1.1), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+        ax.set_xlabel(r"$x^\mathrm{LS'}$")
+        ax.set_ylabel(r"$y^\mathrm{LS'}$")
+        ax.annotate(f"{'ABC'[i]}", xy=(0.95,0.95), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0.1", facecolor="w", linewidth=0), ha="center", va="center")
 
     fig.subplots_adjust(wspace=-0.5)
     fig.tight_layout()
@@ -469,22 +469,22 @@ def plot_projection():
     axs[2].scatter(x_yproj3, y_yproj3, c=c, s=ms)
     axs[2].plot(x_l0_yproj[r_l0_yproj<rlims[1]], y_l0_yproj[r_l0_yproj<rlims[1]] , c="C0")
     axs[2].plot(x_l1_yproj[r_l1_yproj<rlims[1]], y_l1_yproj[r_l1_yproj<rlims[1]] , c="C0")
-    # axs[0].annotate(r"$\Delta y^\mathrm{(C)}$", xy=(0.,0.), xytext=(0.3,0.9), color="k", va="center", ha="center")
-    axs[0].annotate(r"$\dots\Delta y^\mathrm{(C)}$", xy=(-0.05,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow), va="center", ha="left", color=c_arrow)
+    # axs[0].annotate(r"$\Delta y^\mathrm{C}$", xy=(0.,0.), xytext=(0.3,0.9), color="k", va="center", ha="center")
+    axs[0].annotate(r"$\dots\Delta y^\mathrm{C}$", xy=(-0.05,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow), va="center", ha="left", color=c_arrow)
     axs[0].annotate(r"", xy=(1.0,0.0-0.05), xytext=(1.0,0.5-0.05), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow))
     # axs[0].annotate(r"", xy=(1.1,0.23), xytext=(1.2,0.23), arrowprops=dict(arrowstyle="-[, widthB=0.8, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1), xycoords="axes fraction")
-    # axs[0].annotate(r"$\Delta y^\mathrm{(C)}$", xy=(1.0,0.23), xytext=(1.2,0.23), xycoords="axes fraction", ha="left", va="center")
+    # axs[0].annotate(r"$\Delta y^\mathrm{C}$", xy=(1.0,0.23), xytext=(1.2,0.23), xycoords="axes fraction", ha="left", va="center")
 
     for i, ax in enumerate(axs):
         ax.set_xticks(xlims.round(0))
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
-        ax.annotate(f"({'abc'[i]})", xy=(1.0,1.0), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+        ax.annotate(f"{'ABC'[i]}", xy=(0.95,0.95), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0.1", facecolor="w", linewidth=0), ha="center", va="center")
 
         if i == 2:
-            ax.set_xlabel(r"$x^\mathrm{(LS')}$")
-            ax.set_ylabel(r"$y^\mathrm{(LS')}$")
+            ax.set_xlabel(r"$x^\mathrm{LS'}$")
+            ax.set_ylabel(r"$y^\mathrm{LS'}$")
 
     axs[0].set_xticks(*xticks)
     axs[1].set_xticks(*xticks)
@@ -500,9 +500,9 @@ def plot_projection():
     return
 
 def plot_variables():
-    thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{(LS)}_{\min}$", "", r"$\theta^\mathrm{(LS)}_{\max}$"])
-    xticks=(np.linspace(0,2,3), [r"$x^\mathrm{(LS)}_{\min}$", "", r"$x^\mathrm{(LS)}_{\max}$"])
-    yticks=(np.linspace(-2.0,2.0,3), [r"$y^\mathrm{(LS)}_{\min}$", "", r"$y^\mathrm{(LS)}_{\max}$"])
+    thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{LS}_{\min}$", "", r"$\theta^\mathrm{LS}_{\max}$"])
+    xticks=(np.linspace(0,2,3), [r"$x^\mathrm{LS}_{\min}$", "", r"$x^\mathrm{LS}_{\max}$"])
+    yticks=(np.linspace(-2.0,2.0,3), [r"$y^\mathrm{LS}_{\min}$", "", r"$y^\mathrm{LS}_{\max}$"])
     thetaguidelims = (0*np.pi/2,1*np.pi/2)
     panelsize = np.pi/12
 
@@ -514,9 +514,9 @@ def plot_variables():
         thetaticks, xticks, yticks,
         # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
         thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+1*panelsize/1,thetaguidelims[1]-1*panelsize/1),                    
-        thetalabel=r"$\theta^\mathrm{(LS)}$", thetalabelkwargs=dict(xytext=(0.1,0.1)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
-        xlabel=r"$x^\mathrm{(LS)}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-4,-1.3)),
-        ylabel=r"$y^\mathrm{(LS)}$",
+        thetalabel=r"$\theta^\mathrm{LS}$", thetalabelkwargs=dict(xytext=(0.1,0.1)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
+        xlabel=r"$x^\mathrm{LS}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-4,-1.3)),
+        ylabel=r"$y^\mathrm{LS}$",
         xlimdeadzone=0.4,
     )
     for i, th in enumerate(thetaticks[0]):
@@ -554,15 +554,15 @@ def plot_variables():
     # axs.plot(x_ps[2:-2], y_ps[2:-2], c=c)
     # axs.annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
     # axs.annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
-    # axs.annotate(r"$\dots\Delta \theta^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
-    # axs.annotate(r"$\theta^\mathrm{(LS)}_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
+    # axs.annotate(r"$\dots\Delta \theta^\mathrm{LS}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
+    # axs.annotate(r"$\theta^\mathrm{LS}_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
     # axs.annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
-    # axs.annotate(r"$\theta^\mathrm{(LS)}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
+    # axs.annotate(r"$\theta^\mathrm{LS}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
     # axs.annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
-    axs.annotate(r"$x^\mathrm{(LS)}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="k", va="center", ha="center")
+    axs.annotate(r"$x^\mathrm{LS}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="k", va="center", ha="center")
     axs.annotate(r"", xy=(0.2,-0.04), xytext=(0.2,-0.04-0.05), arrowprops=dict(arrowstyle="-[, widthB=2.3, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1))
-    axs.annotate(r"(a)", xy=(0.86, 0.34), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
-    axs.annotate(r"(b)", xy=(0.58, 0.73), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+    axs.annotate(r"A", xy=(0.86, 0.34), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+    axs.annotate(r"B", xy=(0.58, 0.73), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
             
     fig.tight_layout()
     
@@ -608,7 +608,6 @@ def plot_scatter_onepanel_offset():
     return
 
 def plot_scatter_multipanel():
-    
     axs = pp.plot_scatter_multipanel(
         theta_raw, x_raw, y_raw, y_raw_e,
         theta_pro, x_pro, y_pro, y_pro_e,
@@ -695,6 +694,7 @@ def plot_3dsurface(
 
     if SAVE: fig.savefig("../report/gfx/surface3d.pdf", bbox_inches="tight")
     return ax
+
 def plot_3dscatter(
     ):
 
@@ -714,6 +714,7 @@ def plot_3dscatter(
     ax.xaxis.labelpad = 15
     ax.yaxis.labelpad = 15
     ax.zaxis.labelpad = 15
+    ax.legend()
     fig.suptitle("")
     fig.subplots_adjust(left=0.0)
     fig.tight_layout()
@@ -1668,9 +1669,9 @@ def main():
     # plt.rcParams["font.size"] = 25
     # plot_scatter_onepanel()
     # plot_scatter_onepanel_offset()
-    # plot_scatter_multipanel_group()
-    # plot_heatmap()
-    # plot_3dsurface()
+    # # plot_scatter_multipanel_group()
+    # # plot_heatmap()
+    # # plot_3dsurface()
     # plot_3dscatter()
     
 
