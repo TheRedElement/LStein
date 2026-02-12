@@ -45,7 +45,7 @@ class Test_get_rbounds:
 
     @pytest.fixture(
         params=[
-            (LSP1, (3.3, 11.0))
+            (LSP1, (0.3, 1.0))
         ]
     )
     def action(self, request):
@@ -64,7 +64,6 @@ class Test_get_rbounds:
         assert r_lb == pytest.approx(r_lb_tr, rel=1e-3)
         assert r_ub == pytest.approx(r_ub_tr, rel=1e-3)
         
-"""
 class Test_get_yticks:
     
     @pytest.fixture(
@@ -111,19 +110,19 @@ class Test_apply_axis_limits:
         x_cut, y_cut, kwargs = action[0][0:3]
         LSP = action[1]
 
-        assert np.all(LSP.LSC.xlims[0] < x_cut)
-        assert np.all(x_cut < LSP.LSC.xlims[1])
-        assert np.all(LSP.ylims[0] < y_cut)
-        assert np.all(y_cut < LSP.ylims[1])
+        assert np.all(LSP.LSC.xlims_data[0] < x_cut)
+        assert np.all(x_cut < LSP.LSC.xlims_data[1])
+        assert np.all(LSP.ylims_data[0] < y_cut)
+        assert np.all(y_cut < LSP.ylims_data[1])
 
 class Test_project_xy_theta:
 
     @pytest.fixture(
         params=[
             (LSP1,
-             np.linspace(0,15,9), np.linspace(0.2,8.0,9),
-             np.array([0.17362002, 0.53449428, 1.06854129, 1.76028982, 2.59024175, 3.53711985, 4.5798561 , 5.69902841, 6.87768006]),
-             np.array([-2.59419662, -3.8758189, -5.11457178, -6.29605321, -7.41034059, -8.45222985, -9.42075067, -10.3182475 , -11.1493281]),
+                np.linspace(0,15,9), np.linspace(0.2,8.0,9),
+                np.array([0.05584462, 0.1101468 , 0.17837681, 0.25634874, 0.34041605, 0.42801352, 0.51754656, 0.60808895, 0.69912152]),
+                np.array([-0.22967182, -0.33819704, -0.44023484, -0.53618973, -0.62721111, -0.71457519, -0.7993553 , -0.88234625, -0.96410247])             
             )
         ]
     )
@@ -144,15 +143,14 @@ class Test_project_xy_theta:
         assert np.all(x_proj == pytest.approx(x_proj_tr, rel=1e-3))
         assert np.all(y_proj == pytest.approx(y_proj_tr, rel=1e-3))
 
-
 class Test_project_xy_y:
 
     @pytest.fixture(
         params=[
             (LSP1,
-             np.linspace(0,15,9), np.linspace(0.2,8.0,9),
-             np.array([0.16676853, 0.53972186, 1.10641683, 1.86685343, 2.82103167, 3.96895154, 5.31061305, 6.8460162 , 8.57516098]),
-             np.array([-2.6226378 , -3.88518615, -5.10655345, -6.28673969, -7.42574488, -8.52356901, -9.58021208, -10.5956741 , -11.56995506]),
+                np.linspace(0,15,9), np.linspace(0.2,8.0,9),
+                np.array([0.05531838, 0.10817095, 0.17774801, 0.26404954, 0.36707555, 0.48682604, 0.623301  , 0.77650045, 0.94642436]),
+                np.array([-0.2324104 , -0.33978792, -0.44049305, -0.53452579, -0.62188614, -0.7025741 , -0.77658967, -0.84393285, -0.90460364]),
             )
         ]
     )
@@ -172,5 +170,3 @@ class Test_project_xy_y:
         x_proj_tr, y_proj_tr = action[2][0:3]
         assert np.all(x_proj == pytest.approx(x_proj_tr, rel=1e-3))
         assert np.all(y_proj == pytest.approx(y_proj_tr, rel=1e-3))
-
-"""
