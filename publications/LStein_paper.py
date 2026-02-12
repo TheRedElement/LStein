@@ -317,6 +317,9 @@ def plot_projection():
     figs = []
 
     #global layout
+    c = "C1"
+    c_arrow = "purple"
+    ms = 5
     arrowstyle = "-|>,head_width=.15"
     figsize = (7,3)
     xlims = np.array([-0.05,1.05])
@@ -351,13 +354,13 @@ def plot_projection():
     
     fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
-    axs[0].scatter(x, y)
+    axs[0].scatter(x, y, c=c, s=ms)
     axs[0].plot(x_lines, y_lines_0, c="C0")
     axs[0].plot(x_lines, y_lines_1, c="C0")
-    axs[1].scatter(x_01, y_01)
+    axs[1].scatter(x_01, y_01, c=c, s=ms)
     axs[1].plot(x_lines_01, y_lines_01_0, c="C0")
     axs[1].plot(x_lines_01, y_lines_01_1, c="C0")
-    axs[2].scatter(x_prep, y_prep)
+    axs[2].scatter(x_prep, y_prep, c=c, s=ms)
     axs[2].plot(x_lines, x_lines*y_lines_01_0, c="C0")
     axs[2].plot(x_lines, x_lines*y_lines_01_1, c="C0")
     # axs[0].set_xlim(0,1)
@@ -395,25 +398,25 @@ def plot_projection():
     axs[1].set_axis_off()   #replace with polar axis
     axp1 = fig.add_subplot(1,3,1, projection="polar")
     axp2 = fig.add_subplot(1,3,2, projection="polar")
-    axp1.scatter(th+np.pi, x_prep)
+    axp1.scatter(th+np.pi, x_prep, c=c, s=ms)
     axp1.plot((th_l0_1+np.pi)[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
     axp1.plot((th_l1_1+np.pi)[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
-    axp2.scatter(th_thproj1, x_prep)
+    axp2.scatter(th_thproj1, x_prep, c=c, s=ms)
     axp2.plot(th_l0_2[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
     axp2.plot(th_l1_2[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
-    axs[2].scatter(x_thproj1, y_thproj1)
+    axs[2].scatter(x_thproj1, y_thproj1, c=c, s=ms)
     axs[2].plot(x_l0_2[x_lines_01<rlims.max()], y_l0_2[x_lines_01<rlims.max()] , c="C0")
     axs[2].plot(x_l1_2[x_lines_01<rlims.max()], y_l1_2[x_lines_01<rlims.max()] , c="C0")
 
     r_ps = np.ones(20)*1
     th_ps = np.linspace(theta-panelsize/2, theta+panelsize/2,20)
-    axp2.plot(th_ps[2:-2], r_ps[2:-2], c="navy")
-    axp2.annotate("", xy=(th_ps[0], r_ps[0]), xytext=(th_ps[1], r_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor="navy", color="navy"))
-    axp2.annotate("", xy=(th_ps[-1], r_ps[-1]), xytext=(th_ps[-2], r_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor="navy", color="navy"))
+    axp2.plot(th_ps[2:-2], r_ps[2:-2], c=c_arrow)
+    axp2.annotate("", xy=(th_ps[0], r_ps[0]), xytext=(th_ps[1], r_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
+    axp2.annotate("", xy=(th_ps[-1], r_ps[-1]), xytext=(th_ps[-2], r_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
     axp2.annotate(r"$\dots\Delta \theta^\mathrm{(LS')}$",
         xy=(0.0,0.85), xytext=(0.35,0.85),
-        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor="navy", color="navy"),
-        va="center", ha="left", color="navy", xycoords="axes fraction"
+        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
+        va="center", ha="left", color=c_arrow, xycoords="axes fraction"
     )
     axp2.annotate(r"$\theta^\mathrm{(LS')}$", xy=(theta, 1.1))
 
@@ -457,18 +460,18 @@ def plot_projection():
 
     fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
-    axs[0].scatter(x_yproj1, y_yproj1)
+    axs[0].scatter(x_yproj1, y_yproj1, c=c, s=ms)
     axs[0].plot(x_lines_01, x_lines_01*np.tan(panelsize)*y_lines_01_0, c="C0")
     axs[0].plot(x_lines_01, x_lines_01*np.tan(panelsize)*y_lines_01_1, c="C0")
-    axs[1].scatter(x_yproj2, y_yproj2)
+    axs[1].scatter(x_yproj2, y_yproj2, c=c, s=ms)
     axs[1].plot(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_0 - 0.5) , c="C0")
     axs[1].plot(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_1 - 0.5) , c="C0")
-    axs[2].scatter(x_yproj3, y_yproj3)
+    axs[2].scatter(x_yproj3, y_yproj3, c=c, s=ms)
     axs[2].plot(x_l0_yproj[r_l0_yproj<rlims[1]], y_l0_yproj[r_l0_yproj<rlims[1]] , c="C0")
     axs[2].plot(x_l1_yproj[r_l1_yproj<rlims[1]], y_l1_yproj[r_l1_yproj<rlims[1]] , c="C0")
     # axs[0].annotate(r"$\Delta y^\mathrm{(C)}$", xy=(0.,0.), xytext=(0.3,0.9), color="k", va="center", ha="center")
-    axs[0].annotate(r"$\dots\Delta y^\mathrm{(C)}$", xy=(-0.05,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor="navy", color="navy"), va="center", ha="left", color="navy")
-    axs[0].annotate(r"", xy=(1.0,0.0-0.05), xytext=(1.0,0.5-0.05), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor="navy", color="navy"))
+    axs[0].annotate(r"$\dots\Delta y^\mathrm{(C)}$", xy=(-0.05,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow), va="center", ha="left", color=c_arrow)
+    axs[0].annotate(r"", xy=(1.0,0.0-0.05), xytext=(1.0,0.5-0.05), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow))
     # axs[0].annotate(r"", xy=(1.1,0.23), xytext=(1.2,0.23), arrowprops=dict(arrowstyle="-[, widthB=0.8, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1), xycoords="axes fraction")
     # axs[0].annotate(r"$\Delta y^\mathrm{(C)}$", xy=(1.0,0.23), xytext=(1.2,0.23), xycoords="axes fraction", ha="left", va="center")
 
@@ -498,23 +501,27 @@ def plot_projection():
 
 def plot_variables():
     thetaticks=(np.linspace(0,2,3), [r"$\theta^\mathrm{(LS)}_{\min}$", "", r"$\theta^\mathrm{(LS)}_{\max}$"])
-    xticks=(np.linspace(3,30,3), [r"$x^\mathrm{(LS)}_{\min}$", "", r"$x^\mathrm{(LS)}_{\max}$"])
-    yticks=(np.linspace(-1.0,1.0,3), [r"$y^\mathrm{(LS)}_{\min}$", "", r"$y^\mathrm{(LS)}_{\max}$"])
+    xticks=(np.linspace(0,2,3), [r"$x^\mathrm{(LS)}_{\min}$", "", r"$x^\mathrm{(LS)}_{\max}$"])
+    yticks=(np.linspace(-2.0,2.0,3), [r"$y^\mathrm{(LS)}_{\min}$", "", r"$y^\mathrm{(LS)}_{\max}$"])
     thetaguidelims = (0*np.pi/2,1*np.pi/2)
     panelsize = np.pi/12
+
+    #sine wave for illustration
+    x = np.linspace(0,2,70)
+    y = 2*np.sin(x * 13)
 
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
-        thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+panelsize/1,thetaguidelims[1]-panelsize/1),                    
-        thetalabel=r"$\theta^\mathrm{(LS)}$", thetalabelkwargs=dict(xytext=(0.05,0.05)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
-        xlabel=r"$x^\mathrm{(LS)}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-2,-1.3)),
+        thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+1*panelsize/1,thetaguidelims[1]-1*panelsize/1),                    
+        thetalabel=r"$\theta^\mathrm{(LS)}$", thetalabelkwargs=dict(xytext=(0.1,0.1)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(0.0,0.1)),
+        xlabel=r"$x^\mathrm{(LS)}$", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-4,-1.3)),
         ylabel=r"$y^\mathrm{(LS)}$",
         xlimdeadzone=0.4,
     )
     for i, th in enumerate(thetaticks[0]):
         if i == 0:
-            panelboundskwargs = dict(c="#c80000", ls="-")
+            panelboundskwargs = dict(ls="-")
             yticks_use = yticks
             y_projection_method = "theta"
         else:
@@ -530,6 +537,8 @@ def plot_variables():
             yticklabelkwargs=dict(xytext=(0.0, 0.4), textcoords="offset fontsize"),
             y_projection_method=y_projection_method,
         )
+        if i < 2:
+            LSP.plot(x, y, seriestype="line", color=colors[i], linestyle=["-","--","-.",":"][i])
 
     fig, axs = plt.subplots(1,1, figsize=(5,5))
     lstein.LSteinMPL(LSC).show(axs)
@@ -542,10 +551,10 @@ def plot_variables():
     c = "navy"
     x_ps = x_dz * np.cos(th_panelsize)
     y_ps = x_dz * np.sin(th_panelsize)
-    axs.plot(x_ps[2:-2], y_ps[2:-2], c=c)
-    axs.annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
-    axs.annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
-    axs.annotate(r"$\dots\Delta \theta^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
+    # axs.plot(x_ps[2:-2], y_ps[2:-2], c=c)
+    # axs.annotate("", xy=(x_ps[0], y_ps[0]), xytext=(x_ps[1],y_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
+    # axs.annotate("", xy=(x_ps[-1], y_ps[-1]), xytext=(x_ps[-2],y_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c, color=c))
+    # axs.annotate(r"$\dots\Delta \theta^\mathrm{(LS)}$", xy=(0.7,1.0), xytext=(1.0,1.0), arrowprops=dict(arrowstyle="<|"+arrowstyle, facecolor=c, color=c, lw=2), va="center", ha="left", color=c)
     # axs.annotate(r"$\theta^\mathrm{(LS)}_{\max, C}$", xy=(0,0.1), xytext=(-0.1,0.4), va="center", ha="right")
     # axs.annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
     # axs.annotate(r"$\theta^\mathrm{(LS)}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
@@ -1638,7 +1647,7 @@ def main():
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
     plot_projection()
-    # plot_variables()
+    plot_variables()
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
