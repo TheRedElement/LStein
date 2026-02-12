@@ -517,10 +517,11 @@ def plot_variables():
         thetaticks, xticks, yticks,
         # thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]-panelsize/1,thetaguidelims[1]+panelsize/1),                    
         thetaguidelims=thetaguidelims, thetaplotlims=(thetaguidelims[0]+1*panelsize/1,thetaguidelims[1]-1*panelsize/1),                    
-        thetalabel=r"", thetalabelkwargs=dict(xytext=(0.1,0.1)), thetaticklabelkwargs=dict(pad=0.3, textcoords="offset fontsize", xytext=(-0.2,-0.1)),
+        thetalabel=r"", thetalabelkwargs=dict(xytext=(0.1,0.1)), thetaticklabelkwargs=dict(pad=0.2, textcoords="offset fontsize", xytext=(-0.2,-0.1)),
         xlabel=r"", xticklabelkwargs=dict(xytext=(-0.0,-1)), xlabelkwargs=dict(xytext=(-4,-1.3)),
         ylabel=r"",
         xlimdeadzone=0.4,
+        # thetatickkwargs=dict(c="orangered")
     )
     for i, th in enumerate(thetaticks[0]):
         if i == 0:
@@ -541,7 +542,7 @@ def plot_variables():
             y_projection_method=y_projection_method,
         )
         if i < 2:
-            LSP.plot(x, y, seriestype="line", color=colors[i], linestyle=["-","--","-.",":"][i])
+            LSP.plot(x, y, seriestype="line", color=colors[i], linestyle=["-","--","-.",":"][i], zorder=3)
 
     fig, axs = plt.subplots(1,1, figsize=(5,5))
     lstein.LSteinMPL(LSC).show(axs)
@@ -551,7 +552,7 @@ def plot_variables():
     arrowstyle = "-|>,head_width=.15"
     x_dz = 0.4
     th_panelsize = np.linspace(0, panelsize+np.pi/20, 10) + np.pi/70
-    c = "navy"
+    c = "orangered"
     x_ps = x_dz * np.cos(th_panelsize)
     y_ps = x_dz * np.sin(th_panelsize)
     # axs.plot(x_ps[2:-2], y_ps[2:-2], c=c)
@@ -562,11 +563,15 @@ def plot_variables():
     # axs.annotate(r"", xy=(0,0.4), xytext=(-0.08,0.4), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
     # axs.annotate(r"$\theta^\mathrm{LS}_{\min, C}$", xy=(0,0), xytext=(-0.1,0.0), va="center", ha="right")
     # axs.annotate(r"", xy=(0.4,0.0), xytext=(-0.08,0.0), arrowprops=dict(arrowstyle=arrowstyle, facecolor="black", shrinkA=0.1))
-    axs.annotate(r"$x^\mathrm{LS}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.18), color="k", va="center", ha="center")
+    axs.annotate(r"$x^\mathrm{LS}_\mathrm{DZ}$", xy=(0.,0.), xytext=(0.2,-0.11), color="k", va="center", ha="center")
     axs.annotate(r"", xy=(0.2,-0.02), xytext=(0.2,-0.02-0.03), arrowprops=dict(arrowstyle="-[, widthB=2.2, lengthB=0.3", facecolor="k", color="k", shrinkA=0.1))
-    axs.annotate(r"A", xy=(0.86, 0.34), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
-    axs.annotate(r"B", xy=(0.58, 0.73), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
-            
+    axs.annotate(r"A", xy=(0.88, 0.36), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+    axs.annotate(r"B", xy=(0.58, 0.75), bbox=dict(boxstyle="round,pad=0", facecolor="w", linewidth=0), ha="center", va="center")
+    x_ind = 0.4 * np.cos(np.linspace(0, 1.03*np.pi/4, 20))
+    y_ind = 0.4 * np.sin(np.linspace(0, 1.03*np.pi/4, 20))
+    # axs.plot(x_ind[:-2], y_ind[:-2], c=c, zorder=2)
+    # axs.annotate("", xy=(x_ind[-1], y_ind[-1]), xytext=(x_ind[-2],y_ind[-2]), arrowprops=dict(arrowstyle="-|>,head_width=.2", facecolor=c, color=c))
+
     #customize ticks
     xticklabs = [r"$x^\mathrm{LS}_{\min}$", r"$x^\mathrm{LS}$", r"$x^\mathrm{LS}_{\max}$"]
     ha = ["left", "center", "right"]
@@ -578,8 +583,8 @@ def plot_variables():
     for i in range(3):
         axs.annotate(yticklabs[i], xy=(xpos[i],ypos[i]), xytext=(xpos[i],ypos[i]), va="center", ha="left")
     thticklabs = [r"$\theta^\mathrm{LS}_{\min}$", r"$\theta^\mathrm{LS}$", r"$\theta^\mathrm{LS}_{\max}$"]
-    xpos = [0.35,0.26,0.17]
-    ypos = [0.08,0.17,0.27]
+    xpos = [0.35,0.28,0.17]
+    ypos = [0.08,0.19,0.29]
     for i in range(3):
         axs.annotate(thticklabs[i], xy=(xpos[i],ypos[i]), xytext=(xpos[i],ypos[i]), va="center", ha="right")
         
