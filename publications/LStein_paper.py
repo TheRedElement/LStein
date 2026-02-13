@@ -1274,9 +1274,10 @@ def plot_errorband():
 #%%main
 def plot_pulsar_freq_phase():
     
-    data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")
-    # data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")
-    # data = np.load("../data/pulsar_data/J2222-0137_2021-12-27.npz")
+    data = np.load("../data/pulsar_data/J0437-4715_2021-02-03.npz")     #very bright
+    data = np.load("../data/pulsar_data/J1804-2858_2024-03-19.npz")     #very faint
+    data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")     #RFI contaminated
+    data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")     #cleaned (follow-up observation)
     print(data.files)
     freq    = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
     phase   = np.linspace(0, 1, data["nbin"])
@@ -1308,7 +1309,11 @@ def plot_pulsar_freq_phase():
     # plt.show()
 
     #normalize
-    # Y = Y / np.nan(Y, axis=1, keepdims=True)
+    # Y = Y / np.nanmedian(Y, axis=1, keepdims=True)
+
+    #introduce missing freqs
+    fidx = np.random.choice(range(Y.shape[0]), size=10, replace=False)
+    Y[fidx,:] = np.nan
 
     #filter NaNs
     nanmask = np.any(np.isfinite(Y), axis=1)
@@ -1354,11 +1359,11 @@ def plot_pulsar_freq_phase():
             panelsize=panelsize,
             show_panelbounds=show_y_guides,
             show_yticks=show_y_guides,
-            y_projection_method="y",
+            y_projection_method="theta",
             yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
         )
         # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
-        LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1)
+        LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=0.9)
 
     fig = lstein.draw(LSC, figsize=(5,9))
     fig.tight_layout()
@@ -1668,9 +1673,9 @@ def main():
     # for i in range(42):
     #     try: plot_lstein(i); plt.close()
     #     except: pass
-    LSCa = plot_lstein_snii(gp=gp)
-    LSCb = plot_lstein_tde(gp=True)
-    plot_graphical_abstract([LSCa,LSCb])
+    # LSCa = plot_lstein_snii(gp=gp)
+    # LSCb = plot_lstein_tde(gp=True)
+    # plot_graphical_abstract([LSCa,LSCb])
     # plot_projection()
     # plot_variables()
 
@@ -1678,7 +1683,7 @@ def main():
     # plot_projection_methods(context="y")
     # plot_spectra_pessi()
     # plot_spectra_mayall()
-    # plot_pulsar_freq_phase()
+    plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
     # plot_hypsearch()
