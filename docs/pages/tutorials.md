@@ -10,3 +10,4 @@
 1. [Axis Scales](https://github.com/TheRedElement/LStein/blob/main/demo/axis_scales.ipynb)
 1. [Backends](https://github.com/TheRedElement/LStein/blob/main/demo/backends.ipynb)
 1. [Real Data](https://github.com/TheRedElement/LStein/blob/main/demo/real_data.ipynb)
+1. [Pulsars](https://github.com/TheRedElement/LStein/blob/main/demo/pulsars.ipynb)

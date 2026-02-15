@@ -14,7 +14,6 @@ temp*.*
 report/gfx/animations/*
 code/src_demo/data/*
 code/src_py_demo/data/*
-data/pulsar_data
 data/wiserep_*_spectra
 
 *.out
