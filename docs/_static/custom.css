@@ -77,3 +77,7 @@ dt.sig {
     /* object signatures */
     background-color: var(--c_code_bg);
 }
+code {
+    background-color: var(--c_code_bg);
+    color: var(--c_body_text);
+}
