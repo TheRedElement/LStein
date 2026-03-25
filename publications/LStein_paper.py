@@ -145,7 +145,7 @@ def get_data(fidx:int, gp:bool=True,):
         # ylab = "m [mag]" if "mag" in df.columns else "Flux [FLUXCAL]"
         thetalab = r"Wavelength [nm]"
         xlab = r"Time [d]" if "mjd" in df.columns else r"Period [d]"
-        ylab = r"Flux [FLUXCAL]"
+        ylab = r"Flux [Arbitrary Units]"
 
     # df = df.drop_nans()
 
@@ -273,6 +273,7 @@ def plot_lstein_tde(gp=True):
     colors, markers, linestyles = get_stats(theta_raw, x_raw, y_raw, fname, nyticks=3)
     
     thetaguidelims=(0.1*np.pi/4,2.5*np.pi/4)
+    thetaticks = np.linspace(thetaticks.min(), thetaticks.max(), 3).astype(int)
 
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
@@ -602,9 +603,10 @@ def plot_scatter_onepanel():
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,        
     )
-    ax.legend()
+    # ax.legend()
     ax.set_ylim(YLIM)
     fig = ax.get_figure()
+    fig.legend(ncol=3, bbox_to_anchor=(0.5, 1.0), loc="center")
     fig.suptitle("")
     fig.tight_layout()
 
@@ -622,9 +624,10 @@ def plot_scatter_onepanel_offset():
         pb_mappings, otype, survey,
         thetalab, xlab, ylab,        
     )
-    ax.legend(loc="upper right")
+    # ax.legend(loc="upper right")
     ax.set_ylim(YLIM)
     fig = ax.get_figure()
+    fig.legend(ncol=3, bbox_to_anchor=(0.5, 1.0), loc="center")
     fig.suptitle("")
     fig.tight_layout()
 
@@ -640,12 +643,13 @@ def plot_scatter_multipanel():
         thetalab, xlab, ylab,        
     )
     for idx, ax in enumerate(axs):
-        ax.legend(loc="upper left")
+        # ax.legend(loc="upper left")
         ax.set_ylim(YLIM)
         # if idx%3 != 0: ax.set_ylabel("")
         ax.set_ylabel("")
         if idx < 3: ax.set_xlabel("")
     fig = axs[0].get_figure()
+    fig.legend(ncol=3, bbox_to_anchor=(0.5, 1.0), loc="center")
     fig.text(0, 0.5, ylab, rotation=90, va="center")
     fig.suptitle("")
     fig.tight_layout()
@@ -738,8 +742,9 @@ def plot_3dscatter(
     ax.xaxis.labelpad = 15
     ax.yaxis.labelpad = 15
     ax.zaxis.labelpad = 15
-    ax.legend()
+    # ax.legend()
     fig.suptitle("")
+    fig.legend(ncol=3, bbox_to_anchor=(0.5, 0.85), loc="center")
     fig.subplots_adjust(left=0.0)
     fig.tight_layout()
 
@@ -1059,6 +1064,7 @@ def plot_hypsearch():
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
         thetalabel="Hyperparameter\nCombination", xlabel="Epoch", ylabel="Loss",
         thetalabelkwargs=dict(rotation=-45, textcoords="offset fontsize", xytext=(1, 1)),
+        xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-0.2,-1))
 
     )
     for i in range(len(theta)):
@@ -1271,7 +1277,6 @@ def plot_errorband():
 
     if SAVE: fig.savefig("../report/gfx/lstein_errorband.pdf")
     return
-#%%main
 def plot_pulsar_freq_phase():
     
     data = np.load("../data/pulsar_data/J0437-4715_2021-02-03.npz")     #very bright
@@ -1292,9 +1297,9 @@ def plot_pulsar_freq_phase():
     mesh = axs[1].pcolormesh(phase, freq, data["freq_phase"], shading="nearest")
     cax = fig.add_axes([0.95, 0.05, 0.05, 0.4])
     cbar = fig.colorbar(mesh, cax=cax)
-    axs[0].set_xlabel("Phase []")
+    axs[0].set_xlabel("Phase")
     axs[0].set_ylabel("Flux")
-    axs[1].set_xlabel("Phase []")
+    axs[1].set_xlabel("Phase")
     axs[1].set_ylabel("Frequency [MHz]")
     # axs[1].axhline(data["freq_ctr"])
     fig.tight_layout()
@@ -1344,7 +1349,7 @@ def plot_pulsar_freq_phase():
         thetaticks, xticks, yticks,
         thetaguidelims=(plotlims[0],1*plotlims[1]), thetaplotlims=(plotlims[0]+panelsize/2,1*plotlims[1]-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
-        thetalabel="Frequency\n[MHz]", xlabel="Phase []", ylabel="Flux $\\left[\\right]$",
+        thetalabel="Frequency\n[MHz]", xlabel="Phase", ylabel="Flux $\\left[\\right]$",
         thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-0.5,0.0)),
         thetaticklabelkwargs=dict(pad=0.25),
         xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
@@ -1361,6 +1366,7 @@ def plot_pulsar_freq_phase():
             show_yticks=show_y_guides,
             y_projection_method="theta",
             yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+            panelboundskwargs=dict(zorder=100)
         )
         # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
         LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=0.9)
@@ -1620,7 +1626,7 @@ def plot_filtercurve():
 
     fig, axs = plt.subplots(1,1, subplot_kw=dict(
         xlabel=r"Wavelength [nm]",
-        ylabel=r"Transmission []",
+        ylabel=r"Transmission",
     ))
     for idx, row in enumerate(df_pb.iter_rows(named=True)):
         band = sncosmo.get_bandpass(f"lsst{row['name'].lower()}")
@@ -1630,10 +1636,12 @@ def plot_filtercurve():
         wavelength = wavelength[mask] / 10
         transmission = transmission[mask]
         axs.plot(wavelength, transmission, c=colors[idx], ls=row["plot_ls"], label=f"LSST {row['name']}")
-    axs.legend(loc="upper right")
+        axs.axvline(row["wavelength"], color=colors[idx], ls="--", label="")
+    fig.legend(ncol=3, bbox_to_anchor=(0.5, 1.0), loc="center")
     if SAVE: fig.savefig(f"../report/gfx/filtercurve.pdf")
     return
 
+#%%main
 def main():
     #declare as global so no arguments have to be passed to nested functions
     global theta_raw, x_raw, y_raw, y_raw_e
@@ -1683,7 +1691,7 @@ def main():
     # plot_projection_methods(context="y")
     # plot_spectra_pessi()
     # plot_spectra_mayall()
-    plot_pulsar_freq_phase()
+    # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
     # plot_hypsearch()
