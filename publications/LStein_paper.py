@@ -366,6 +366,17 @@ def plot_projection():
     axs[2].plot(x_lines, x_lines*y_lines_01_1, c="C0")
     # axs[0].set_xlim(0,1)
     axs[0].set_aspect(.5)
+
+    axs[2].annotate(r"$\dots y_1^\mathrm{LS'}$",
+        xy=(0.05,0.85), xytext=(0.4,0.85),
+        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
+        va="center", ha="left", color=c_arrow, xycoords="axes fraction"
+    )
+    axs[2].annotate(r"",
+        xy=(0.75,0.01), xytext=(0.75,0.75+0.02),
+        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
+        va="center", ha="left", color=c_arrow, xycoords="axes fraction", zorder=-1
+    )
     
     for i, ax in enumerate(axs):
         axs[i].annotate(f"{'ABC'[i]}", xy=(0.95,0.95), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0.1", facecolor="w", linewidth=0), ha="center", va="center")
@@ -373,13 +384,14 @@ def plot_projection():
             ax.set_xlim(*xlims)
             ax.set_ylim(*ylims)
             ax.set_xticks(*xticks)
+            # ax.set_xlabel(r"$x_1^\mathrm{LS'}$")
         else:
             ax.set_xlabel(r"$x^\mathrm{C}$")
             ax.set_ylabel(r"$y^\mathrm{C}$")
     fig.subplots_adjust(wspace=-0.2)
     fig.tight_layout()
     figs.append(fig)
-
+    
     #projection = theta
     r_min, th_min = lsu.cart2polar(1, 0)
     r_max, th_max = lsu.cart2polar(1, 1)    
@@ -1684,7 +1696,7 @@ def main():
     # LSCa = plot_lstein_snii(gp=gp)
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
-    # plot_projection()
+    plot_projection()
     # plot_variables()
 
     # plot_projection_methods(context="theta")
