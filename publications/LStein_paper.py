@@ -344,7 +344,17 @@ def plot_projection():
     x_lines = np.linspace(0,2,5)
     y_lines_0 = np.ones_like(x_lines) * y.min()
     y_lines_1 = np.ones_like(x_lines) * y.max()
+
+    #highlighted point
+    hidx = 25
+    ch = "C0"
+    msh = 15*ms
+    markerh = "*"
     
+    #transformation arrows
+    l_tarrow = 0.03
+    c_tarrow = "tab:gray"
+
     #preprocessing
     x_01 = lsu.minmaxscale(x,xdeadzone,1, x.min(), x.max())
     y_01 = lsu.minmaxscale(y,0,1, y.min(), y.max())
@@ -357,42 +367,60 @@ def plot_projection():
     fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
     axs[0].scatter(x, y, c=c, s=ms)
+    axs[0].scatter(x[hidx], y[hidx], c=ch, s=msh, marker=markerh)
     axs[0].plot(x_lines, y_lines_0, c="C0")
     axs[0].plot(x_lines, y_lines_1, c="C0")
     axs[1].scatter(x_01, y_01, c=c, s=ms)
+    axs[1].scatter(x_01[hidx], y_01[hidx], c=ch, s=msh, marker=markerh)
     axs[1].plot(x_lines_01, y_lines_01_0, c="C0")
     axs[1].plot(x_lines_01, y_lines_01_1, c="C0")
     axs[2].scatter(x_prep, y_prep, c=c, s=ms)
+    axs[2].scatter(x_prep[hidx], y_prep[hidx], c=ch, s=msh, marker=markerh)
     axs[2].plot(x_lines, x_lines*y_lines_01_0, c="C0")
     axs[2].plot(x_lines, x_lines*y_lines_01_1, c="C0")
     # axs[0].set_xlim(0,1)
     axs[0].set_aspect(.5)
 
-    axs[2].annotate(r"$\dots y_1^\mathrm{LS'}$",
-        xy=(0.05,0.85), xytext=(0.4,0.85),
-        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
-        va="center", ha="left", color=c_arrow, xycoords="axes fraction"
-    )
+    # axs[2].annotate(r"$\dots y_1^\mathrm{LS'}$",
+    #     xy=(0.05,0.85), xytext=(0.4,0.85),
+    #     arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
+    #     va="center", ha="left", color=c_arrow, xycoords="axes fraction"
+    # )
     axs[2].annotate(r"",
         xy=(0.75,0.01), xytext=(0.75,0.75+0.02),
         arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
         va="center", ha="left", color=c_arrow, xycoords="axes fraction", zorder=-1
     )
+    x0_tarrow = 0.33
+    y0_tarrow = 0.66    
+    axs[0].annotate("", xy=(x0_tarrow+l_tarrow, y0_tarrow), xytext=(x0_tarrow, y0_tarrow),
+        xycoords="figure fraction", textcoords="figure fraction",
+        arrowprops=dict(headwidth=20, width=10, fc=c_tarrow, ec=c_tarrow)
+    )
+    axs[1].annotate("", xy=(2*x0_tarrow+l_tarrow, y0_tarrow), xytext=(2*x0_tarrow, y0_tarrow),
+        xycoords="figure fraction", textcoords="figure fraction",
+        arrowprops=dict(headwidth=20, width=10, fc=c_tarrow, ec=c_tarrow)
+    )
+
     
     for i, ax in enumerate(axs):
         axs[i].annotate(f"{'ABC'[i]}", xy=(0.95,0.95), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0.1", facecolor="w", linewidth=0), ha="center", va="center")
+        ax.grid()
         if i > 0:
             ax.set_xlim(*xlims)
             ax.set_ylim(*ylims)
             ax.set_xticks(*xticks)
             # ax.set_xlabel(r"$x_1^\mathrm{LS'}$")
+            ax.set_ylabel(r"$y_1^\mathrm{LS'}$")
+            ax.annotate(r"$x_1^\mathrm{LS'}$", xy=(0.6,-0.25), xycoords="axes fraction", ha="center", va="center")
         else:
-            ax.set_xlabel(r"$x^\mathrm{C}$")
+            # ax.set_xlabel(r"$x^\mathrm{C}$")
             ax.set_ylabel(r"$y^\mathrm{C}$")
-    fig.subplots_adjust(wspace=-0.2)
+            ax.annotate(r"$x^\mathrm{C}$", xy=(0.6,-0.265), xycoords="axes fraction", ha="center", va="center")
+    fig.subplots_adjust(wspace=-0.5)
     fig.tight_layout()
     figs.append(fig)
-    
+
     #projection = theta
     r_min, th_min = lsu.cart2polar(1, 0)
     r_max, th_max = lsu.cart2polar(1, 1)    
@@ -413,12 +441,15 @@ def plot_projection():
     axp1 = fig.add_subplot(1,3,1, projection="polar")
     axp2 = fig.add_subplot(1,3,2, projection="polar")
     axp1.scatter(th+np.pi, x_prep, c=c, s=ms)
+    axp1.scatter(th[hidx]+np.pi, x_prep[hidx], c=ch, s=msh, marker=markerh)
     axp1.plot((th_l0_1+np.pi)[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
     axp1.plot((th_l1_1+np.pi)[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
     axp2.scatter(th_thproj1, x_prep, c=c, s=ms)
+    axp2.scatter(th_thproj1[hidx], x_prep[hidx], c=ch, s=msh, marker=markerh)
     axp2.plot(th_l0_2[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
     axp2.plot(th_l1_2[x_lines_01<rlims.max()], x_lines_01[x_lines_01<rlims.max()], c="C0")
     axs[2].scatter(x_thproj1, y_thproj1, c=c, s=ms)
+    axs[2].scatter(x_thproj1[hidx], y_thproj1[hidx], c=ch, s=msh, marker=markerh)
     axs[2].plot(x_l0_2[x_lines_01<rlims.max()], y_l0_2[x_lines_01<rlims.max()] , c="C0")
     axs[2].plot(x_l1_2[x_lines_01<rlims.max()], y_l1_2[x_lines_01<rlims.max()] , c="C0")
 
@@ -427,13 +458,26 @@ def plot_projection():
     axp2.plot(th_ps[2:-2], r_ps[2:-2], c=c_arrow)
     axp2.annotate("", xy=(th_ps[0], r_ps[0]), xytext=(th_ps[1], r_ps[1]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
     axp2.annotate("", xy=(th_ps[-1], r_ps[-1]), xytext=(th_ps[-2], r_ps[-2]), arrowprops=dict(arrowstyle=arrowstyle, facecolor=c_arrow, color=c_arrow))
-    axp2.annotate(r"$\dots\Delta \theta^\mathrm{LS'}$",
-        xy=(0.05,0.85), xytext=(0.4,0.85),
-        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
-        va="center", ha="left", color=c_arrow, xycoords="axes fraction"
+    # axp2.annotate(r"$\dots\Delta \theta^\mathrm{LS'}$",
+    #     xy=(0.05,0.85), xytext=(0.4,0.85),
+    #     arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
+    #     va="center", ha="left", color=c_arrow, xycoords="axes fraction"
+    # )
+    x0_tarrow = 0.26
+    y0_tarrow = 0.71
+    axp1.annotate("", xy=(x0_tarrow+l_tarrow, y0_tarrow), xytext=(x0_tarrow, y0_tarrow),
+        xycoords="figure fraction", textcoords="figure fraction",
+        arrowprops=dict(headwidth=20, width=10, fc=c_tarrow, ec=c_tarrow)
     )
-    axp2.annotate(r"$\theta^\mathrm{LS'}$", xy=(theta, 1.1))
+    x0_tarrow = 0.56
+    axp2.annotate("", xy=(x0_tarrow+l_tarrow, y0_tarrow), xytext=(x0_tarrow, y0_tarrow),
+        xycoords="figure fraction", textcoords="figure fraction",
+        arrowprops=dict(headwidth=20, width=10, fc=c_tarrow, ec=c_tarrow)
+    )    
 
+    axp1.annotate(r"$\theta^\mathrm{P}$", xy=(0,0), xytext=(np.pi/18, 1.23))
+    axp2.annotate(r"$\theta^\mathrm{P}$", xy=(0,0), xytext=(np.pi/18, 1.23))
+    axp2.annotate(r"$\theta^\mathrm{LS'}$", xy=(0,0), xytext=(0.95*theta, 1.11))
     for i, axp in enumerate([axp1, axp2]):
         # axp.set_xticks(np.linspace(np.pi/4, 7*np.pi/4, 4), [r"$\frac{" + str(int(i)) + r"\pi}{4}$" for i in range(1,8,2)])
         axp.set_xlim(*thlims)
@@ -441,17 +485,22 @@ def plot_projection():
         axp.set_ylim(*rlims)
         axp.set_yticks(*rticks)
         if i == 1:
-            axp.set_xticks((thticks[0][0],thticks[0][2]), (thticks[1][0],thticks[1][2]))
+            axp.set_xticks((thticks[0][0],thticks[0][1],thticks[0][2],theta), (thticks[1][0],thticks[1][1],thticks[1][2],r""))
             
 
     for i, ax in enumerate(axs):
+        ax.grid()
         ax.set_xticks(xlims.round(0))
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
-        ax.set_xlabel(r"$x^\mathrm{LS'}$")
+        # ax.set_xlabel(r"$x^\mathrm{LS'}$")
         ax.set_ylabel(r"$y^\mathrm{LS'}$")
         ax.annotate(f"{'ABC'[i]}", xy=(0.95,0.95), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0.1", facecolor="w", linewidth=0), ha="center", va="center")
+        if i < 2:
+            ax.annotate(r"$x_1^\mathrm{LS'}$", xy=(0.6,-0.25), xycoords="axes fraction", ha="center", va="center")
+        else:
+            ax.annotate(r"$x^\mathrm{LS'}$", xy=(0.6,-0.26), xycoords="axes fraction", ha="center", va="center")
 
     fig.subplots_adjust(wspace=-0.5)
     fig.tight_layout()
@@ -475,36 +524,56 @@ def plot_projection():
     fig, axs = plt.subplots(1,3, figsize=figsize, subplot_kw=dict(aspect="equal"))
     axs = axs.flatten()
     axs[0].scatter(x_yproj1, y_yproj1, c=c, s=ms)
+    axs[0].scatter(x_yproj1[hidx], y_yproj1[hidx], c=ch, s=msh, marker=markerh)
     axs[0].plot(x_lines_01, x_lines_01*np.tan(panelsize)*y_lines_01_0, c="C0")
     axs[0].plot(x_lines_01, x_lines_01*np.tan(panelsize)*y_lines_01_1, c="C0")
     axs[1].scatter(x_yproj2, y_yproj2, c=c, s=ms)
+    axs[1].scatter(x_yproj2[hidx], y_yproj2[hidx], c=ch, s=msh, marker=markerh)
     axs[1].plot(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_0 - 0.5) , c="C0")
     axs[1].plot(x_lines_01, x_lines_01*np.tan(panelsize) * (y_lines_01_1 - 0.5) , c="C0")
     axs[2].scatter(x_yproj3, y_yproj3, c=c, s=ms)
+    axs[2].scatter(x_yproj3[hidx], y_yproj3[hidx], c=ch, s=msh, marker=markerh)
     axs[2].plot(x_l0_yproj[r_l0_yproj<rlims[1]], y_l0_yproj[r_l0_yproj<rlims[1]] , c="C0")
     axs[2].plot(x_l1_yproj[r_l1_yproj<rlims[1]], y_l1_yproj[r_l1_yproj<rlims[1]] , c="C0")
     # axs[0].annotate(r"$\Delta y^\mathrm{C}$", xy=(0.,0.), xytext=(0.3,0.9), color="k", va="center", ha="center")
-    axs[0].annotate(r"$\dots\Delta y^\mathrm{C}$", xy=(0.01,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow), va="center", ha="left", color=c_arrow)
+    # axs[0].annotate(r"$\dots\Delta y^\mathrm{C}$", xy=(0.01,0.8), xytext=(0.35,0.8), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow), va="center", ha="left", color=c_arrow)
     axs[0].annotate(r"", xy=(1.0,0.0-0.05), xytext=(1.0,0.5-0.05), arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow))
     # axs[0].annotate(r"", xy=(1.1,0.23), xytext=(1.2,0.23), arrowprops=dict(arrowstyle="-[, widthB=0.8, lengthB=0.4", facecolor="k", color="k", shrinkA=0.1), xycoords="axes fraction")
     # axs[0].annotate(r"$\Delta y^\mathrm{C}$", xy=(1.0,0.23), xytext=(1.2,0.23), xycoords="axes fraction", ha="left", va="center")
+    x0_tarrow = 0.3
+    y0_tarrow = 0.63
+    axs[0].annotate("", xy=(x0_tarrow+l_tarrow, y0_tarrow), xytext=(x0_tarrow, y0_tarrow),
+        xycoords="figure fraction", textcoords="figure fraction",
+        arrowprops=dict(headwidth=20, width=10, fc=c_tarrow, ec=c_tarrow)
+    )
+    x0_tarrow = 0.63
+    axs[1].annotate("", xy=(x0_tarrow+l_tarrow, y0_tarrow), xytext=(x0_tarrow, y0_tarrow),
+        xycoords="figure fraction", textcoords="figure fraction",
+        arrowprops=dict(headwidth=20, width=10, fc=c_tarrow, ec=c_tarrow)
+    )
 
     for i, ax in enumerate(axs):
+        ax.grid()
         ax.set_xticks(xlims.round(0))
         ax.set_yticks(ylims.round(0))
         ax.set_xlim(*xlims)
         ax.set_ylim(*ylims)
         ax.annotate(f"{'ABC'[i]}", xy=(0.95,0.95), xycoords="axes fraction", bbox=dict(boxstyle="round,pad=0.1", facecolor="w", linewidth=0), ha="center", va="center")
 
-        if i == 2:
-            ax.set_xlabel(r"$x^\mathrm{LS'}$")
+        if i < 2:
+            ax.annotate(r"$x_1^\mathrm{LS'}$", xy=(0.6,-0.25), xycoords="axes fraction", ha="center", va="center")
+        else:
+            # ax.set_xlabel(r"$x^\mathrm{LS'}$")
             ax.set_ylabel(r"$y^\mathrm{LS'}$")
+            ax.annotate(r"$x^\mathrm{LS'}$", xy=(0.6,-0.26), xycoords="axes fraction", ha="center", va="center")
 
+    axs[0].set_ylabel(r"$\Delta y_{\max}^\mathrm{C}\cdot y_1^\mathrm{LS'}$")
+    axs[1].set_ylabel(r"$y_2^\mathrm{LS'}$")
     axs[0].set_xticks(*xticks)
     axs[1].set_xticks(*xticks)
-    axs[1].set_ylim(-0.5, 0.5)
+    axs[1].set_ylim(-0.55, 0.55)
     axs[1].set_yticks([-0.5, 0.0, 0.5])
-    fig.subplots_adjust(wspace=-0.5)
+    fig.subplots_adjust(wspace=-0.45)
     fig.tight_layout()
     figs.append(fig)
 
@@ -656,6 +725,7 @@ def plot_scatter_multipanel():
         thetalab, xlab, ylab,        
     )
     for idx, ax in enumerate(axs):
+        ax.set_xlim(np.min([xr.min() for xr in x_raw]), np.max([xr.max() for xr in x_raw]))
         # ax.legend(loc="upper left")
         ax.set_ylim(YLIM)
         # if idx%3 != 0: ax.set_ylabel("")
@@ -750,8 +820,12 @@ def plot_3dscatter(
         cmap=CMAP,
     )
     # ax.set_ylim(YLIM)
+    import matplotlib.ticker as mticker
+
     fig = ax.get_figure()
-    ax.set_box_aspect(None, zoom=0.89)
+    ax.set_box_aspect(None, zoom=0.87)
+    ax.minorticks_off()
+    # ax.set_yticks(np.arange(*ax.get_ylim(), 100))
     ax.xaxis.labelpad = 15
     ax.yaxis.labelpad = 15
     ax.zaxis.labelpad = 15
@@ -1716,12 +1790,12 @@ def main():
     # plot_snn()
     # plot_errorband()
 
-    plot_scatter_multipanel()
+    # plot_scatter_multipanel()
 
-    plot_filtercurve()
+    # plot_filtercurve()
 
-    # #plots with increased fontsize (one column)
-    # plt.rcParams["font.size"] = 25
+    #plots with increased fontsize (one column)
+    plt.rcParams["font.size"] = 25
     # plot_scatter_onepanel()
     # plot_scatter_onepanel_offset()
     # # plot_scatter_multipanel_group()
