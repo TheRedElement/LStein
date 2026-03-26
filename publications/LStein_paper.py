@@ -1647,8 +1647,13 @@ def plot_filtercurve():
         mask = (transmission > 0)
         wavelength = wavelength[mask] / 10
         transmission = transmission[mask]
+
+        num = np.trapezoid(wavelength*transmission, wavelength)
+        den = np.trapezoid(transmission, wavelength)
+        mean_wavelegth = num/den
+
         axs.plot(wavelength, transmission, c=colors[idx], ls=row["plot_ls"], label=f"LSST {row['name']}")
-        axs.axvline(row["wavelength"], color=colors[idx], ls="--", label="")
+        axs.axvline(mean_wavelegth, color=colors[idx], ls="--", label="")
     fig.legend(ncol=3, bbox_to_anchor=(0.5, 1.0), loc="center")
     if SAVE: fig.savefig(f"../report/gfx/filtercurve.pdf")
     return
@@ -1696,7 +1701,7 @@ def main():
     # LSCa = plot_lstein_snii(gp=gp)
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
-    plot_projection()
+    # plot_projection()
     # plot_variables()
 
     # plot_projection_methods(context="theta")
@@ -1712,7 +1717,7 @@ def main():
 
     # plot_scatter_multipanel()
 
-    # plot_filtercurve()
+    plot_filtercurve()
 
     # #plots with increased fontsize (one column)
     # plt.rcParams["font.size"] = 25

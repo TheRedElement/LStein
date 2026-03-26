@@ -1,5 +1,5 @@
 name,wavelength,plot_color,plot_marker,plot_ls,mission,source
-u,361.7,#0c71ff,o,-,lsst,https://ui.adsabs.harvard.edu/abs/2021A%26A...646A.110H/abstract
+u,367.1,#0c71ff,o,-,lsst,https://ui.adsabs.harvard.edu/abs/2021A%26A...646A.110H/abstract
 g,482.7,#49be61,^,-,lsst,https://ui.adsabs.harvard.edu/abs/2021A%26A...646A.110H/abstract
 r,622.3,#c61c00,v,-,lsst,https://ui.adsabs.harvard.edu/abs/2021A%26A...646A.110H/abstract
 i,754.6,#ffc200,s,-,lsst,https://ui.adsabs.harvard.edu/abs/2021A%26A...646A.110H/abstract
