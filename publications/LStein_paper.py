@@ -41,9 +41,10 @@ prop_cycle = (
 )
 plt.rcParams["font.size"] = 22
 plt.rcParams["lines.markersize"] = 5
-plt.rcParams["legend.framealpha"] = 0.8
+plt.rcParams["legend.framealpha"] = 0.0
 plt.rcParams["legend.facecolor"] = "w"
 plt.rcParams["axes.prop_cycle"] = prop_cycle        #constant linestyle
+plt.rcParams["axes.grid"] = False        
 plt.rcParams["savefig.bbox"] = "tight"
 plt.rcParams["savefig.transparent"] = True
 plt.rcParams["text.usetex"] = True
@@ -203,7 +204,7 @@ def get_stats(theta_raw, x_raw, y_raw, fname,
     # yticks = np.sort(np.append(yticks, [-10, 80]))
     panelsize = np.pi/10
     vmin = 300 if ".py" not in fname else None
-    colors = lsu.get_colors(theta_raw, cmap=CMAP_BANDS, vmin=vmin)
+    colors = lsu.get_colors(theta_raw, cmap=CMAP_BANDS, vmin=vmin, vmax=theta_raw.max()+30)
     # colors = COLORS_BANDS
     markers = MARKERS
     linestyles = LINESTYLES
@@ -1652,7 +1653,7 @@ def plot_filtercurve():
         den = np.trapezoid(transmission, wavelength)
         mean_wavelegth = num/den
 
-        axs.plot(wavelength, transmission, c=colors[idx], ls=row["plot_ls"], label=f"LSST {row['name']}")
+        axs.plot(wavelength, transmission, c=colors[idx], ls=row["plot_ls"], label=f"{row['name']}")
         axs.axvline(mean_wavelegth, color=colors[idx], ls="--", label="")
     fig.legend(ncol=3, bbox_to_anchor=(0.5, 1.0), loc="center")
     if SAVE: fig.savefig(f"../report/gfx/filtercurve.pdf")
@@ -1715,7 +1716,7 @@ def main():
     # plot_snn()
     # plot_errorband()
 
-    # plot_scatter_multipanel()
+    plot_scatter_multipanel()
 
     plot_filtercurve()
 
