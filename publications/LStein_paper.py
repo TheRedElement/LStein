@@ -475,8 +475,8 @@ def plot_projection():
         arrowprops=dict(headwidth=20, width=10, fc=c_tarrow, ec=c_tarrow)
     )    
 
-    axp1.annotate(r"$\theta^\mathrm{P}$", xy=(0,0), xytext=(np.pi/18, 1.23))
-    axp2.annotate(r"$\theta^\mathrm{P}$", xy=(0,0), xytext=(np.pi/18, 1.23))
+    axp1.annotate(r"$\theta^\mathrm{P}_1$", xy=(0,0), xytext=(np.pi/18, 1.23))
+    axp2.annotate(r"$\theta^\mathrm{P}_2$", xy=(0,0), xytext=(np.pi/18, 1.23))
     axp2.annotate(r"$\theta^\mathrm{LS'}$", xy=(0,0), xytext=(0.95*theta, 1.11))
     for i, axp in enumerate([axp1, axp2]):
         # axp.set_xticks(np.linspace(np.pi/4, 7*np.pi/4, 4), [r"$\frac{" + str(int(i)) + r"\pi}{4}$" for i in range(1,8,2)])
@@ -567,7 +567,7 @@ def plot_projection():
             ax.set_ylabel(r"$y^\mathrm{LS'}$")
             ax.annotate(r"$x^\mathrm{LS'}$", xy=(0.6,-0.26), xycoords="axes fraction", ha="center", va="center")
 
-    axs[0].set_ylabel(r"$\Delta y_{\max}^\mathrm{C}\cdot y_1^\mathrm{LS'}$")
+    axs[0].set_ylabel(r"$y_1^\mathrm{LS'}$")
     axs[1].set_ylabel(r"$y_2^\mathrm{LS'}$")
     axs[0].set_xticks(*xticks)
     axs[1].set_xticks(*xticks)
@@ -1776,7 +1776,7 @@ def main():
     # LSCa = plot_lstein_snii(gp=gp)
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
-    # plot_projection()
+    plot_projection()
     # plot_variables()
 
     # plot_projection_methods(context="theta")
