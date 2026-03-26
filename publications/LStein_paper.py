@@ -411,12 +411,13 @@ def plot_projection():
             ax.set_ylim(*ylims)
             ax.set_xticks(*xticks)
             # ax.set_xlabel(r"$x_1^\mathrm{LS'}$")
-            ax.set_ylabel(r"$y_1^\mathrm{LS'}$")
             ax.annotate(r"$x_1^\mathrm{LS'}$", xy=(0.6,-0.25), xycoords="axes fraction", ha="center", va="center")
         else:
             # ax.set_xlabel(r"$x^\mathrm{C}$")
             ax.set_ylabel(r"$y^\mathrm{C}$")
             ax.annotate(r"$x^\mathrm{C}$", xy=(0.6,-0.265), xycoords="axes fraction", ha="center", va="center")
+    axs[1].set_ylabel(r"$y_0^\mathrm{LS'}$")
+    axs[2].set_ylabel(r"$y_1^\mathrm{LS'}$")
     fig.subplots_adjust(wspace=-0.5)
     fig.tight_layout()
     figs.append(fig)
@@ -567,7 +568,7 @@ def plot_projection():
             ax.set_ylabel(r"$y^\mathrm{LS'}$")
             ax.annotate(r"$x^\mathrm{LS'}$", xy=(0.6,-0.26), xycoords="axes fraction", ha="center", va="center")
 
-    axs[0].set_ylabel(r"$y_1^\mathrm{LS'}$")
+    axs[0].set_ylabel(r"$\Delta y^\mathrm{C}_{\max} \cdot y_1^\mathrm{LS'}$")
     axs[1].set_ylabel(r"$y_2^\mathrm{LS'}$")
     axs[0].set_xticks(*xticks)
     axs[1].set_xticks(*xticks)
