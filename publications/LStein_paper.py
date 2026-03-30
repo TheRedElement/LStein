@@ -231,7 +231,7 @@ def plot_lstein_snii(gp=True):
 
     # thetaguidelims=(0*np.pi/2,2*np.pi/2)
     thetaguidelims=(2*np.pi/2,0*np.pi/2)
-    thetaticks = thetaticks[::-1]
+    thetaticks = (thetaticks[::-1],thetaticks[::1])
     xticks = xticks[::-1]
     yticks = yticks[::-1]
 
@@ -386,11 +386,11 @@ def plot_projection():
     #     arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
     #     va="center", ha="left", color=c_arrow, xycoords="axes fraction"
     # )
-    axs[2].annotate(r"",
-        xy=(0.75,0.01), xytext=(0.75,0.75+0.02),
-        arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
-        va="center", ha="left", color=c_arrow, xycoords="axes fraction", zorder=-1
-    )
+    # axs[2].annotate(r"",
+    #     xy=(0.75,0.01), xytext=(0.75,0.75+0.02),
+    #     arrowprops=dict(arrowstyle="<|-|>,head_width=.15", linewidth=2, facecolor=c_arrow, color=c_arrow),
+    #     va="center", ha="left", color=c_arrow, xycoords="axes fraction", zorder=-1
+    # )
     x0_tarrow = 0.33
     y0_tarrow = 0.66    
     axs[0].annotate("", xy=(x0_tarrow+l_tarrow, y0_tarrow), xytext=(x0_tarrow, y0_tarrow),
@@ -1425,7 +1425,7 @@ def plot_pulsar_freq_phase():
     xticks = np.round(np.linspace(np.nanmin(xticks[:,0]), np.nanmax(xticks[:,1]), 5), 1)#.astype(int)
     # xticks = np.linspace(4000, 9000, 5).astype(int)
     yticks = np.array([[np.nanmin(yi), np.nanmax(yi)] for yi in Y])
-    yticks = np.array([np.floor(np.nanmin(yticks[:,0])), np.ceil(np.nanmax(yticks[:,1]))])
+    yticks = np.array([np.floor(np.nanmin(yticks[:,0])), np.ceil(np.nanmax(yticks[:,1]))]).astype(int)
 
     colors = lsu.get_colors(theta, cmap=CMAP)
     panelsize = np.pi/12
@@ -1437,15 +1437,16 @@ def plot_pulsar_freq_phase():
         thetaticks, xticks, yticks,
         thetaguidelims=(plotlims[0],1*plotlims[1]), thetaplotlims=(plotlims[0]+panelsize/2,1*plotlims[1]-panelsize/2), panelsize=panelsize,
         # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
-        thetalabel="Frequency\n[MHz]", xlabel="Phase", ylabel="Flux $\\left[\\right]$",
+        thetalabel="Frequency\n[MHz]", xlabel="Phase", ylabel="Flux",
         thetalabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(-0.5,0.0)),
         thetaticklabelkwargs=dict(pad=0.25),
         xlabelkwargs=dict(rotation=-90, textcoords="offset fontsize", xytext=(-3.3,0)),
         xticklabelkwargs=dict(textcoords="offset fontsize", xytext=(-2,-0.5)),
-        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(5.5,1.2)),
+        ylabelkwargs=dict(rotation=0, textcoords="offset fontsize", xytext=(8.5,19)),
     )
     for i in range(len(theta)):
-        show_y_guides = (i==16) #only for one specific LSP
+        # show_y_guides = (i==16) #only for one specific LSP
+        show_y_guides = (i==80) #only for one specific LSP
 
         LSP = LSC.add_panel(
             theta[i],
@@ -1453,8 +1454,9 @@ def plot_pulsar_freq_phase():
             show_panelbounds=show_y_guides,
             show_yticks=show_y_guides,
             y_projection_method="theta",
-            yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
-            panelboundskwargs=dict(zorder=100)
+            # yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+            yticklabelkwargs=dict(rotation=38, textcoords="offset fontsize", xytext=(0.1,0.1)),
+            panelboundskwargs=dict(zorder=100, c="k", ls="-")
         )
         # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
         LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=0.9)
@@ -1777,14 +1779,14 @@ def main():
     # LSCa = plot_lstein_snii(gp=gp)
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
-    plot_projection()
+    # plot_projection()
     # plot_variables()
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
     # plot_spectra_pessi()
     # plot_spectra_mayall()
-    # plot_pulsar_freq_phase()
+    plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
     # plot_hypsearch()
