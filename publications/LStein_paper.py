@@ -608,6 +608,10 @@ def plot_variables():
         # thetatickkwargs=dict(c="orangered")
     )
     for i, th in enumerate(thetaticks[0]):
+        if i > 1:
+            #don't plot last panel
+            continue
+
         if i == 0:
             panelboundskwargs = dict(ls="-")
             yticks_use = yticks
@@ -1780,13 +1784,13 @@ def main():
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
     # plot_projection()
-    # plot_variables()
+    plot_variables()
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
     # plot_spectra_pessi()
     # plot_spectra_mayall()
-    plot_pulsar_freq_phase()
+    # plot_pulsar_freq_phase()
     # plot_pulsar_subint_phase()
     # plot_pulsar_combined()
     # plot_hypsearch()
