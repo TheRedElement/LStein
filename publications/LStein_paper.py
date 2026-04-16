@@ -1784,7 +1784,7 @@ def main():
     # LSCb = plot_lstein_tde(gp=True)
     # plot_graphical_abstract([LSCa,LSCb])
     # plot_projection()
-    plot_variables()
+    # plot_variables()
 
     # plot_projection_methods(context="theta")
     # plot_projection_methods(context="y")
@@ -1797,12 +1797,12 @@ def main():
     # plot_snn()
     # plot_errorband()
 
-    # plot_scatter_multipanel()
 
     # plot_filtercurve()
 
     #plots with increased fontsize (one column)
     plt.rcParams["font.size"] = 25
+    # plot_scatter_multipanel()
     # plot_scatter_onepanel()
     # plot_scatter_onepanel_offset()
     # # plot_scatter_multipanel_group()
