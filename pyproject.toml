@@ -1,6 +1,6 @@
 [project]
 name = "LStein"
-version = "1.0.0"
+version = "0.2.0"
 description = "LStein: a new approach to visualizing sparse 2.5-dimensional data in 2D"
 readme = "README.md"
 authors = [
