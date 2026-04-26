@@ -33,8 +33,8 @@ jobs:
         run: uv build
       #basic checks
       - name: LSteinCanvas test (wheel)
-        run: uv run --isolated --no-project --with dev --with dist/*.whl tests/base/LSteinCanvas_test.py
+        run: uv run --isolated --no-project --with dist/*.whl tests/install_test.py
       - name: LSteinCanvas test (source distribution)
-        run: uv run --isolated --no-project --with dev --with dist/*.tar.gz tests/base/LSteinCanvas_test.py
+        run: uv run --isolated --no-project --with dist/*.tar.gz tests/install_test.py
       # - name: Publish
       #   run: uv publish
