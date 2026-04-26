@@ -1,10 +1,10 @@
 [project]
 name = "LStein"
 version = "1.0.0"
-description = "Add your description here"
+description = "LStein: a new approach to visualizing sparse 2.5-dimensional data in 2D"
 readme = "README.md"
 authors = [
-    {name = "Lukas Steinwender"}
+    {name = "Lukas Steinwender", email="lukas.steinwender99+lstein@gmail.com"}
 ]
 requires-python = ">=3.11"
 dependencies = [
@@ -13,7 +13,7 @@ dependencies = [
     "plotly>=6.4.0",
 ]
 maintainers = [
-    {name = "Lukas Steinwender"}
+    {name = "Lukas Steinwender", email="lukas.steinwender99+lstein@gmail.com"}
 ]
 license = {file = "LICENSE"}
 keywords = [ "visualization", "projection", ]
@@ -53,7 +53,7 @@ lustcodesnippets-py = { git = "https://github.com/TheRedElement/LuStCodeSnippets
 
 #custom stuff
 [project.urls]
-Homepage = "https://github.com/TheRedElement/LStein"
+Homepage = "https://lstein.readthedocs.io/"
 Repository = "https://github.com/TheRedElement/LStein"
 Issues = "https://github.com/TheRedElement/LStein/issues"
 

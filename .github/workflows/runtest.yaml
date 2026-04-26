@@ -1,0 +1,36 @@
+# workflow based on uv tutorial: https://docs.astral.sh/uv/guides/integration/github/#publishing-to-pypi
+
+name: "Run tests"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          # pin specific uv version
+          version: "0.8.15"        
+      - name: "Set up Python"
+        uses: actions/setup-python@v6
+        with:
+          # use latest python version compatible with project
+          python-version-file: "pyproject.toml"
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+      - name: Run tests
+        run: uv run pytest -s test/
