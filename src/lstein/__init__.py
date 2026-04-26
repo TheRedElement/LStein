@@ -14,13 +14,14 @@ Subpackages
 - `base`
 
 """
+from importlib.metadata import metadata, version
 
-__modulename__ = "LStein" 
-__version__ = "1.0.0"
-__author__ = "Lukas Steinwender"
-__author_email__ = ""
-__maintainer__ = "Lukas Steinwender"
-__maintainer_email__ = ""
-__url__ = "https://github.com/TheRedElement/LStein"
-__docs__ = "https://lstein.readthedocs.io/"
-__credits__ = ""
+#expose metadata
+meta = metadata("lstein")
+__modulename__ = "LStein"
+__version__ = version("lstein")
+__author__ = meta["Author"]
+__author_email__ = meta["Author-email"]
+__maintainer__ = meta["Maintainer"]
+__maintainer_email__ = meta["Maintainer-email"]
+__url__ = meta.get_all("Project-URL")

@@ -13,7 +13,7 @@ dependencies = [
     "plotly>=6.4.0",
 ]
 maintainers = [
-    {name = "Lukas Steinwender", email="lukas.steinwender99+lstein@gmail.com"}
+    {name = "Lukas Steinwender", email="lukas.steinwender99+lstein@gmail.com"},
 ]
 license = {file = "LICENSE"}
 keywords = [ "visualization", "projection", ]
@@ -54,6 +54,7 @@ lustcodesnippets-py = { git = "https://github.com/TheRedElement/LuStCodeSnippets
 #custom stuff
 [project.urls]
 Homepage = "https://lstein.readthedocs.io/"
+Docs = "https://lstein.readthedocs.io/"
 Repository = "https://github.com/TheRedElement/LStein"
 Issues = "https://github.com/TheRedElement/LStein/issues"
 

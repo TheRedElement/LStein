@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "LStein: Linking Series to envision information neatly"
+
+authors:
+  - family-names: Steinwender
+    given-names: Lukas
+
+version: "latest"
+
+date-released: 2025-07-01
+
+url: "https://github.com/TheRedElement/LStein.git"
+
+preferred-citation:
+  type: software
+  title: "LStein: Linking Series to envision information neatly"
+  authors:
+    - family-names: Steinwender
+      given-names: Lukas
+  version: "latest"
+  url: "https://github.com/TheRedElement/LStein.git"
+  year: 2025
+  month: 7
