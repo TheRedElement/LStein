@@ -8,14 +8,29 @@ on:
       # publish on any tag starting with a `v`, e.g., v0.1.0
       - v*
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   publish:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -36,5 +51,6 @@ jobs:
         run: uv run --isolated --no-project --with dist/*.whl tests/import_test.py
       - name: LSteinCanvas test (source distribution)
         run: uv run --isolated --no-project --with dist/*.tar.gz tests/import_test.py
-      # - name: Publish
-      #   run: uv publish
+      #publish to pypi
+      - name: Publish
+        run: uv publish
