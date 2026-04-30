@@ -1,25 +1,21 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-type: software
-title: "LStein: Linking Series to envision information neatly"
-
+message: "If you use this work, please cite it as below."
+type: article
+title: "LStein: A new approach to visualizing sparse 2.5-dimensional data"
 authors:
-  - family-names: Steinwender
-    given-names: Lukas
-
-version: "latest"
-
-date-released: 2025-07-01
-
-url: "https://github.com/TheRedElement/LStein.git"
-
-preferred-citation:
-  type: software
-  title: "LStein: Linking Series to envision information neatly"
-  authors:
-    - family-names: Steinwender
-      given-names: Lukas
-  version: "latest"
-  url: "https://github.com/TheRedElement/LStein.git"
-  year: 2025
-  month: 7
+  - family-names: "Steinwender"
+    given-names: "Lukas"
+  - family-names: "Möller"
+    given-names: "Anais"
+  - family-names: "Fluke"
+    given-names: "Christopher J."
+year: 2026
+month: 4
+journal: "arXiv e-prints"
+identifiers:
+  - type: doi
+    value: "10.48550/arXiv.2604.24034"
+  - type: arxiv
+    value: "2604.24034"
+keywords:
+  - "Instrumentation and Methods for Astrophysics"

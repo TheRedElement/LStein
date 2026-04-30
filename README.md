@@ -27,13 +27,21 @@
 If you use this code in your work please use this entry in your bibliography (for now):
 
 ```latex
-@software{PY_Steinwender2025_lstein,
-	author    = {{Steinwender}, Lukas},
-	title     = {LStein: Linking Series to envision information neatly},
-	month     = Jul,
-	year      = 2025,
-	version   = {latest},
-	url       = {https://github.com/TheRedElement/LStein.git}
+@ARTICLE{Steinwender2026_Lstein,
+       author = {{Steinwender}, Lukas and {M{\"o}ller}, Anais and {Fluke}, Christopher J.},
+        title = "{LStein: A new approach to visualizing sparse 2.5-dimensional data}",
+      journal = {arXiv e-prints},
+     keywords = {Instrumentation and Methods for Astrophysics},
+         year = 2026,
+        month = apr,
+          eid = {arXiv:2604.24034},
+        pages = {arXiv:2604.24034},
+          doi = {10.48550/arXiv.2604.24034},
+archivePrefix = {arXiv},
+       eprint = {2604.24034},
+ primaryClass = {astro-ph.IM},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2026arXiv260424034S},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
 
