@@ -4,6 +4,7 @@
 ~/
 .vscode
 gfx/*.png
+gfx/*.json
 gfx/*.pdf
 poetry.lock
 report/gfx
