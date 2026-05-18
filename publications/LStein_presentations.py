@@ -20,6 +20,31 @@ CMAP:str = "plasma"
 
 
 #%%definitions
+
+def binning(
+    x, y, dx,
+    func=np.nanmean,
+    ):
+
+    xbin = np.array([])
+    ybin = np.array([])
+    
+    #init inteval bounds
+    xlb = np.nanmin(x)
+    xub = xlb+dx
+    #apply binning
+    while xub <= np.nanmax(x):
+        mask = (xlb <= x)&(x < xub)  #current inteval
+        xbin = np.append(xbin, func(x[mask]))
+        ybin = np.append(ybin, func(y[mask]))
+        
+        #update
+        xlb += dx
+        xub += dx
+
+
+    return xbin, ybin
+
 def get_passbands() -> dict:
     df_pb = pl.read_csv("../data/passband_specs.csv")
     # passbands = list(df_pb["name"])
@@ -362,7 +387,6 @@ def plot_lstein_snn():
 
 def plot_lstein_pulsar():
 
-
     data = np.load("../data/pulsar_data/J0437-4715_2021-02-03.npz")     #very bright
     data = np.load("../data/pulsar_data/J1804-2858_2024-03-19.npz")     #very faint
     data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")     #RFI contaminated
@@ -463,6 +487,131 @@ def plot_lstein_pulsar():
     )    
     pio.write_json(fig, "../gfx/LsteinPulsar.json", pretty=True)
     fig.show()
+
+def plot_lstein_spectra():
+
+    datadir = "../data/wiserep_SN2023ixf_spectra/"
+    lbda_factor = 1     #1/10  #convert AA -> nm
+    #load data
+    df_obs = (pl.read_csv(f"{datadir}wiserep_spectra.csv", comment_prefix="#")
+        .select("IAU name", "Obs-date", "JD", "Ascii file", "Phase (days)", "Spec. ID")
+        .filter(pl.col("Ascii file").str.contains("Mayall"))   #different format -> ignore
+        .sort("Ascii file")
+        # .sort("Phase (days)")
+    )
+    print(df_obs["Phase (days)"].to_numpy())
+    print(df_obs.height)
+    df_obs = df_obs[[0,5,8,11,15,17],:] #wiserep
+
+    # df_obs = df_obs.filter((pl.col("Phase (days)").abs() < 1)) #wiserep
+    dfs_spec = [] 
+    for idx in range(df_obs.height):
+        df_spec = (
+            pl.read_csv(f"{datadir}{df_obs['Ascii file'][idx]}", comment_prefix="#", separator=" ")
+                .rename({"WAVE":"wavelength","FLUX":"flux"})
+        )
+        dfs_spec.append(df_spec)
+
+    #preprocessing
+    flux_factor = 1e-3#1e15
+    theta = df_obs["Phase (days)"]
+    # theta = df_obs["index"]
+    X = [df["wavelength"].to_numpy().flatten()*lbda_factor for df in dfs_spec]
+    Y = [df["flux"].to_numpy().flatten()*flux_factor for df in dfs_spec]
+
+    #continuum removal
+    XY_cont = [binning(xi, yi, 500, np.nanmedian) for xi, yi in zip(X, Y)]
+    X_cont = [np.linspace(X[i].min(), X[i].max(), X[i].shape[0]) for i in range(len(X))]
+    Y_cont = [np.interp(np.linspace(X[i].min(), X[i].max(), X[i].shape[0]), XY_cont[i][0], XY_cont[i][1]) for i in range(len(X))]
+    
+    Y = [Y[i] - Y_cont[i] for i in range(len(Y))]
+    # for i in range(len(X)):
+    #     plt.plot(X[i], Y[i])
+    #     plt.plot(X_cont[i], Y_cont[i])
+
+    # #wavelength constraint
+    Y = [Y[i][((5000*lbda_factor<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
+    X = [X[i][((5000*lbda_factor<X[i]) & (X[i]<np.inf))] for i in range(len(X))]
+
+    #sigma clipping
+    sc_mask = lambda x, n=5: (np.median(x)-n*x.std()<x)&(x<np.median(x)+n*x.std())
+    X = [X[i][sc_mask(Y[i])] for i in range(len(X))]
+    Y = [Y[i][sc_mask(Y[i])] for i in range(len(Y))]
+
+    #binning
+    XY = [binning(xi, yi, 10, np.nanmean) for xi, yi in zip(X, Y)]
+    X = [XYi[0] for XYi in XY]
+    Y = [XYi[1] for XYi in XY]
+
+    # for i in range(len(theta)):
+    #     plt.plot(X[i], Y[i])
+
+    #X as an offset (to ensure computation with smaller values => minimize projection effects)
+    Xmin = np.min([np.min(xi) for xi in X])
+    Xmax = np.max([np.max(xi) for xi in X])
+    Xmin = 5000*lbda_factor
+    Xmax = 9500*lbda_factor
+    X = [lsu.minmaxscale(xi, 0, 10, Xmin, Xmax) for xi in X]
+
+    thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
+    xticks = np.array([[np.min(xi), np.max(xi)] for xi in X])
+    xticks = np.round(np.linspace(xticks[:,0].min(), xticks[:,1].max(), 5), 5).astype(int)
+    # xticks = (xticks,np.linspace(Xmin,Xmax,5).astype(int))   #make sure ticklabels display correct value
+    yticks = np.array([[np.min(yi), np.max(yi)] for yi in Y])
+    yticks = np.round(np.array([yticks[:,0].min(), yticks[:,1].max()]), 1).astype(float)
+
+    colors = lsu.get_colors(theta, cmap=CMAP)
+    panelsize = np.pi/10
+    # guidelims = (-np.pi/2,1*np.pi/2)
+    guidelims = (3*np.pi/2,np.pi/2)
+    xticks = (xticks[::-1], np.linspace(Xmin,Xmax,5).astype(int)[::-1])
+    yticks = yticks[::-1]
+    # erg cm(-2) sec(-1) Ang(-1)
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=guidelims, thetaplotlims=(guidelims[0]-1.3*panelsize+1.3*panelsize/2,guidelims[1]+panelsize-panelsize/2), panelsize=panelsize,
+        # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+        thetalabel="Time since peak [d]", xlabel="Wavelength [&#xC5;]", ylabel=r"Flux &#x00b7; 10<sup>-20</sup> [erg/cm<sup>2</sup>/s/&#xC5;]",
+        thetalabelkwargs=dict(c="w", textangle=0, xshift=10),
+        xlabelkwargs=dict(c="w", textangle=-90, xshift=40, yanchor="bottom"),
+        xticklabelkwargs=dict(c="w", xshift=20),
+        ylabelkwargs=dict(c="w", textangle=0, xshift=0, yshift=-10),
+    )
+    for i in range(len(theta)):
+        rot = lsu.minmaxscale(theta[i], *LSC.thetaplotlims, *LSC.thetalims)*180/np.pi + 180 #rotating labels
+        LSP = LSC.add_panel(
+            theta[i],
+            panelsize=panelsize,
+            show_panelbounds=True,
+            y_projection_method="theta",
+            panelboundskwargs=dict(c="w"),
+            yticklabelkwargs=dict(c="w"),
+        )
+        LSP.plot(X[i], Y[i],  c=colors[i], showlegend=False)
+
+    fig = lstein.draw(LSC, backend="plotly")
+    fig.update_layout(
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+        margin=dict(
+            t=0,
+            b=0,
+            l=0,
+            r=0,
+        ),
+        font=dict(
+            size=10,
+        ),
+    )        
+    pio.write_json(fig, f"../gfx/LsteinSpectra.json", pretty=True)
+    fig.show()
+    
+    return
 #%%main
 def main():
 
@@ -480,9 +629,9 @@ def main():
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     pb_mappings,
     # )
-    plot_lstein_snn()
+    # plot_lstein_snn()
     # plot_lstein_pulsar()
-
+    plot_lstein_spectra()
 
 
 
