@@ -308,7 +308,7 @@ def plot_lstein_snn():
         state_mon_eif.u/mV,
         state_mon_qif.u/mV,
     ])
-    thetaticks  = np.round(np.linspace(theta.min(), theta.max(), 5), decimals=0).astype(int)
+    thetaticks  = np.round(np.linspace(theta.min(), theta.max(), 3), decimals=0).astype(int)
     xticks      = np.round(np.linspace(x.min(), x.max(), 5), decimals=0).astype(int)
     yticks      = np.round(np.linspace(y.min(), y.max(), 5), decimals=0).astype(int)
     colors = np.repeat(np.array(lsu.get_colors(np.arange(n_neurons), cmap=CMAP)).reshape(-1,1), len(np.unique(theta)))     #one color per NEURON TYPE
@@ -318,7 +318,7 @@ def plot_lstein_snn():
         xlimdeadzone=0.35,
         # thetalabel="$I_\mathrm{ext}$ [pA]", xlabel="Time [ms]", ylabel="$u_\mathrm{membrane}$ [mV]",
         thetalabel="External current [pA]", xlabel="Time [ms]", ylabel="Membrane potential [mV]",
-        thetalabelkwargs=dict(c="w", textangle=45, yshift=30, xshift=30),
+        thetalabelkwargs=dict(c="w", textangle=45, yshift=20, xshift=20),
         xlabelkwargs=dict(c="w", yshift=-20),
         ylabelkwargs=dict(c="w", textangle=80, xshift=5),
         thetaticklabelkwargs=dict(c="w"),
@@ -480,8 +480,8 @@ def main():
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     pb_mappings,
     # )
-    # plot_lstein_snn()
-    plot_lstein_pulsar()
+    plot_lstein_snn()
+    # plot_lstein_pulsar()
 
 
 
