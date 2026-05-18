@@ -15,6 +15,10 @@ from lstein import lstein, utils as lsu, makedata as md, paper_plots as pp
 
 pio.templates.default = "plotly_dark"
 
+#%%constants
+CMAP:str = "plasma"
+
+
 #%%definitions
 def get_passbands() -> dict:
     df_pb = pl.read_csv("../data/passband_specs.csv")
@@ -287,7 +291,7 @@ def plot_lstein_snn():
     n_neurons, state_mon_lif, state_mon_eif, state_mon_qif = run_brian2()
 
     panelsize = np.pi/8
-    cmap = "plasma"
+
     ##lstein
     theta = np.concat([
         np.unique(state_mon_lif.I/pA),
@@ -307,7 +311,7 @@ def plot_lstein_snn():
     thetaticks  = np.round(np.linspace(theta.min(), theta.max(), 5), decimals=0).astype(int)
     xticks      = np.round(np.linspace(x.min(), x.max(), 5), decimals=0).astype(int)
     yticks      = np.round(np.linspace(y.min(), y.max(), 5), decimals=0).astype(int)
-    colors = np.repeat(np.array(lsu.get_colors(np.arange(n_neurons), cmap=cmap)).reshape(-1,1), len(np.unique(theta)))     #one color per NEURON TYPE
+    colors = np.repeat(np.array(lsu.get_colors(np.arange(n_neurons), cmap=CMAP)).reshape(-1,1), len(np.unique(theta)))     #one color per NEURON TYPE
     LSC = lstein.LSteinCanvas(
         thetaticks, xticks, yticks,
         thetaguidelims=(0,np.pi/2), thetaplotlims=(0+panelsize/2,np.pi/2-panelsize/2), panelsize=panelsize,
@@ -355,6 +359,110 @@ def plot_lstein_snn():
     pio.write_json(fig, f"../gfx/LsteinSnn.json", pretty=True)
     fig.show()
     return
+
+def plot_lstein_pulsar():
+
+
+    data = np.load("../data/pulsar_data/J0437-4715_2021-02-03.npz")     #very bright
+    data = np.load("../data/pulsar_data/J1804-2858_2024-03-19.npz")     #very faint
+    data = np.load("../data/pulsar_data/J2145-0750_2023-03-07.npz")     #RFI contaminated
+    data = np.load("../data/pulsar_data/J2145-0750_2023-03-30.npz")     #cleaned (follow-up observation)
+    print(data.files)
+    freq    = np.linspace(0, data["bandwidth"], data["nchan"]) + data["freq_ctr"]-data["bandwidth"]/2
+    phase   = np.linspace(0, 1, data["nbin"])
+    print(data["nsubint"])
+    subint  = np.linspace(0, 8, data["nsubint"])
+
+    #define dimensions
+    theta = freq
+    X = np.repeat(phase.reshape(1,-1), theta.shape[0], axis=0)
+    Y = data["freq_phase"][:theta.shape[0]]
+    # plt.plot(np.nanmean(X, axis=0), np.nanmean(Y, axis=0), zorder=10)
+    # for i in range(10):
+    #     plt.plot(X[i,:], Y[i,:])
+    # plt.show()
+
+    #normalize
+    # Y = Y / np.nanmedian(Y, axis=1, keepdims=True)
+
+    #introduce missing freqs
+    fidx = np.random.choice(range(Y.shape[0]), size=10, replace=False)
+    Y[fidx,:] = np.nan
+
+    #filter NaNs
+    nanmask = np.any(np.isfinite(Y), axis=1)
+    theta = theta[nanmask]
+    X = X[nanmask]
+    Y = Y[nanmask]
+
+    subset = slice(0,None,1)
+    theta = theta[subset]
+    X = X[subset,:]
+    Y = Y[subset,:]
+    X = [xi for xi in X]
+    Y = [yi for yi in Y]
+    thetaticks = np.round(np.linspace(theta.min(), theta.max(), 5)).astype(int)
+    xticks = np.array([[np.nanmin(xi), np.nanmax(xi)] for xi in X])
+    xticks = np.round(np.linspace(np.nanmin(xticks[:,0]), np.nanmax(xticks[:,1]), 5), 1)#.astype(int)
+    # xticks = np.linspace(4000, 9000, 5).astype(int)
+    yticks = np.array([[np.nanmin(yi), np.nanmax(yi)] for yi in Y])
+    yticks = np.array([np.floor(np.nanmin(yticks[:,0])), np.ceil(np.nanmax(yticks[:,1]))]).astype(int)
+
+    colors = lsu.get_colors(theta, cmap=CMAP)
+    panelsize = np.pi/12
+    plotlims = [-np.pi/2, 1*np.pi/2]
+    # plotlims = [np.pi/2, 3*np.pi/2]
+    # xticks = xticks[::-1]
+    # yticks = yticks[::-1]
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(plotlims[0],1*plotlims[1]), thetaplotlims=(plotlims[0]+panelsize/2,1*plotlims[1]-panelsize/2), panelsize=panelsize,
+        # thetalabel=df.columns[0], xlabel=df.columns[1], ylabel=df.columns[y1idx],
+        thetalabel="Frequency<br>[MHz]", xlabel="Phase", ylabel="Flux",
+        thetalabelkwargs=dict(c="w", textangle=0,),
+        thetaticklabelkwargs=dict(c="w", pad=0.25),
+        xlabelkwargs=dict(c="w", textangle=90, xshift=-25, yshift=10),
+        xticklabelkwargs=dict(c="w", xshift=-10),
+        ylabelkwargs=dict(c="w", textangle=0, xshift=170, yshift=350),
+    )
+    for i in range(len(theta)):
+        # show_y_guides = (i==16) #only for one specific LSP
+        show_y_guides = (i==80) #only for one specific LSP
+
+        LSP = LSC.add_panel(
+            theta[i],
+            panelsize=panelsize,
+            show_panelbounds=show_y_guides,
+            show_yticks=show_y_guides,
+            y_projection_method="theta",
+            # yticklabelkwargs=dict(rotation=np.linspace(panelsize/2, np.pi/2-panelsize/2, len(theta))[i]*180/np.pi),
+            yticklabelkwargs=dict(c="w", textangle=38,),
+            panelboundskwargs=dict(zorder=100, c="w")
+        )
+        # LSP.plot(X[i], Y[i],  c=colors[i], label=f"{theta[i]}: {thetalabs[i]}")
+        LSP.plot(X[i], Y[i],  c=colors[i], label=f"", lw=1, alpha=0.9, showlegend=False)
+
+    fig = lstein.draw(LSC, backend="plotly")
+    fig.update_layout(
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+        margin=dict(
+            t=0,
+            b=0,
+            l=0,
+            r=0,
+        ),
+        font=dict(
+            size=10,
+        ),
+    )    
+    pio.write_json(fig, "../gfx/LsteinPulsar.json", pretty=True)
+    fig.show()
 #%%main
 def main():
 
@@ -372,7 +480,8 @@ def main():
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     pb_mappings,
     # )
-    plot_lstein_snn()
+    # plot_lstein_snn()
+    plot_lstein_pulsar()
 
 
 
