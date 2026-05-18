@@ -1,4 +1,10 @@
 #%%imports
+import brian2
+import brian2.numpy_ as np_
+from brian2 import NeuronGroup, Network
+from brian2 import TimedArray
+from brian2 import StateMonitor, SpikeMonitor
+from brian2 import Gohm, ms, mV, pA, pF, second
 import numpy as np
 import polars as pl
 from plotly.subplots import make_subplots
@@ -31,7 +37,6 @@ def get_passbands() -> dict:
 def load_data() -> Tuple[pl.DataFrame, pl.DataFrame]:
     df = pl.read_csv(f"../data/72147108_snii_elasticc.csv", comment_prefix="#")
     
-    print(df)
     df_raw = df.filter(pl.col("processing")=="raw")
     df_pro = df.filter(pl.col("processing")=="gp")
 
@@ -132,7 +137,7 @@ def plot_onepanel(
     fig.show()
     return
 
-def plot_lstein(
+def plot_lstein_snii(
     pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
     pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
     pb_mappings:dict,        
@@ -180,6 +185,175 @@ def plot_lstein(
     pio.write_json(fig, "../gfx/LsteinSnii.json", pretty=True)
     fig.show()
     return
+
+def run_brian2():
+
+    #simulation
+    ##neuron params
+    n_neurons   = 3
+    u_rest      = -65*mV
+    # u_rest      = 0*mV
+    u_reset     = -75*mV
+    u_th        = -50*mV #(=theta)
+    C_m         = 750*pF
+    R_m         = 0.02*Gohm
+    tau_m       = R_m*C_m
+    a0          = 3e-1*(1/mV)   #qif specific
+    u_c         = -50*mV        #qif specific
+    Delta_T     = 3*mV          #eif specific
+    theta_rh    = -50*mV        #eif specific
+    delta_abs   = 0*ms  #refractory period
+
+    ##simulation specs
+    t_sim = .2 * second
+    dt = .1 * ms
+    
+    ##config brian2
+    brian2.defaultclock.dt = dt
+
+    ##neuron inputs
+    t_in = np_.arange(0, t_sim, dt)
+    I_in = TimedArray(np_.linspace([800]*len(t_in), 1000, n_neurons).T * pA, dt=dt)
+
+    ##init network
+    brian2.start_scope()
+    net1 = Network()
+    
+    ##setup neurons
+    def get_lif():
+        eqs = dict(
+            model=(
+                'du/dt = -(u-u_rest)/tau_m + (R_m*I)/tau_m : volt (unless refractory)\n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+    def get_eif():
+        eqs = dict(
+            model=(
+                'du/dt = (-(u-u_rest)/tau_m) + Delta_T * exp((u - theta_rh)/Delta_T)/tau_m'
+                ' + R_m*I/tau_m'
+                '\n'
+                '   : volt (unless refractory) \n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+    def get_qif():
+        eqs = dict(
+            model=(
+                'du/dt = (a0*(u-u_rest)*(u-u_c)/tau_m)'
+                ' + R_m*I/tau_m'
+                '\n'
+                '   : volt (unless refractory) \n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+
+    G_lif, state_mon_lif = get_lif()
+    G_eif, state_mon_eif = get_eif()
+    G_qif, state_mon_qif = get_qif()
+    net1.add([
+        G_lif, state_mon_lif,
+        G_eif, state_mon_eif,
+        G_qif, state_mon_qif,
+    ])
+
+    ##simulate
+    net1.run(t_sim)
+
+    return n_neurons, state_mon_lif, state_mon_eif, state_mon_qif
+
+def plot_lstein_snn():
+    n_neurons, state_mon_lif, state_mon_eif, state_mon_qif = run_brian2()
+
+    panelsize = np.pi/8
+    cmap = "plasma"
+    ##lstein
+    theta = np.concat([
+        np.unique(state_mon_lif.I/pA),
+        np.unique(state_mon_eif.I/pA),
+        np.unique(state_mon_qif.I/pA)
+    ])
+    x = np.concat([
+        [state_mon_lif.t/ms]*n_neurons,
+        [state_mon_eif.t/ms]*n_neurons,
+        [state_mon_qif.t/ms]*n_neurons,
+    ])
+    y = np.concat([
+        state_mon_lif.u/mV,
+        state_mon_eif.u/mV,
+        state_mon_qif.u/mV,
+    ])
+    thetaticks  = np.round(np.linspace(theta.min(), theta.max(), 5), decimals=0).astype(int)
+    xticks      = np.round(np.linspace(x.min(), x.max(), 5), decimals=0).astype(int)
+    yticks      = np.round(np.linspace(y.min(), y.max(), 5), decimals=0).astype(int)
+    colors = np.repeat(np.array(lsu.get_colors(np.arange(n_neurons), cmap=cmap)).reshape(-1,1), len(np.unique(theta)))     #one color per NEURON TYPE
+    LSC = lstein.LSteinCanvas(
+        thetaticks, xticks, yticks,
+        thetaguidelims=(0,np.pi/2), thetaplotlims=(0+panelsize/2,np.pi/2-panelsize/2), panelsize=panelsize,
+        xlimdeadzone=0.35,
+        thetalabel="$I_\mathrm{ext}$ [pA]", xlabel="Time [ms]", ylabel="$u_\mathrm{membrane}$ [mV]",
+        thetalabelkwargs=dict(c="w", textangle=45, yshift=30, xshift=30),
+        xlabelkwargs=dict(c="w", yshift=-20),
+        ylabelkwargs=dict(c="w", textangle=80, xshift=5),
+        thetaticklabelkwargs=dict(c="w"),
+        xticklabelkwargs=dict(c="w", yshift=-10),
+    )
+
+    LSC.plot(theta, x, y, seriestype="line",
+        series_kwargs=[dict(
+            c=colors[i],
+            name=[f"LIF","","", f"EIF","","", f"QIF","",""][i],
+            showlegend=[True,False,False,True,False,False,True,False,False][i],
+            ) for i in range(len(theta))],
+        panel_kwargs=[dict(
+            show_yticks=[True,True,True,False,False,False,False,False,False][i],
+            yticklabelkwargs=dict(c="w"),
+        ) for i in range(len(theta))],
+    )
+
+    fig = lstein.draw(LSC, backend="plotly")
+    fig.update_layout(
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+        margin=dict(
+            t=0,
+            b=0,
+            l=0,
+            r=0,
+        ),
+        font=dict(
+            size=10,
+        ),
+    )
+    pio.write_json(fig, f"../gfx/LsteinSnn.json", pretty=True)
+    fig.show()
+    return
 #%%main
 def main():
 
@@ -192,11 +366,12 @@ def main():
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     pb_mappings,
     # )
-    plot_lstein(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        pb_mappings,
-    )
+    # plot_lstein_snii(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     pb_mappings,
+    # )
+    plot_lstein_snn()
 
 
 
