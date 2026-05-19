@@ -53,9 +53,12 @@ def get_passbands() -> dict:
     pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength")).to_numpy()))
     
     #adjust colors
-    bands = list("ugrizy")
-    pb_colors = lsu.get_colors(range(len(bands)), cmap=CMAP_PB, vmin=-0.5, vmax=5)
-    pb_colors = {pb:c for pb, c in zip(bands, pb_colors)}
+    bands_lsst = list("ugrizy")
+    pb_colors_lsst = lsu.get_colors(range(len(bands_lsst)), cmap=CMAP_PB, vmin=-0.5, vmax=5)
+    pb_colors_lsst = {pb:c for pb, c in zip(bands_lsst, pb_colors_lsst)}
+    bands_des = ["DES "+pb for pb in list("griz")]
+    pb_colors_des = list(pb_colors_lsst.values())[1:-1]
+    pb_colors_des = {pb:c for pb, c in zip(bands_des, pb_colors_des)}
     
     #adjustments
     for pb in pb_mappings.keys():
@@ -68,13 +71,18 @@ def get_passbands() -> dict:
             "*":"star",
             "p":"pentagon",
         }[pb_mappings[pb][2]]
-        if pb_mappings[pb][0] in bands:
-            pb_mappings[pb][1] = pb_colors[pb_mappings[pb][0]]
+        if pb_mappings[pb][0] in bands_lsst:
+            pb_mappings[pb][1] = pb_colors_lsst[pb_mappings[pb][0]]
+        if pb_mappings[pb][0] in bands_des:
+            pb_mappings[pb][1] = pb_colors_des[pb_mappings[pb][0]]
 
     return pb_mappings
 
-def load_data() -> Tuple[pl.DataFrame, pl.DataFrame]:
-    df = pl.read_csv(f"../data/0901_snii_elasticc.csv", comment_prefix="#")
+def load_data(fname:str, pb_ref:float) -> Tuple[pl.DataFrame, pl.DataFrame]:
+    df = pl.read_csv(fname, comment_prefix="#")
+
+    survey = fname.replace(".csv", "").split("_")[-1]
+    sntype = fname.replace(".csv", "").split("_")[-2]
     
     df_raw = df.filter(pl.col("processing")=="raw")
     df_pro = df.filter(pl.col("processing")=="gp")
@@ -83,9 +91,9 @@ def load_data() -> Tuple[pl.DataFrame, pl.DataFrame]:
     pb_pro, x_pro, y_pro, y_pro_e = df_pro[:,:4].to_numpy().T
 
     #normalize
-    pb_pro_r = (pb_pro==622.3)
+    pb_pro_r = (pb_pro==pb_ref)
     x_peak_r = x_pro[pb_pro_r][np.argmax(y_pro[pb_pro_r])]
-    y_peak = y_pro.max()
+    y_peak = y_pro[pb_pro_r].max()
     x_raw -= x_peak_r
     x_pro -= x_peak_r
 
@@ -98,6 +106,7 @@ def load_data() -> Tuple[pl.DataFrame, pl.DataFrame]:
     return (
         (pb_raw, x_raw, y_raw, y_raw_e),
         (pb_pro, x_pro, y_pro, y_pro_e),
+        (survey, sntype)
     )
 
 def load_rubin(pb_mappings:dict) -> Tuple:
@@ -140,10 +149,12 @@ def plot_onepanel(
     pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
     pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
     pb_mappings:dict,
+    survey:str,
+    sntype:str,
     ) -> None:
     fig = make_subplots(1,1,
         x_title="Time [d]",
-        y_title="Normalized flux",
+        y_title="Relative flux",
     )
 
     fig.update_layout(
@@ -172,7 +183,8 @@ def plot_onepanel(
                 visible=False,
             ),
             type="scatter", mode="markers",
-            name=f"{pb_mappings[pb][4].upper()} {pb_mappings[pb][0]} ({pb} nm)",
+            name=f"{pb_mappings[pb][0]} ({pb} nm)",
+            # name=f"{pb_mappings[pb][4].upper()} {pb_mappings[pb][0]} ({pb} nm)",
             marker=dict(
                 color=pb_mappings[pb][1],
                 symbol=pb_mappings[pb][2],
@@ -207,15 +219,17 @@ def plot_onepanel(
         )
     for pb in np.unique(pb_pro)])
 
-    pio.write_json(fig, "../gfx/ScatterOnepanel.json", pretty=True)
+    pio.write_json(fig, f"../gfx/ScatterOnepanel{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
 
     fig.show()
     return
 
-def plot_lstein_snii(
+def plot_lstein(
     pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
     pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
-    pb_mappings:dict,        
+    pb_mappings:dict,
+    survey:str,
+    sntype:str,    
     ) -> None:
 
     thticks = np.linspace(pb_raw.min(), pb_raw.max(), 5).astype(int)
@@ -229,7 +243,7 @@ def plot_lstein_snii(
         xticklabelkwargs=dict(c="#ffffff", xshift=-13, yshift=0),
         thetaticklabelkwargs=dict(c="#ffffff"),
         xlabel="Time [d]", xlabelkwargs=dict(c="w", textangle=90, xshift=-30, yshift=20),
-        ylabel="Normalized flux", ylabelkwargs=dict(c="w", textangle=0),
+        ylabel="Relative flux", ylabelkwargs=dict(c="w", textangle=0),
         thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
     )
     for idx, pb in enumerate(np.unique(pb_raw)):
@@ -257,7 +271,7 @@ def plot_lstein_snii(
             size=10,
         ),
     )
-    pio.write_json(fig, "../gfx/LsteinSnii.json", pretty=True)
+    pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
     fig.show()
     return
 
@@ -760,30 +774,47 @@ def plot_onepanel_rubin(
     return
 #%%main
 def main():
-
-    (pb_raw, x_raw, y_raw, y_raw_e), \
-        (pb_pro, x_pro, y_pro, y_pro_e), = load_data()
     pb_mappings = get_passbands()
 
-    obj, sntype, \
-        pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(pb_mappings)
-
+    """ #elasticc
+    (pb_raw, x_raw, y_raw, y_raw_e), \
+        (pb_pro, x_pro, y_pro, y_pro_e), \
+        (survey, sntype) = load_data(f"../data/0901_snii_elasticc.csv", pb_ref=622.3)
     plot_onepanel(
         pb_raw, x_raw, y_raw, y_raw_e,
         pb_pro, x_pro, y_pro, y_pro_e,
         pb_mappings,
+        survey, sntype,
     )
-    plot_lstein_snii(
+    plot_lstein(
         pb_raw, x_raw, y_raw, y_raw_e,
         pb_pro, x_pro, y_pro, y_pro_e,
         pb_mappings,
+        survey, sntype,
+    ) """
+
+    #des simulations
+    (pb_raw, x_raw, y_raw, y_raw_e), \
+        (pb_pro, x_pro, y_pro, y_pro_e), \
+             (survey, sntype) = load_data(f"../data/3787399_snia_des.csv", pb_ref=642.0)
+            #  (survey, sntype) = load_data(f"../data/11370314_snib_des.csv", pb_ref=642.0)
+        # (survey, sntype) = load_data(f"../data/2723412_sniin_des.csv", pb_ref=642.0)
+    plot_onepanel(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        pb_mappings,
+        survey, sntype,
     )
-    plot_lstein_snn()
-    plot_lstein_pulsar()
-    plot_lstein_spectra()
+
+    #rubin
+    obj, sntype, \
+        pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(pb_mappings)
     plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, pb_mappings)
     plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, pb_mappings)
 
+    # plot_lstein_snn()
+    # plot_lstein_pulsar()
+    # plot_lstein_spectra()
 
 
 if __name__ == "__main__":
