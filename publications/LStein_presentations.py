@@ -5,6 +5,7 @@ from brian2 import NeuronGroup, Network
 from brian2 import TimedArray
 from brian2 import StateMonitor, SpikeMonitor
 from brian2 import Gohm, ms, mV, pA, pF, second
+import json
 import numpy as np
 import polars as pl
 from plotly.subplots import make_subplots
@@ -612,6 +613,84 @@ def plot_lstein_spectra():
     fig.show()
     
     return
+
+def plot_lstein_lsst(
+    pb_mappings:dict
+    ) -> None:
+
+    obj, sntype = "313998569623257167", "snii"
+    obj, sntype = "314003014107006318", "snic"
+
+    pb_inv = {v[0]:k for k, v in pb_mappings.items()}   #invert to get wavelength of passband
+
+    cols = {
+        "r:midpointMjdTai":"time [d]", 
+        "r:scienceFlux":"flux_science", "r:scienceFluxErr":"flux_science_e",
+        "r:templateFlux":"flux_template", "r:templateFluxErr":"flux_template_e",
+        "r:band":"band",
+    }
+    with open(f"../data/fink_lsst_alerts/{obj}.json", "r") as f:
+        data = json.load(f)
+        df_lc = pl.from_dicts([
+            {v:alert[k] for k, v in cols.items()}
+        for alert in data])
+
+    df_lc = (df_lc
+        .with_columns(
+            (pl.col("flux_science") - pl.col("flux_template")).alias("flux_difference"),
+            (pl.col("flux_science_e") + pl.col("flux_template_e")).alias("flux_difference_e"),
+            (pl.col("band").replace(pb_inv).cast(pl.Float64)).alias("Wavelength [nm]"),
+        )
+    )
+
+    pb_raw = df_lc["Wavelength [nm]"].to_numpy().flatten()
+    x_raw = (df_lc["time [d]"] - df_lc["time [d]"].min()).to_numpy().flatten()
+    y_raw = df_lc["flux_science"].to_numpy().flatten() * 1e-3
+    y_raw_e = df_lc["flux_difference_e"].to_numpy().flatten()
+
+
+    thticks = np.linspace(pb_raw.min(), pb_raw.max(), 5).astype(int)
+    xticks  = np.arange(np.floor(x_raw.min()), np.ceil(x_raw.max()), 20).astype(int)
+    yticks  = np.linspace(y_raw.min(), y_raw.max(), 3).round(1)
+
+    LSC = lstein.LSteinCanvas(
+        thticks, xticks, yticks,
+        thetaguidelims=(-1*np.pi/2,1*np.pi/2),
+        panelsize=np.pi/6,
+        xticklabelkwargs=dict(c="#ffffff", xshift=-13, yshift=0),
+        thetaticklabelkwargs=dict(c="#ffffff"),
+        xlabel="Time [d]", xlabelkwargs=dict(c="w", textangle=90, xshift=-30, yshift=20),
+        ylabel="Normalized flux", ylabelkwargs=dict(c="w", textangle=0),
+        thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
+    )
+    for idx, pb in enumerate(np.unique(pb_raw)):
+        
+        LSP = LSC.add_panel(pb,
+            yticklabelkwargs=dict(c="#ffffff"),
+            yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
+            y_projection_method="theta",
+            # ytickkwargs=dict(c="w"),
+            show_panelbounds=True,
+            panelboundskwargs=dict(c="w"),
+        )
+        LSP.plot(x_raw[(pb_raw==pb)], y_raw[(pb_raw==pb)], seriestype="scatter", marker=dict(color=pb_mappings[pb][1], symbol=pb_mappings[pb][2]))
+
+    fig = lstein.draw(LSC, backend="plotly")
+    fig.update_layout(
+        margin=dict(
+            t=0,
+            b=0,
+            l=0,
+            r=0,
+        ),
+        font=dict(
+            size=10,
+        ),
+    )
+    pio.write_json(fig, f"../gfx/LsteinRubin{sntype.capitalize()}.json", pretty=True)
+    fig.show()        
+
+    return
 #%%main
 def main():
 
@@ -631,7 +710,8 @@ def main():
     # )
     # plot_lstein_snn()
     # plot_lstein_pulsar()
-    plot_lstein_spectra()
+    # plot_lstein_spectra()
+    # plot_lstein_lsst(pb_mappings)
 
 
 
