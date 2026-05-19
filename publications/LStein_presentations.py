@@ -18,6 +18,7 @@ pio.templates.default = "plotly_dark"
 
 #%%constants
 CMAP:str = "plasma"
+CMAP_PB:str = "jet"
 
 
 #%%definitions
@@ -51,8 +52,14 @@ def get_passbands() -> dict:
     # passbands = list(df_pb["name"])
     pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength")).to_numpy()))
     
-    #translate markers to plotly
+    #adjust colors
+    bands = list("ugrizy")
+    pb_colors = lsu.get_colors(range(len(bands)), cmap=CMAP_PB, vmin=-0.5, vmax=5)
+    pb_colors = {pb:c for pb, c in zip(bands, pb_colors)}
+    
+    #adjustments
     for pb in pb_mappings.keys():
+        #translate markers to plotly
         pb_mappings[pb][2] = {
             "o":"circle",
             "^":"triangle-up",
@@ -61,11 +68,13 @@ def get_passbands() -> dict:
             "*":"star",
             "p":"pentagon",
         }[pb_mappings[pb][2]]
+        if pb_mappings[pb][0] in bands:
+            pb_mappings[pb][1] = pb_colors[pb_mappings[pb][0]]
 
     return pb_mappings
 
 def load_data() -> Tuple[pl.DataFrame, pl.DataFrame]:
-    df = pl.read_csv(f"../data/72147108_snii_elasticc.csv", comment_prefix="#")
+    df = pl.read_csv(f"../data/0901_snii_elasticc.csv", comment_prefix="#")
     
     df_raw = df.filter(pl.col("processing")=="raw")
     df_pro = df.filter(pl.col("processing")=="gp")
@@ -89,6 +98,42 @@ def load_data() -> Tuple[pl.DataFrame, pl.DataFrame]:
     return (
         (pb_raw, x_raw, y_raw, y_raw_e),
         (pb_pro, x_pro, y_pro, y_pro_e),
+    )
+
+def load_rubin(pb_mappings:dict) -> Tuple:
+
+    obj, sntype = "313998569623257167", "snii"
+    obj, sntype = "314003014107006318", "snic"
+    # obj, sntype = "170107660764446767", "snii"
+
+    pb_inv = {v[0]:k for k, v in pb_mappings.items()}   #invert to get wavelength of passband
+
+    cols = {
+        "r:midpointMjdTai":"time [d]", 
+        "r:scienceFlux":"flux_science", "r:scienceFluxErr":"flux_science_e",
+        "r:templateFlux":"flux_template", "r:templateFluxErr":"flux_template_e",
+        "r:band":"band",
+    }
+    with open(f"../data/fink_lsst_alerts/{obj}.json", "r") as f:
+        data = json.load(f)
+        df_lc = pl.from_dicts([
+            {v:alert[k] for k, v in cols.items()}
+        for alert in data])
+
+    df_lc = (df_lc
+        .with_columns(
+            (pl.col("flux_science") - pl.col("flux_template")).alias("flux_difference"),
+            (pl.col("flux_science_e") + pl.col("flux_template_e")).alias("flux_difference_e"),
+            (pl.col("band").replace(pb_inv).cast(pl.Float64)).alias("Wavelength [nm]"),
+        )
+    )
+
+    pb_raw = df_lc["Wavelength [nm]"].to_numpy().flatten()
+    x_raw = (df_lc["time [d]"] - df_lc["time [d]"].min()).to_numpy().flatten()
+    y_raw = df_lc["flux_difference"].to_numpy().flatten() * 1e-3
+    y_raw_e = df_lc["flux_difference_e"].to_numpy().flatten() * 1e-3
+    return (obj, sntype, 
+        pb_raw, x_raw, y_raw, y_raw_e
     )
 
 def plot_onepanel(
@@ -124,7 +169,7 @@ def plot_onepanel(
             error_y=dict(
                 type="data",
                 array=y_raw_e[(pb_raw==pb)],
-                visible=True,
+                visible=False,
             ),
             type="scatter", mode="markers",
             name=f"{pb_mappings[pb][4].upper()} {pb_mappings[pb][0]} ({pb} nm)",
@@ -614,44 +659,15 @@ def plot_lstein_spectra():
     
     return
 
-def plot_lstein_lsst(
-    pb_mappings:dict
+def plot_lstein_rubin(
+    obj:str, sntype:str,
+    pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
+    pb_mappings:dict,
     ) -> None:
 
-    obj, sntype = "313998569623257167", "snii"
-    obj, sntype = "314003014107006318", "snic"
-
-    pb_inv = {v[0]:k for k, v in pb_mappings.items()}   #invert to get wavelength of passband
-
-    cols = {
-        "r:midpointMjdTai":"time [d]", 
-        "r:scienceFlux":"flux_science", "r:scienceFluxErr":"flux_science_e",
-        "r:templateFlux":"flux_template", "r:templateFluxErr":"flux_template_e",
-        "r:band":"band",
-    }
-    with open(f"../data/fink_lsst_alerts/{obj}.json", "r") as f:
-        data = json.load(f)
-        df_lc = pl.from_dicts([
-            {v:alert[k] for k, v in cols.items()}
-        for alert in data])
-
-    df_lc = (df_lc
-        .with_columns(
-            (pl.col("flux_science") - pl.col("flux_template")).alias("flux_difference"),
-            (pl.col("flux_science_e") + pl.col("flux_template_e")).alias("flux_difference_e"),
-            (pl.col("band").replace(pb_inv).cast(pl.Float64)).alias("Wavelength [nm]"),
-        )
-    )
-
-    pb_raw = df_lc["Wavelength [nm]"].to_numpy().flatten()
-    x_raw = (df_lc["time [d]"] - df_lc["time [d]"].min()).to_numpy().flatten()
-    y_raw = df_lc["flux_science"].to_numpy().flatten() * 1e-3
-    y_raw_e = df_lc["flux_difference_e"].to_numpy().flatten()
-
-
-    thticks = np.linspace(pb_raw.min(), pb_raw.max(), 5).astype(int)
-    xticks  = np.arange(np.floor(x_raw.min()), np.ceil(x_raw.max()), 20).astype(int)
-    yticks  = np.linspace(y_raw.min(), y_raw.max(), 3).round(1)
+    thticks = np.linspace(pb_rubin.min(), pb_rubin.max(), 5).astype(int)
+    xticks  = np.arange(np.floor(x_rubin.min()), np.ceil(x_rubin.max()), 20).astype(int)
+    yticks  = np.linspace(y_rubin.min(), y_rubin.max(), 3).round(1)
 
     LSC = lstein.LSteinCanvas(
         thticks, xticks, yticks,
@@ -660,10 +676,10 @@ def plot_lstein_lsst(
         xticklabelkwargs=dict(c="#ffffff", xshift=-13, yshift=0),
         thetaticklabelkwargs=dict(c="#ffffff"),
         xlabel="Time [d]", xlabelkwargs=dict(c="w", textangle=90, xshift=-30, yshift=20),
-        ylabel="Normalized flux", ylabelkwargs=dict(c="w", textangle=0),
+        ylabel="Difference flux [&#xb5;Jy]", ylabelkwargs=dict(c="w", textangle=0),
         thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
     )
-    for idx, pb in enumerate(np.unique(pb_raw)):
+    for idx, pb in enumerate(np.unique(pb_rubin)):
         
         LSP = LSC.add_panel(pb,
             yticklabelkwargs=dict(c="#ffffff"),
@@ -673,7 +689,7 @@ def plot_lstein_lsst(
             show_panelbounds=True,
             panelboundskwargs=dict(c="w"),
         )
-        LSP.plot(x_raw[(pb_raw==pb)], y_raw[(pb_raw==pb)], seriestype="scatter", marker=dict(color=pb_mappings[pb][1], symbol=pb_mappings[pb][2]))
+        LSP.plot(x_rubin[(pb_rubin==pb)], y_rubin[(pb_rubin==pb)], seriestype="scatter", marker=dict(color=pb_mappings[pb][1], symbol=pb_mappings[pb][2]))
 
     fig = lstein.draw(LSC, backend="plotly")
     fig.update_layout(
@@ -691,6 +707,57 @@ def plot_lstein_lsst(
     fig.show()        
 
     return
+
+def plot_onepanel_rubin(
+    obj:str, sntype:str,
+    pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
+    pb_mappings:dict,
+    ):
+
+    fig = make_subplots(1,1,
+        x_title="Time [d]",
+        y_title="Flux [&#xb5;Jy]",
+    )
+
+    fig.update_layout(
+        margin=dict(
+            l=70,
+            r=0,
+            t=0,
+            b=60,
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        )        
+    )
+
+    fig.add_traces([
+        dict(
+            x=x_rubin[(pb_rubin==pb)],
+            y=y_rubin[(pb_rubin==pb)],
+            error_y=dict(
+                type="data",
+                array=y_rubin_e[(pb_rubin==pb)],
+                visible=True,
+            ),
+            type="scatter", mode="markers",
+            name=f"{pb_mappings[pb][4].upper()} {pb_mappings[pb][0]} ({pb} nm)",
+            marker=dict(
+                color=pb_mappings[pb][1],
+                symbol=pb_mappings[pb][2],
+            )
+        )
+    for pb in np.unique(pb_rubin)])
+
+    pio.write_json(fig, f"../gfx/ScatterOnepanelRubin{sntype.capitalize()}.json", pretty=True)
+
+    fig.show()    
+
+    return
 #%%main
 def main():
 
@@ -698,20 +765,24 @@ def main():
         (pb_pro, x_pro, y_pro, y_pro_e), = load_data()
     pb_mappings = get_passbands()
 
-    # plot_onepanel(
-    #     pb_raw, x_raw, y_raw, y_raw_e,
-    #     pb_pro, x_pro, y_pro, y_pro_e,
-    #     pb_mappings,
-    # )
-    # plot_lstein_snii(
-    #     pb_raw, x_raw, y_raw, y_raw_e,
-    #     pb_pro, x_pro, y_pro, y_pro_e,
-    #     pb_mappings,
-    # )
-    # plot_lstein_snn()
-    # plot_lstein_pulsar()
-    # plot_lstein_spectra()
-    # plot_lstein_lsst(pb_mappings)
+    obj, sntype, \
+        pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(pb_mappings)
+
+    plot_onepanel(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        pb_mappings,
+    )
+    plot_lstein_snii(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        pb_mappings,
+    )
+    plot_lstein_snn()
+    plot_lstein_pulsar()
+    plot_lstein_spectra()
+    plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, pb_mappings)
+    plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, pb_mappings)
 
 
 
