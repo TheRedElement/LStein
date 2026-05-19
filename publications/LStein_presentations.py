@@ -143,7 +143,7 @@ def plot_onepanel(
     ) -> None:
     fig = make_subplots(1,1,
         x_title="Time [d]",
-        y_title="Flux [Arbitrary Units]",
+        y_title="Normalized flux",
     )
 
     fig.update_layout(
