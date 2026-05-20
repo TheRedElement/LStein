@@ -6,6 +6,8 @@ from brian2 import TimedArray
 from brian2 import StateMonitor, SpikeMonitor
 from brian2 import Gohm, ms, mV, pA, pF, second
 import json
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import numpy as np
 import polars as pl
 from plotly.subplots import make_subplots
@@ -47,36 +49,62 @@ def binning(
 
     return xbin, ybin
 
-def get_passbands() -> dict:
-    df_pb = pl.read_csv("../data/passband_specs.csv")
-    # passbands = list(df_pb["name"])
-    pb_mappings = dict(zip(df_pb["wavelength"], df_pb.select(pl.exclude("wavelength")).to_numpy()))
+def get_passbands(
+    cmap:str=None, vmin:float=300, vmax:float=1000,
+    ) -> pl.LazyFrame:
+    """returns passband specifications
+
+    Parameters
+        - `cmap`
+            - `str`, optional
+            - colormap to use for encoding passband wavelength
+            - the default is `None`
+                - set to `"jet"`
+        - `vmin`
+            - `float`, optional
+            - vmin to apply to the wavelength colormap
+            - the default is `300`
+        - `vmax`
+            - `float`, optional
+            - vmax to apply to the wavelength colormap
+            - the default is `1000`
     
-    #adjust colors
-    bands_lsst = list("ugrizy")
-    pb_colors_lsst = lsu.get_colors(range(len(bands_lsst)), cmap=CMAP_PB, vmin=-0.5, vmax=5)
-    pb_colors_lsst = {pb:c for pb, c in zip(bands_lsst, pb_colors_lsst)}
-    bands_des = ["DES "+pb for pb in list("griz")]
-    pb_colors_des = list(pb_colors_lsst.values())[1:-1]
-    pb_colors_des = {pb:c for pb, c in zip(bands_des, pb_colors_des)}
+    Raises
+
+    Returns
+        - `df_pb`
+            - `pl.LazyFrame`
+            - contains passband specifications
+
+    Dependencies
+        - `matplotlib`
+        - `polars`
+    """
+
+    #default parameters
+    if cmap is None: cmap = "turbo"
+
+    df_pb = pl.scan_csv("../data/passband_specs.csv")
     
-    #adjustments
-    for pb in pb_mappings.keys():
-        #translate markers to plotly
-        pb_mappings[pb][2] = {
+    #generate passband colors
+    norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
+    cmap = plt.get_cmap(cmap)
+    pb_colors = cmap(norm(df_pb.collect()["wavelength"]))
+    pb_colors = np.array([mcolors.to_hex(pbc) for pbc in pb_colors])
+
+    df_pb = df_pb.with_columns(
+        pl.col("plot_marker").replace({
             "o":"circle",
             "^":"triangle-up",
             "v":"triangle-down",
             "s":"square",
             "*":"star",
             "p":"pentagon",
-        }[pb_mappings[pb][2]]
-        if pb_mappings[pb][0] in bands_lsst:
-            pb_mappings[pb][1] = pb_colors_lsst[pb_mappings[pb][0]]
-        if pb_mappings[pb][0] in bands_des:
-            pb_mappings[pb][1] = pb_colors_des[pb_mappings[pb][0]]
-
-    return pb_mappings
+        }),
+        pl.lit(pb_colors).alias("plot_color_cmap")
+    )
+    
+    return df_pb
 
 def load_data(fname:str, pb_ref:float) -> Tuple[pl.DataFrame, pl.DataFrame]:
     df = pl.read_csv(fname, comment_prefix="#")
@@ -109,13 +137,11 @@ def load_data(fname:str, pb_ref:float) -> Tuple[pl.DataFrame, pl.DataFrame]:
         (survey, sntype)
     )
 
-def load_rubin(pb_mappings:dict) -> Tuple:
+def load_rubin(df_pb:pl.DataFrame) -> Tuple:
 
     obj, sntype = "313998569623257167", "snii"
     obj, sntype = "314003014107006318", "snic"
     # obj, sntype = "170107660764446767", "snii"
-
-    pb_inv = {v[0]:k for k, v in pb_mappings.items()}   #invert to get wavelength of passband
 
     cols = {
         "r:midpointMjdTai":"time [d]", 
@@ -130,14 +156,14 @@ def load_rubin(pb_mappings:dict) -> Tuple:
         for alert in data])
 
     df_lc = (df_lc
+        .join(df_pb.filter(pl.col("mission")=="lsst").select("band", "wavelength"), left_on="band", right_on="band", how="left")
         .with_columns(
             (pl.col("flux_science") - pl.col("flux_template")).alias("flux_difference"),
             (pl.col("flux_science_e") + pl.col("flux_template_e")).alias("flux_difference_e"),
-            (pl.col("band").replace(pb_inv).cast(pl.Float64)).alias("Wavelength [nm]"),
         )
     )
 
-    pb_raw = df_lc["Wavelength [nm]"].to_numpy().flatten()
+    pb_raw = df_lc["wavelength"].to_numpy().flatten()
     x_raw = (df_lc["time [d]"] - df_lc["time [d]"].min()).to_numpy().flatten()
     y_raw = df_lc["flux_difference"].to_numpy().flatten() * 1e-3
     y_raw_e = df_lc["flux_difference_e"].to_numpy().flatten() * 1e-3
@@ -148,12 +174,12 @@ def load_rubin(pb_mappings:dict) -> Tuple:
 def plot_onepanel(
     pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
     pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
-    pb_mappings:dict,
+    df_pb:pl.DataFrame,
     survey:str,
     sntype:str,
     ) -> None:
     fig = make_subplots(1,1,
-        x_title="Time [d]",
+        x_title="Explosion phase [d]",
         y_title="Relative flux",
     )
 
@@ -183,11 +209,11 @@ def plot_onepanel(
                 visible=False,
             ),
             type="scatter", mode="markers",
-            name=f"{pb_mappings[pb][0]} ({pb} nm)",
-            # name=f"{pb_mappings[pb][4].upper()} {pb_mappings[pb][0]} ({pb} nm)",
+            name=f"{df_pb.filter(pl.col('wavelength')==pb)['name'].item()} ({pb} nm)",
+            # name=f"{df_pb.filter(pl.col("wavelength")==pb).item().upper()} {df_pb.filter(pl.col("wavelength")==pb).item()} ({pb} nm)",
             marker=dict(
-                color=pb_mappings[pb][1],
-                symbol=pb_mappings[pb][2],
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+                symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item(),
             )
         )
     for pb in np.unique(pb_raw)])
@@ -196,10 +222,10 @@ def plot_onepanel(
             x=x_pro[(pb_pro==pb)],
             y=y_pro[(pb_pro==pb)],
             type="scatter", mode="lines",
-            name=pb_mappings[pb][0],
+            name=df_pb.filter(pl.col("wavelength")==pb)["name"].item(),
             showlegend=False,
             marker=dict(
-                color=pb_mappings[pb][1],
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
             )
         )
     for pb in np.unique(pb_pro)])
@@ -210,11 +236,11 @@ def plot_onepanel(
             y=np.append(y_pro[(pb_pro==pb)]-y_pro_e[(pb_pro==pb)], (y_pro[(pb_pro==pb)]+y_pro_e[(pb_pro==pb)])[::-1]),
             type="scatter",
             fill="toself",
-            name=pb_mappings[pb][0],
+            name=df_pb.filter(pl.col("wavelength")==pb)["name"].item(),
             showlegend=False,
             visible=False,
             marker=dict(
-                color=pb_mappings[pb][1],
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
             )
         )
     for pb in np.unique(pb_pro)])
@@ -227,7 +253,7 @@ def plot_onepanel(
 def plot_lstein(
     pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
     pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
-    pb_mappings:dict,
+    df_pb:pl.DataFrame,
     survey:str,
     sntype:str,    
     ) -> None:
@@ -256,8 +282,8 @@ def plot_lstein(
             show_panelbounds=True,
             panelboundskwargs=dict(c="w"),
         )
-        LSP.plot(x_raw[(pb_raw==pb)], y_raw[(pb_raw==pb)], seriestype="scatter", marker=dict(color=pb_mappings[pb][1], symbol=pb_mappings[pb][2]))
-        LSP.plot(x_pro[(pb_pro==pb)], y_pro[(pb_pro==pb)], seriestype="line", c=pb_mappings[pb][1])
+        LSP.plot(x_raw[(pb_raw==pb)], y_raw[(pb_raw==pb)], seriestype="scatter", marker=dict(color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(), symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item()))
+        LSP.plot(x_pro[(pb_pro==pb)], y_pro[(pb_pro==pb)], seriestype="line", c=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item())
 
     fig = lstein.draw(LSC, backend="plotly")
     fig.update_layout(
@@ -676,7 +702,7 @@ def plot_lstein_spectra():
 def plot_lstein_rubin(
     obj:str, sntype:str,
     pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
-    pb_mappings:dict,
+    df_pb:pl.DataFrame,
     ) -> None:
 
     thticks = np.linspace(pb_rubin.min(), pb_rubin.max(), 5).astype(int)
@@ -703,10 +729,13 @@ def plot_lstein_rubin(
             show_panelbounds=True,
             panelboundskwargs=dict(c="w"),
         )
-        LSP.plot(x_rubin[(pb_rubin==pb)], y_rubin[(pb_rubin==pb)], seriestype="scatter", marker=dict(color=pb_mappings[pb][1], symbol=pb_mappings[pb][2]))
+        LSP.plot(x_rubin[(pb_rubin==pb)], y_rubin[(pb_rubin==pb)], seriestype="scatter", marker=dict(color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(), symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item()))
 
     fig = lstein.draw(LSC, backend="plotly")
     fig.update_layout(
+        autosize=True,
+        width=None,
+        height=None,        
         margin=dict(
             t=0,
             b=0,
@@ -725,7 +754,7 @@ def plot_lstein_rubin(
 def plot_onepanel_rubin(
     obj:str, sntype:str,
     pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
-    pb_mappings:dict,
+    df_pb:pl.DataFrame,
     ):
 
     fig = make_subplots(1,1,
@@ -734,6 +763,9 @@ def plot_onepanel_rubin(
     )
 
     fig.update_layout(
+        autosize=True,
+        width=None,
+        height=None,
         margin=dict(
             l=70,
             r=0,
@@ -759,10 +791,10 @@ def plot_onepanel_rubin(
                 visible=True,
             ),
             type="scatter", mode="markers",
-            name=f"{pb_mappings[pb][4].upper()} {pb_mappings[pb][0]} ({pb} nm)",
+            name=f"{df_pb.filter(pl.col('wavelength')==pb)['name'].item()} ({df_pb.filter(pl.col('wavelength')==pb)['wavelength'].item()} nm)",
             marker=dict(
-                color=pb_mappings[pb][1],
-                symbol=pb_mappings[pb][2],
+                color=df_pb.filter(pl.col('wavelength')==pb)['plot_color_cmap'].item(),
+                symbol=df_pb.filter(pl.col('wavelength')==pb)['plot_marker'].item(),
             )
         )
     for pb in np.unique(pb_rubin)])
@@ -774,26 +806,26 @@ def plot_onepanel_rubin(
     return
 #%%main
 def main():
-    pb_mappings = get_passbands()
+    df_pb = get_passbands().collect()
 
     """ #elasticc
     (pb_raw, x_raw, y_raw, y_raw_e), \
         (pb_pro, x_pro, y_pro, y_pro_e), \
         (survey, sntype) = load_data(f"../data/0901_snii_elasticc.csv", pb_ref=622.3)
-    plot_onepanel(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        pb_mappings,
-        survey, sntype,
-    )
+    # plot_onepanel(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     df_pb,
+    #     survey, sntype,
+    # )
     plot_lstein(
         pb_raw, x_raw, y_raw, y_raw_e,
         pb_pro, x_pro, y_pro, y_pro_e,
-        pb_mappings,
+        df_pb,
         survey, sntype,
     ) """
 
-    #des simulations
+    """ #des simulations
     (pb_raw, x_raw, y_raw, y_raw_e), \
         (pb_pro, x_pro, y_pro, y_pro_e), \
              (survey, sntype) = load_data(f"../data/3787399_snia_des.csv", pb_ref=642.0)
@@ -802,15 +834,15 @@ def main():
     plot_onepanel(
         pb_raw, x_raw, y_raw, y_raw_e,
         pb_pro, x_pro, y_pro, y_pro_e,
-        pb_mappings,
+        df_pb,
         survey, sntype,
-    )
+    ) """
 
-    #rubin
+    """ #rubin
     obj, sntype, \
-        pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(pb_mappings)
-    plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, pb_mappings)
-    plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, pb_mappings)
+        pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(df_pb)
+    plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb)
+    plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb) """
 
     # plot_lstein_snn()
     # plot_lstein_pulsar()
