@@ -650,7 +650,8 @@ def plot_lstein(
     pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
     df_pb:pl.DataFrame,
     survey:str,
-    sntype:str,    
+    sntype:str,
+    y_projection_method:str,
     ) -> None:
 
     thticks = np.linspace(pb_raw.min(), pb_raw.max(), 5).astype(int)
@@ -672,7 +673,7 @@ def plot_lstein(
         LSP = LSC.add_panel(pb,
             yticklabelkwargs=dict(c="#ffffff"),
             yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
-            y_projection_method="theta",
+            y_projection_method=y_projection_method,
             # ytickkwargs=dict(c="w"),
             show_panelbounds=True,
             panelboundskwargs=dict(c="w"),
@@ -692,7 +693,7 @@ def plot_lstein(
             size=10,
         ),
     )
-    pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
+    pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}{y_projection_method.capitalize()}.json", pretty=True)
     fig.show()
     return
 
@@ -1170,12 +1171,12 @@ def main():
     (pb_raw, x_raw, y_raw, y_raw_e), \
         (pb_pro, x_pro, y_pro, y_pro_e), \
         (survey, sntype) = load_data(f"../data/0901_snii_elasticc.csv", pb_ref=622.3)
-    plot_onepanel(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        df_pb,
-        survey, sntype,
-    )
+    # plot_onepanel(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     df_pb,
+    #     survey, sntype,
+    # )
     # plot_onepanel_offset(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,
@@ -1194,12 +1195,20 @@ def main():
     #     df_pb,
     #     survey, sntype,
     # )
-    # plot_lstein(
-    #     pb_raw, x_raw, y_raw, y_raw_e,
-    #     pb_pro, x_pro, y_pro, y_pro_e,
-    #     df_pb,
-    #     survey, sntype,
-    # ) """
+    plot_lstein(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        df_pb,
+        survey, sntype,
+        y_projection_method="theta",
+    )
+    plot_lstein(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        df_pb,
+        survey, sntype,
+        y_projection_method="y",
+    ) """
 
     # #des simulations
     # (pb_raw, x_raw, y_raw, y_raw_e), \
