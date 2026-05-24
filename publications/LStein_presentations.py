@@ -203,6 +203,7 @@ def run_brian2():
 
     return n_neurons, state_mon_lif, state_mon_eif, state_mon_qif
 
+#data loading
 def load_data(fname:str, pb_ref:float) -> Tuple:
     df = pl.read_csv(fname, comment_prefix="#")
 
@@ -296,6 +297,7 @@ def load_rubin(df_pb:pl.DataFrame) -> Tuple:
         pb_raw, x_raw, y_raw, y_raw_e
     )
 
+#plotting
 def plot_onepanel(
     pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
     pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
@@ -371,6 +373,274 @@ def plot_onepanel(
     for pb in np.unique(pb_pro)])
 
     pio.write_json(fig, f"../gfx/ScatterOnepanel{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
+
+    fig.show()
+    return
+
+def plot_onepanel_offset(
+    pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
+    pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
+    df_pb:pl.DataFrame,
+    survey:str,
+    sntype:str,
+    ) -> None:
+
+    #offset
+    y_raw += pb_raw/100 #lambda/100
+    y_pro += pb_pro/100 #lambda/100
+
+    fig = make_subplots(1,1,
+        x_title="Explosion phase [d]",
+        y_title="Relative flux",
+    )
+
+    fig.update_layout(
+        margin=dict(
+            l=70,
+            r=0,
+            t=0,
+            b=60,
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        )        
+    )
+
+    fig.add_traces([
+        dict(
+            x=x_raw[(pb_raw==pb)],
+            y=y_raw[(pb_raw==pb)],
+            error_y=dict(
+                type="data",
+                array=y_raw_e[(pb_raw==pb)],
+                visible=False,
+            ),
+            type="scatter", mode="markers",
+            name=f"{df_pb.filter(pl.col('wavelength')==pb)['name'].item()} ({pb} nm)",
+            # name=f"{df_pb.filter(pl.col("wavelength")==pb).item().upper()} {df_pb.filter(pl.col("wavelength")==pb).item()} ({pb} nm)",
+            marker=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+                symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item(),
+            )
+        )
+    for pb in np.unique(pb_raw)])
+    fig.add_traces([
+        dict(
+            x=x_pro[(pb_pro==pb)],
+            y=y_pro[(pb_pro==pb)],
+            type="scatter", mode="lines",
+            name=df_pb.filter(pl.col("wavelength")==pb)["name"].item(),
+            showlegend=False,
+            marker=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+            )
+        )
+    for pb in np.unique(pb_pro)])
+    fig.add_traces([
+        #GP error-bands
+        dict(
+            x=np.append(x_pro[(pb_pro==pb)],x_pro[(pb_pro==pb)][::-1]),
+            y=np.append(y_pro[(pb_pro==pb)]-y_pro_e[(pb_pro==pb)], (y_pro[(pb_pro==pb)]+y_pro_e[(pb_pro==pb)])[::-1]),
+            type="scatter",
+            fill="toself",
+            name=df_pb.filter(pl.col("wavelength")==pb)["name"].item(),
+            showlegend=False,
+            visible=False,
+            marker=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+            )
+        )
+    for pb in np.unique(pb_pro)])
+
+    pio.write_json(fig, f"../gfx/ScatterOnepanelOffset{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
+
+    fig.show()
+    return
+
+def plot_multipanel(
+    pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
+    pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
+    df_pb:pl.DataFrame,
+    survey:str,
+    sntype:str,
+    ) -> None:
+
+    #panels
+    rows = [1,1,1,2,2,2]
+    cols = [1,2,3,1,2,3]
+
+
+    fig = make_subplots(2,3,
+        shared_xaxes=True,
+        x_title="Explosion phase [d]",
+        y_title="Relative flux",
+    )
+
+    fig.update_layout(
+        margin=dict(
+            l=70,
+            r=0,
+            t=0,
+            b=60,
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        )        
+    )
+
+    fig.add_traces([
+        dict(
+            x=x_raw[(pb_raw==pb)],
+            y=y_raw[(pb_raw==pb)],
+            error_y=dict(
+                type="data",
+                array=y_raw_e[(pb_raw==pb)],
+                visible=False,
+            ),
+            type="scatter", mode="markers",
+            name=f"{df_pb.filter(pl.col('wavelength')==pb)['name'].item()} ({pb} nm)",
+            # name=f"{df_pb.filter(pl.col("wavelength")==pb).item().upper()} {df_pb.filter(pl.col("wavelength")==pb).item()} ({pb} nm)",
+            marker=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+                symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item(),
+            )
+        )
+    for pb in np.unique(pb_raw)], rows=rows, cols=cols)
+    fig.add_traces([
+        dict(
+            x=x_pro[(pb_pro==pb)],
+            y=y_pro[(pb_pro==pb)],
+            type="scatter", mode="lines",
+            name=df_pb.filter(pl.col("wavelength")==pb)["name"].item(),
+            showlegend=False,
+            marker=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+            )
+        )
+    for pb in np.unique(pb_pro)], rows=rows, cols=cols)
+    fig.add_traces([
+        #GP error-bands
+        dict(
+            x=np.append(x_pro[(pb_pro==pb)],x_pro[(pb_pro==pb)][::-1]),
+            y=np.append(y_pro[(pb_pro==pb)]-y_pro_e[(pb_pro==pb)], (y_pro[(pb_pro==pb)]+y_pro_e[(pb_pro==pb)])[::-1]),
+            type="scatter",
+            fill="toself",
+            name=df_pb.filter(pl.col("wavelength")==pb)["name"].item(),
+            showlegend=False,
+            visible=False,
+            marker=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+            )
+        )
+    for pb in np.unique(pb_pro)], rows=rows, cols=cols)
+
+    pio.write_json(fig, f"../gfx/ScatterMultipanel{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
+
+    fig.show()
+    return
+
+def plot_3d(
+    pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
+    pb_pro:np.ndarray, x_pro:np.ndarray, y_pro:np.ndarray, y_pro_e:np.ndarray,
+    df_pb:pl.DataFrame,
+    survey:str,
+    sntype:str,
+    ) -> None:
+
+    #plotly only supports a few markers in 3d
+    df_pb = (df_pb
+        .with_columns(
+            pl.col("plot_marker").replace({
+                "triangle-up":"diamond",
+                "triangle-down":"diamond-open",
+                "star":"square-open",
+                "pentagon":"cross",
+            })
+        )
+    )
+
+    fig = make_subplots(1,1,
+        specs=[[{"type":"scene"}]],
+    )
+
+    fig.add_traces([
+        dict(
+            x=pb_raw[(pb_raw==pb)],
+            y=x_raw[(pb_raw==pb)],
+            z=y_raw[(pb_raw==pb)],
+            error_y=dict(
+                type="data",
+                array=y_raw_e[(pb_raw==pb)],
+                visible=True,
+            ),
+            type="scatter3d", mode="markers",
+            name=f"{df_pb.filter(pl.col('wavelength')==pb)['name'].item()} ({pb} nm)",
+            marker=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+                symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item(),
+                size=3,
+            )
+        )
+    for pb in np.unique(pb_raw)])
+    fig.add_traces([
+        dict(
+            x=pb_pro[(pb_pro==pb)],
+            y=x_pro[(pb_pro==pb)],
+            z=y_pro[(pb_pro==pb)],
+            type="scatter3d", mode="lines",
+            name=df_pb.filter(pl.col("wavelength")==pb)["name"].item(),
+            showlegend=False,
+            line=dict(
+                color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(),
+                width=5,
+            )
+        )
+    for pb in np.unique(pb_pro)])
+    
+    fig.update_layout(
+        margin=dict(
+            l=70,
+            r=0,
+            t=0,
+            b=60,
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.0,
+            xanchor="center",
+            x=0.5
+        ),
+        scene_camera=dict(
+            eye=dict(
+                x=1.7,
+                y=1.7,
+                z=1.7,
+            ),
+        ),
+        scene=dict(
+            yaxis=dict(
+                title="Explosion phase [d]",
+            ),
+            xaxis=dict(
+                title="Wavelength [nm]",
+                autorange="reversed",
+            ),
+            zaxis=dict(
+                title="Relative flux",
+            ),
+        )
+    )
+
+    pio.write_json(fig, f"../gfx/Scatter3d{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
 
     fig.show()
     return
@@ -900,18 +1170,36 @@ def main():
     (pb_raw, x_raw, y_raw, y_raw_e), \
         (pb_pro, x_pro, y_pro, y_pro_e), \
         (survey, sntype) = load_data(f"../data/0901_snii_elasticc.csv", pb_ref=622.3)
-    # plot_onepanel(
+    plot_onepanel(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        df_pb,
+        survey, sntype,
+    )
+    # plot_onepanel_offset(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     df_pb,
     #     survey, sntype,
     # )
-    plot_lstein(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        df_pb,
-        survey, sntype,
-    ) """
+    # plot_multipanel(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     df_pb,
+    #     survey, sntype,
+    # )
+    # plot_3d(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     df_pb,
+    #     survey, sntype,
+    # )
+    # plot_lstein(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     df_pb,
+    #     survey, sntype,
+    # ) """
 
     # #des simulations
     # (pb_raw, x_raw, y_raw, y_raw_e), \
@@ -945,11 +1233,11 @@ def main():
         suffix="Bad"
     ) """
 
-    #rubin
+    """ #rubin
     obj, sntype, \
         pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(df_pb)
     plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb, sharey=False)
-    plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb)
+    plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb) """
 
     # plot_lstein_snn()
     # plot_lstein_pulsar()
