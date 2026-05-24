@@ -265,8 +265,8 @@ def load_rubin(df_pb:pl.DataFrame) -> Tuple:
 
     #t_peak estimated via visual inspection
     # obj, sntype, t_peak = "313998569623257167", "snii", 61144
-    # obj, sntype, t_peak = "314003014107006318", "snic", 61138
-    obj, sntype, t_peak  = "170107660764446767", "snii", 61141
+    obj, sntype, t_peak = "314003014107006318", "snic", 61138
+    # obj, sntype, t_peak  = "170107660764446767", "snii", 61141
 
     cols = {
         "r:midpointMjdTai":"time [d]", 
