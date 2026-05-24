@@ -106,6 +106,103 @@ def get_passbands(
     
     return df_pb
 
+def run_brian2():
+
+    #simulation
+    ##neuron params
+    n_neurons   = 3
+    u_rest      = -65*mV
+    # u_rest      = 0*mV
+    u_reset     = -75*mV
+    u_th        = -50*mV #(=theta)
+    C_m         = 750*pF
+    R_m         = 0.02*Gohm
+    tau_m       = R_m*C_m
+    a0          = 3e-1*(1/mV)   #qif specific
+    u_c         = -50*mV        #qif specific
+    Delta_T     = 3*mV          #eif specific
+    theta_rh    = -50*mV        #eif specific
+    delta_abs   = 0*ms  #refractory period
+
+    ##simulation specs
+    t_sim = .2 * second
+    dt = .1 * ms
+    
+    ##config brian2
+    brian2.defaultclock.dt = dt
+
+    ##neuron inputs
+    t_in = np_.arange(0, t_sim, dt)
+    I_in = TimedArray(np_.linspace([800]*len(t_in), 1000, n_neurons).T * pA, dt=dt)
+
+    ##init network
+    brian2.start_scope()
+    net1 = Network()
+    
+    ##setup neurons
+    def get_lif():
+        eqs = dict(
+            model=(
+                'du/dt = -(u-u_rest)/tau_m + (R_m*I)/tau_m : volt (unless refractory)\n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+    def get_eif():
+        eqs = dict(
+            model=(
+                'du/dt = (-(u-u_rest)/tau_m) + Delta_T * exp((u - theta_rh)/Delta_T)/tau_m'
+                ' + R_m*I/tau_m'
+                '\n'
+                '   : volt (unless refractory) \n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+    def get_qif():
+        eqs = dict(
+            model=(
+                'du/dt = (a0*(u-u_rest)*(u-u_c)/tau_m)'
+                ' + R_m*I/tau_m'
+                '\n'
+                '   : volt (unless refractory) \n'
+                'I = I_in(t, i) : amp \n'
+            ),
+            threshold="u>u_th",
+            reset="u=u_reset",
+            refractory=delta_abs,
+        )
+        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
+        G.u = u_reset
+        state_mon = StateMonitor(G, ["u","I"], record=True)
+        return G, state_mon
+
+    G_lif, state_mon_lif = get_lif()
+    G_eif, state_mon_eif = get_eif()
+    G_qif, state_mon_qif = get_qif()
+    net1.add([
+        G_lif, state_mon_lif,
+        G_eif, state_mon_eif,
+        G_qif, state_mon_qif,
+    ])
+
+    ##simulate
+    net1.run(t_sim)
+
+    return n_neurons, state_mon_lif, state_mon_eif, state_mon_qif
+
 def load_data(fname:str, pb_ref:float) -> Tuple:
     df = pl.read_csv(fname, comment_prefix="#")
 
@@ -164,12 +261,12 @@ def load_des(fname:str, df_pb:pl.DataFrame, pb_ref:float) -> Tuple:
         (survey, sntype)
     )
 
-
 def load_rubin(df_pb:pl.DataFrame) -> Tuple:
 
-    obj, sntype = "313998569623257167", "snii"
-    obj, sntype = "314003014107006318", "snic"
-    # obj, sntype = "170107660764446767", "snii"
+    #t_peak estimated via visual inspection
+    # obj, sntype, t_peak = "313998569623257167", "snii", 61144
+    # obj, sntype, t_peak = "314003014107006318", "snic", 61138
+    obj, sntype, t_peak  = "170107660764446767", "snii", 61141
 
     cols = {
         "r:midpointMjdTai":"time [d]", 
@@ -192,10 +289,10 @@ def load_rubin(df_pb:pl.DataFrame) -> Tuple:
     )
 
     pb_raw = df_lc["wavelength"].to_numpy().flatten()
-    x_raw = (df_lc["time [d]"] - df_lc["time [d]"].min()).to_numpy().flatten()
+    x_raw = (df_lc["time [d]"] - t_peak).to_numpy().flatten()
     y_raw = df_lc["flux_difference"].to_numpy().flatten() * 1e-3
     y_raw_e = df_lc["flux_difference_e"].to_numpy().flatten() * 1e-3
-    return (obj, sntype, 
+    return (obj, sntype,
         pb_raw, x_raw, y_raw, y_raw_e
     )
 
@@ -329,102 +426,170 @@ def plot_lstein(
     fig.show()
     return
 
-def run_brian2():
+def plot_lstein_des(
+    pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
+    df_pb:pl.DataFrame,
+    survey:str,
+    sntype:str,
+    suffix:str="",
+    ) -> None:
 
-    #simulation
-    ##neuron params
-    n_neurons   = 3
-    u_rest      = -65*mV
-    # u_rest      = 0*mV
-    u_reset     = -75*mV
-    u_th        = -50*mV #(=theta)
-    C_m         = 750*pF
-    R_m         = 0.02*Gohm
-    tau_m       = R_m*C_m
-    a0          = 3e-1*(1/mV)   #qif specific
-    u_c         = -50*mV        #qif specific
-    Delta_T     = 3*mV          #eif specific
-    theta_rh    = -50*mV        #eif specific
-    delta_abs   = 0*ms  #refractory period
+    thticks = np.linspace(pb_raw.min(), pb_raw.max(), 5).astype(int)
+    # xticks  = np.linspace(x_raw.min(), x_raw.max(), 3).round(1)
+    xticks  = np.arange(-30, 110, 20).astype(int)
+    yticks  = np.linspace(y_raw.min(), y_raw.max(), 3).round(1)
 
-    ##simulation specs
-    t_sim = .2 * second
-    dt = .1 * ms
-    
-    ##config brian2
-    brian2.defaultclock.dt = dt
-
-    ##neuron inputs
-    t_in = np_.arange(0, t_sim, dt)
-    I_in = TimedArray(np_.linspace([800]*len(t_in), 1000, n_neurons).T * pA, dt=dt)
-
-    ##init network
-    brian2.start_scope()
-    net1 = Network()
-    
-    ##setup neurons
-    def get_lif():
-        eqs = dict(
-            model=(
-                'du/dt = -(u-u_rest)/tau_m + (R_m*I)/tau_m : volt (unless refractory)\n'
-                'I = I_in(t, i) : amp \n'
-            ),
-            threshold="u>u_th",
-            reset="u=u_reset",
-            refractory=delta_abs,
+    LSC = lstein.LSteinCanvas(
+        thticks, xticks, yticks,
+        thetaguidelims=(-1*np.pi/2,1*np.pi/2),
+        panelsize=np.pi/6,
+        xticklabelkwargs=dict(c="#ffffff", xshift=-13, yshift=0),
+        thetaticklabelkwargs=dict(c="#ffffff"),
+        xlabel="Time [d]", xlabelkwargs=dict(c="w", textangle=90, xshift=-30, yshift=20),
+        ylabel="Relative flux", ylabelkwargs=dict(c="w", textangle=0),
+        thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
+    )
+    for idx, pb in enumerate(np.unique(pb_raw)):
+        
+        LSP = LSC.add_panel(pb,
+            yticklabelkwargs=dict(c="#ffffff"),
+            yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
+            y_projection_method="theta",
+            # ytickkwargs=dict(c="w"),
+            show_panelbounds=True,
+            panelboundskwargs=dict(c="w"),
         )
-        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
-        G.u = u_reset
-        state_mon = StateMonitor(G, ["u","I"], record=True)
-        return G, state_mon
-    def get_eif():
-        eqs = dict(
-            model=(
-                'du/dt = (-(u-u_rest)/tau_m) + Delta_T * exp((u - theta_rh)/Delta_T)/tau_m'
-                ' + R_m*I/tau_m'
-                '\n'
-                '   : volt (unless refractory) \n'
-                'I = I_in(t, i) : amp \n'
+        LSP.plot(x_raw[(pb_raw==pb)], y_raw[(pb_raw==pb)], seriestype="scatter", marker=dict(color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(), symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item()))
+
+    fig = lstein.draw(LSC, backend="plotly")
+    fig.update_layout(
+        margin=dict(
+            t=0,
+            b=0,
+            l=0,
+            r=0,
+        ),
+        font=dict(
+            size=10,
+        ),
+    )
+    pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}Real{suffix}.json", pretty=True)
+    fig.show()
+    return
+
+def plot_onepanel_rubin(
+    obj:str, sntype:str,
+    pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
+    df_pb:pl.DataFrame,
+    ):
+
+    fig = make_subplots(1,1,
+        x_title="Time [d]",
+        y_title="Flux [&#xb5;Jy]",
+    )
+
+    fig.update_layout(
+        autosize=True,
+        width=None,
+        height=None,
+        margin=dict(
+            l=70,
+            r=0,
+            t=0,
+            b=60,
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        )        
+    )
+
+    fig.add_traces([
+        dict(
+            x=x_rubin[(pb_rubin==pb)],
+            y=y_rubin[(pb_rubin==pb)],
+            error_y=dict(
+                type="data",
+                array=y_rubin_e[(pb_rubin==pb)],
+                visible=True,
             ),
-            threshold="u>u_th",
-            reset="u=u_reset",
-            refractory=delta_abs,
+            type="scatter", mode="markers",
+            name=f"{df_pb.filter(pl.col('wavelength')==pb)['name'].item()} ({df_pb.filter(pl.col('wavelength')==pb)['wavelength'].item()} nm)",
+            marker=dict(
+                color=df_pb.filter(pl.col('wavelength')==pb)['plot_color_cmap'].item(),
+                symbol=df_pb.filter(pl.col('wavelength')==pb)['plot_marker'].item(),
+            )
         )
-        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
-        G.u = u_reset
-        state_mon = StateMonitor(G, ["u","I"], record=True)
-        return G, state_mon
-    def get_qif():
-        eqs = dict(
-            model=(
-                'du/dt = (a0*(u-u_rest)*(u-u_c)/tau_m)'
-                ' + R_m*I/tau_m'
-                '\n'
-                '   : volt (unless refractory) \n'
-                'I = I_in(t, i) : amp \n'
-            ),
-            threshold="u>u_th",
-            reset="u=u_reset",
-            refractory=delta_abs,
+    for pb in np.unique(pb_rubin)])
+
+    pio.write_json(fig, f"../gfx/ScatterOnepanelRubin{sntype.capitalize()}.json", pretty=True)
+
+    fig.show()    
+
+    return
+
+def plot_lstein_rubin(
+    obj:str, sntype:str,
+    pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
+    df_pb:pl.DataFrame,
+    sharey:False,
+    ) -> None:
+
+    thticks = np.linspace(pb_rubin.min(), pb_rubin.max(), 5).astype(int)
+    xticks  = np.arange(np.floor(x_rubin.min()/10)*10, np.ceil(x_rubin.max()/10)*10, 20).astype(int)
+    yticks  = np.linspace(y_rubin.min(), y_rubin.max(), 3).round(1)
+
+    LSC = lstein.LSteinCanvas(
+        thticks, xticks, yticks,
+        thetaguidelims=(-0*np.pi/2,2*np.pi/2),
+        panelsize=np.pi/6,
+        xticklabelkwargs=dict(c="#ffffff", xshift=0, yshift=-10),
+        thetaticklabelkwargs=dict(c="#ffffff"),
+        xlabel="Explosion phase [d]", xlabelkwargs=dict(c="w", textangle=0, xshift=0, yshift=-20, xanchor="right"),
+        ylabel="Difference flux [&#xb5;Jy]", ylabelkwargs=dict(c="w", textangle=80, xshift=7),
+        thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
+    )
+    for idx, pb in enumerate(np.unique(pb_rubin)):
+        y_pb = y_rubin[(pb_rubin==pb)]
+        x_pb = x_rubin[(pb_rubin==pb)]
+        
+        if sharey:  #shared y-axis
+            yticks = (yticks if idx==0 else (yticks, [""]*len(yticks)))
+        else:       #each y-axis scales individually
+            yticks = np.linspace(y_pb.min(), y_pb.max(), 3).round(1)
+
+        LSP = LSC.add_panel(pb,
+            yticklabelkwargs=dict(c="#ffffff"),
+            yticks=yticks,
+            y_projection_method="theta",
+            # ytickkwargs=dict(c="w"),
+            show_panelbounds=True,
+            panelboundskwargs=dict(c="w"),
         )
-        G = NeuronGroup(n_neurons, **eqs, method="euler", dt=dt)
-        G.u = u_reset
-        state_mon = StateMonitor(G, ["u","I"], record=True)
-        return G, state_mon
+        LSP.plot(x_pb, y_pb, seriestype="scatter", marker=dict(color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(), symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item()))
 
-    G_lif, state_mon_lif = get_lif()
-    G_eif, state_mon_eif = get_eif()
-    G_qif, state_mon_qif = get_qif()
-    net1.add([
-        G_lif, state_mon_lif,
-        G_eif, state_mon_eif,
-        G_qif, state_mon_qif,
-    ])
+    fig = lstein.draw(LSC, backend="plotly")
+    fig.update_layout(
+        autosize=True,
+        width=None,
+        height=None,        
+        margin=dict(
+            t=0,
+            b=0,
+            l=0,
+            r=0,
+        ),
+        font=dict(
+            size=10,
+        ),
+    )
+    pio.write_json(fig, f"../gfx/LsteinRubin{sntype.capitalize()}.json", pretty=True)
+    fig.show()        
 
-    ##simulate
-    net1.run(t_sim)
-
-    return n_neurons, state_mon_lif, state_mon_eif, state_mon_qif
+    return
 
 def plot_lstein_snn():
     n_neurons, state_mon_lif, state_mon_eif, state_mon_qif = run_brian2()
@@ -727,165 +892,7 @@ def plot_lstein_spectra():
     
     return
 
-def plot_lstein_rubin(
-    obj:str, sntype:str,
-    pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
-    df_pb:pl.DataFrame,
-    ) -> None:
-
-    thticks = np.linspace(pb_rubin.min(), pb_rubin.max(), 5).astype(int)
-    xticks  = np.arange(np.floor(x_rubin.min()), np.ceil(x_rubin.max()), 20).astype(int)
-    yticks  = np.linspace(y_rubin.min(), y_rubin.max(), 3).round(1)
-
-    LSC = lstein.LSteinCanvas(
-        thticks, xticks, yticks,
-        thetaguidelims=(-1*np.pi/2,1*np.pi/2),
-        panelsize=np.pi/6,
-        xticklabelkwargs=dict(c="#ffffff", xshift=-13, yshift=0),
-        thetaticklabelkwargs=dict(c="#ffffff"),
-        xlabel="Time [d]", xlabelkwargs=dict(c="w", textangle=90, xshift=-30, yshift=20),
-        ylabel="Difference flux [&#xb5;Jy]", ylabelkwargs=dict(c="w", textangle=0),
-        thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
-    )
-    for idx, pb in enumerate(np.unique(pb_rubin)):
-        
-        LSP = LSC.add_panel(pb,
-            yticklabelkwargs=dict(c="#ffffff"),
-            yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
-            y_projection_method="theta",
-            # ytickkwargs=dict(c="w"),
-            show_panelbounds=True,
-            panelboundskwargs=dict(c="w"),
-        )
-        LSP.plot(x_rubin[(pb_rubin==pb)], y_rubin[(pb_rubin==pb)], seriestype="scatter", marker=dict(color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(), symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item()))
-
-    fig = lstein.draw(LSC, backend="plotly")
-    fig.update_layout(
-        autosize=True,
-        width=None,
-        height=None,        
-        margin=dict(
-            t=0,
-            b=0,
-            l=0,
-            r=0,
-        ),
-        font=dict(
-            size=10,
-        ),
-    )
-    pio.write_json(fig, f"../gfx/LsteinRubin{sntype.capitalize()}.json", pretty=True)
-    fig.show()        
-
-    return
-
-def plot_onepanel_rubin(
-    obj:str, sntype:str,
-    pb_rubin:np.ndarray, x_rubin:np.ndarray, y_rubin:np.ndarray, y_rubin_e:np.ndarray,
-    df_pb:pl.DataFrame,
-    ):
-
-    fig = make_subplots(1,1,
-        x_title="Time [d]",
-        y_title="Flux [&#xb5;Jy]",
-    )
-
-    fig.update_layout(
-        autosize=True,
-        width=None,
-        height=None,
-        margin=dict(
-            l=70,
-            r=0,
-            t=0,
-            b=60,
-        ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="center",
-            x=0.5
-        )        
-    )
-
-    fig.add_traces([
-        dict(
-            x=x_rubin[(pb_rubin==pb)],
-            y=y_rubin[(pb_rubin==pb)],
-            error_y=dict(
-                type="data",
-                array=y_rubin_e[(pb_rubin==pb)],
-                visible=True,
-            ),
-            type="scatter", mode="markers",
-            name=f"{df_pb.filter(pl.col('wavelength')==pb)['name'].item()} ({df_pb.filter(pl.col('wavelength')==pb)['wavelength'].item()} nm)",
-            marker=dict(
-                color=df_pb.filter(pl.col('wavelength')==pb)['plot_color_cmap'].item(),
-                symbol=df_pb.filter(pl.col('wavelength')==pb)['plot_marker'].item(),
-            )
-        )
-    for pb in np.unique(pb_rubin)])
-
-    pio.write_json(fig, f"../gfx/ScatterOnepanelRubin{sntype.capitalize()}.json", pretty=True)
-
-    fig.show()    
-
-    return
 #%%main
-
-
-def plot_lstein_des(
-    pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
-    df_pb:pl.DataFrame,
-    survey:str,
-    sntype:str,
-    suffix:str="",
-    ) -> None:
-
-    thticks = np.linspace(pb_raw.min(), pb_raw.max(), 5).astype(int)
-    # xticks  = np.linspace(x_raw.min(), x_raw.max(), 3).round(1)
-    xticks  = np.arange(-30, 110, 20).astype(int)
-    yticks  = np.linspace(y_raw.min(), y_raw.max(), 3).round(1)
-
-    LSC = lstein.LSteinCanvas(
-        thticks, xticks, yticks,
-        thetaguidelims=(-1*np.pi/2,1*np.pi/2),
-        panelsize=np.pi/6,
-        xticklabelkwargs=dict(c="#ffffff", xshift=-13, yshift=0),
-        thetaticklabelkwargs=dict(c="#ffffff"),
-        xlabel="Time [d]", xlabelkwargs=dict(c="w", textangle=90, xshift=-30, yshift=20),
-        ylabel="Relative flux", ylabelkwargs=dict(c="w", textangle=0),
-        thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
-    )
-    for idx, pb in enumerate(np.unique(pb_raw)):
-        
-        LSP = LSC.add_panel(pb,
-            yticklabelkwargs=dict(c="#ffffff"),
-            yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
-            y_projection_method="theta",
-            # ytickkwargs=dict(c="w"),
-            show_panelbounds=True,
-            panelboundskwargs=dict(c="w"),
-        )
-        LSP.plot(x_raw[(pb_raw==pb)], y_raw[(pb_raw==pb)], seriestype="scatter", marker=dict(color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(), symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item()))
-
-    fig = lstein.draw(LSC, backend="plotly")
-    fig.update_layout(
-        margin=dict(
-            t=0,
-            b=0,
-            l=0,
-            r=0,
-        ),
-        font=dict(
-            size=10,
-        ),
-    )
-    pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}Real{suffix}.json", pretty=True)
-    fig.show()
-    return
-
 def main():
     df_pb = get_passbands().collect()
 
@@ -938,11 +945,11 @@ def main():
         suffix="Bad"
     ) """
 
-    """ #rubin
+    #rubin
     obj, sntype, \
         pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(df_pb)
-    plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb)
-    plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb) """
+    plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb, sharey=False)
+    # plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb)
 
     # plot_lstein_snn()
     # plot_lstein_pulsar()
