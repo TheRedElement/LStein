@@ -12,7 +12,7 @@ import numpy as np
 import polars as pl
 from plotly.subplots import make_subplots
 import plotly.io as pio
-from typing import Tuple
+from typing import Any, Tuple
 
 from lstein import lstein, utils as lsu, makedata as md, paper_plots as pp
 
@@ -106,7 +106,7 @@ def get_passbands(
     
     return df_pb
 
-def load_data(fname:str, pb_ref:float) -> Tuple[pl.DataFrame, pl.DataFrame]:
+def load_data(fname:str, pb_ref:float) -> Tuple:
     df = pl.read_csv(fname, comment_prefix="#")
 
     survey = fname.replace(".csv", "").split("_")[-1]
@@ -136,6 +136,34 @@ def load_data(fname:str, pb_ref:float) -> Tuple[pl.DataFrame, pl.DataFrame]:
         (pb_pro, x_pro, y_pro, y_pro_e),
         (survey, sntype)
     )
+
+def load_des(fname:str, df_pb:pl.DataFrame, pb_ref:float) -> Tuple:
+    df = pl.read_parquet(fname)
+
+    survey = fname.replace(".parquet", "").split("_")[-1]
+    sntype = fname.replace(".parquet", "").split("_")[-2]
+
+    #add pb info    
+    df_raw = (df
+        .join(df_pb.filter(pl.col("mission")=="lsst").select("band", "wavelength"), left_on="band", right_on="band", how="left")
+    )
+
+    x_raw, y_raw, y_raw_e, pb_raw = df_raw.select(pl.exclude("band"))[:,:4].to_numpy().T
+
+    #normalize
+    pb_raw_r = (pb_raw==pb_ref)
+    x_peak_r = x_raw[pb_raw_r][np.argmax(y_raw[pb_raw_r])]
+    y_peak = y_raw[pb_raw_r].max()
+    x_raw -= x_peak_r
+
+    y_raw /= y_peak
+    y_raw_e /= y_peak
+
+    return (
+        (pb_raw, x_raw, y_raw, y_raw_e),
+        (survey, sntype)
+    )
+
 
 def load_rubin(df_pb:pl.DataFrame) -> Tuple:
 
@@ -805,6 +833,59 @@ def plot_onepanel_rubin(
 
     return
 #%%main
+
+
+def plot_lstein_des(
+    pb_raw:np.ndarray, x_raw:np.ndarray, y_raw:np.ndarray, y_raw_e:np.ndarray,
+    df_pb:pl.DataFrame,
+    survey:str,
+    sntype:str,
+    suffix:str="",
+    ) -> None:
+
+    thticks = np.linspace(pb_raw.min(), pb_raw.max(), 5).astype(int)
+    # xticks  = np.linspace(x_raw.min(), x_raw.max(), 3).round(1)
+    xticks  = np.arange(-30, 110, 20).astype(int)
+    yticks  = np.linspace(y_raw.min(), y_raw.max(), 3).round(1)
+
+    LSC = lstein.LSteinCanvas(
+        thticks, xticks, yticks,
+        thetaguidelims=(-1*np.pi/2,1*np.pi/2),
+        panelsize=np.pi/6,
+        xticklabelkwargs=dict(c="#ffffff", xshift=-13, yshift=0),
+        thetaticklabelkwargs=dict(c="#ffffff"),
+        xlabel="Time [d]", xlabelkwargs=dict(c="w", textangle=90, xshift=-30, yshift=20),
+        ylabel="Relative flux", ylabelkwargs=dict(c="w", textangle=0),
+        thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
+    )
+    for idx, pb in enumerate(np.unique(pb_raw)):
+        
+        LSP = LSC.add_panel(pb,
+            yticklabelkwargs=dict(c="#ffffff"),
+            yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
+            y_projection_method="theta",
+            # ytickkwargs=dict(c="w"),
+            show_panelbounds=True,
+            panelboundskwargs=dict(c="w"),
+        )
+        LSP.plot(x_raw[(pb_raw==pb)], y_raw[(pb_raw==pb)], seriestype="scatter", marker=dict(color=df_pb.filter(pl.col("wavelength")==pb)["plot_color_cmap"].item(), symbol=df_pb.filter(pl.col("wavelength")==pb)["plot_marker"].item()))
+
+    fig = lstein.draw(LSC, backend="plotly")
+    fig.update_layout(
+        margin=dict(
+            t=0,
+            b=0,
+            l=0,
+            r=0,
+        ),
+        font=dict(
+            size=10,
+        ),
+    )
+    pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}Real{suffix}.json", pretty=True)
+    fig.show()
+    return
+
 def main():
     df_pb = get_passbands().collect()
 
@@ -825,17 +906,36 @@ def main():
         survey, sntype,
     ) """
 
-    """ #des simulations
+    # #des simulations
+    # (pb_raw, x_raw, y_raw, y_raw_e), \
+    #     (pb_pro, x_pro, y_pro, y_pro_e), \
+    #         (survey, sntype) = load_data(f"../data/3787399_snia_des.csv", pb_ref=642.0)
+    #         # (survey, sntype) = load_data(f"../data/11370314_snib_des.csv", pb_ref=642.0)
+    #         # (survey, sntype) = load_data(f"../data/2723412_sniin_des.csv", pb_ref=642.0)
+    # plot_onepanel(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     df_pb,
+    #     survey, sntype,
+    # )
+
+    """ #def real data
     (pb_raw, x_raw, y_raw, y_raw_e), \
-        (pb_pro, x_pro, y_pro, y_pro_e), \
-             (survey, sntype) = load_data(f"../data/3787399_snia_des.csv", pb_ref=642.0)
-            #  (survey, sntype) = load_data(f"../data/11370314_snib_des.csv", pb_ref=642.0)
-        # (survey, sntype) = load_data(f"../data/2723412_sniin_des.csv", pb_ref=642.0)
-    plot_onepanel(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
+            (survey, sntype) = load_des(f"../data/lcs_des/1330031_snia_des.parquet", df_pb=df_pb, pb_ref=622.3)
+            # (survey, sntype) = load_des(f"../data/lcs_des/1447077_snibc_des.parquet", df_pb=df_pb, pb_ref=622.3)
+            # (survey, sntype) = load_des(f"../data/lcs_des/1861397_snii_des.parquet", df_pb=df_pb, pb_ref=622.3)
+    plot_lstein_des(pb_raw, x_raw, y_raw, y_raw_e,
+        df_pb,
+        survey, sntype
+    )
+    
+    ##bad lc
+    (pb_raw, x_raw, y_raw, y_raw_e), \
+            (survey, sntype) = load_des(f"../data/lcs_des/1876655_snii_des.parquet", df_pb=df_pb, pb_ref=622.3)
+    plot_lstein_des(pb_raw, x_raw, y_raw, y_raw_e,
         df_pb,
         survey, sntype,
+        suffix="Bad"
     ) """
 
     """ #rubin

@@ -52,7 +52,7 @@ def cart2polar(
         - `numpy`
         - `typing`
     """
-    
+    print(x, y)
     r = np.sqrt(x**2 + y**2)
     theta = np.arctan2(y, x) + np.pi
 
