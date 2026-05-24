@@ -264,8 +264,8 @@ def load_des(fname:str, df_pb:pl.DataFrame, pb_ref:float) -> Tuple:
 def load_rubin(df_pb:pl.DataFrame) -> Tuple:
 
     #t_peak estimated via visual inspection
-    # obj, sntype, t_peak = "313998569623257167", "snii", 61144
-    obj, sntype, t_peak = "314003014107006318", "snic", 61138
+    obj, sntype, t_peak = "313998569623257167", "snii", 61144
+    # obj, sntype, t_peak = "314003014107006318", "snic", 61138
     # obj, sntype, t_peak  = "170107660764446767", "snii", 61141
 
     cols = {
@@ -484,7 +484,7 @@ def plot_onepanel_rubin(
     ):
 
     fig = make_subplots(1,1,
-        x_title="Time [d]",
+        x_title="Explosion phase [d]",
         y_title="Flux [&#xb5;Jy]",
     )
 
@@ -949,7 +949,7 @@ def main():
     obj, sntype, \
         pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e = load_rubin(df_pb)
     plot_lstein_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb, sharey=False)
-    # plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb)
+    plot_onepanel_rubin(obj, sntype, pb_rubin_rubin, x_rubin, y_rubin, y_rubin_e, df_pb)
 
     # plot_lstein_snn()
     # plot_lstein_pulsar()
