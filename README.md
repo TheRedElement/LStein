@@ -11,13 +11,6 @@
 ```
 
 <!-- block -->
-> [!WARNING]
-> Note, that this package is currently under development.
-> Most functionalities should work, but changes will be implemented on a running basis and without notice.
-> No tests have been performed yet.
-<!-- block -->
-
-<!-- block -->
 > [!NOTE]
 > This page summarizes the most common characteristics, pitfalls etc.
 > Please refer to the paper (in prep) for a more detailed list and [Tutorials](docs/pages/tutorals.rst) for solutions to some known issues/missing features.
@@ -49,8 +42,14 @@ archivePrefix = {arXiv},
 ## Installation
 You can easily install the package using [pip](https://pypi.org/project/pip/):
 
+* directly from [GitHub](https://github.com/TheRedElement/LStein)
 ```shell
 pip3 install git+https://github.com/TheRedElement/LStein.git
+```
+
+* from [pypi](https://pypi.org/project/lstein/)
+```shell
+pip3 install lstein
 ```
 
 ## Quick Start
