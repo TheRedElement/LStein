@@ -475,7 +475,7 @@ def plot_multipanel(
 
 
     fig = make_subplots(2,3,
-        shared_xaxes=True,
+        shared_xaxes="all",
         x_title="Explosion phase [d]",
         y_title="Relative flux",
     )
@@ -1167,7 +1167,7 @@ def plot_lstein_spectra():
 def main():
     df_pb = get_passbands().collect()
 
-    """ #elasticc
+    #elasticc
     (pb_raw, x_raw, y_raw, y_raw_e), \
         (pb_pro, x_pro, y_pro, y_pro_e), \
         (survey, sntype) = load_data(f"../data/0901_snii_elasticc.csv", pb_ref=622.3)
@@ -1183,45 +1183,45 @@ def main():
     #     df_pb,
     #     survey, sntype,
     # )
-    # plot_multipanel(
-    #     pb_raw, x_raw, y_raw, y_raw_e,
-    #     pb_pro, x_pro, y_pro, y_pro_e,
-    #     df_pb,
-    #     survey, sntype,
-    # )
+    plot_multipanel(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        df_pb,
+        survey, sntype,
+    )
     # plot_3d(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     df_pb,
     #     survey, sntype,
     # )
-    plot_lstein(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        df_pb,
-        survey, sntype,
-        y_projection_method="theta",
-    )
-    plot_lstein(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        df_pb,
-        survey, sntype,
-        y_projection_method="y",
-    ) """
-
-    # #des simulations
-    # (pb_raw, x_raw, y_raw, y_raw_e), \
-    #     (pb_pro, x_pro, y_pro, y_pro_e), \
-    #         (survey, sntype) = load_data(f"../data/3787399_snia_des.csv", pb_ref=642.0)
-    #         # (survey, sntype) = load_data(f"../data/11370314_snib_des.csv", pb_ref=642.0)
-    #         # (survey, sntype) = load_data(f"../data/2723412_sniin_des.csv", pb_ref=642.0)
-    # plot_onepanel(
+    # plot_lstein(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     df_pb,
     #     survey, sntype,
+    #     y_projection_method="theta",
     # )
+    # plot_lstein(
+    #     pb_raw, x_raw, y_raw, y_raw_e,
+    #     pb_pro, x_pro, y_pro, y_pro_e,
+    #     df_pb,
+    #     survey, sntype,
+    #     y_projection_method="y",
+    # )
+
+    """ #des simulations
+    (pb_raw, x_raw, y_raw, y_raw_e), \
+        (pb_pro, x_pro, y_pro, y_pro_e), \
+            (survey, sntype) = load_data(f"../data/3787399_snia_des.csv", pb_ref=642.0)
+            # (survey, sntype) = load_data(f"../data/11370314_snib_des.csv", pb_ref=642.0)
+            # (survey, sntype) = load_data(f"../data/2723412_sniin_des.csv", pb_ref=642.0)
+    plot_onepanel(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        df_pb,
+        survey, sntype,
+    ) """
 
     """ #def real data
     (pb_raw, x_raw, y_raw, y_raw_e), \
