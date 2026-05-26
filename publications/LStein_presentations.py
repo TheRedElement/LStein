@@ -637,11 +637,18 @@ def plot_3d(
             zaxis=dict(
                 title="Relative flux",
             ),
-        )
+        ),
     )
 
     pio.write_json(fig, f"../gfx/Scatter3d{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
-
+    
+    #for printing to pdf/browsers without webgl support
+    fig.update_layout(
+        width=500*1.3,
+        height=415*1.3,
+        autosize=True,
+    )
+    pio.write_image(fig, f"../gfx/temp_Scatter3d{survey.capitalize()}{sntype.capitalize()}.svg")
     fig.show()
     return
 
@@ -1183,18 +1190,18 @@ def main():
     #     df_pb,
     #     survey, sntype,
     # )
-    plot_multipanel(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        df_pb,
-        survey, sntype,
-    )
-    # plot_3d(
+    # plot_multipanel(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     df_pb,
     #     survey, sntype,
     # )
+    plot_3d(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        df_pb,
+        survey, sntype,
+    )
     # plot_lstein(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,

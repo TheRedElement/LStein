@@ -42,6 +42,7 @@ docs = [
     "sphinx-copybutton>=0.5.2",
 ]
 paper = [
+    "kaleido>=1.3.0",
     "lustcodesnippets-py",
     "pandas>=2.3.3",
     "sncosmo>=2.12.1",
