@@ -3,9 +3,11 @@
 #my files
 ~/
 .vscode
-gfx/*.png
+Session.vim
 gfx/*.json
 gfx/*.pdf
+gfx/*.png
+gfx/*.svg
 poetry.lock
 report/gfx
 
@@ -25,6 +27,7 @@ data/wiserep_*_spectra
 !gfx/1189_snia_elasticc.png
 !gfx/2025_tde_elasticc.png
 !gfx/sin_simulated.png
+!gfx/lstein_logo.svg
 
 ##############
 #CUSTOM LATEX#

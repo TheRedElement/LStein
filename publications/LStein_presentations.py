@@ -32,7 +32,7 @@ def binning(
 
     xbin = np.array([])
     ybin = np.array([])
-    
+
     #init inteval bounds
     xlb = np.nanmin(x)
     xub = xlb+dx
@@ -41,7 +41,7 @@ def binning(
         mask = (xlb <= x)&(x < xub)  #current inteval
         xbin = np.append(xbin, func(x[mask]))
         ybin = np.append(ybin, func(y[mask]))
-        
+
         #update
         xlb += dx
         xub += dx
@@ -68,7 +68,7 @@ def get_passbands(
             - `float`, optional
             - vmax to apply to the wavelength colormap
             - the default is `1000`
-    
+
     Raises
 
     Returns
@@ -85,7 +85,7 @@ def get_passbands(
     if cmap is None: cmap = "turbo"
 
     df_pb = pl.scan_csv("../data/passband_specs.csv")
-    
+
     #generate passband colors
     norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
     cmap = plt.get_cmap(cmap)
@@ -103,7 +103,7 @@ def get_passbands(
         }),
         pl.lit(pb_colors).alias("plot_color_cmap")
     )
-    
+
     return df_pb
 
 def run_brian2():
@@ -127,7 +127,7 @@ def run_brian2():
     ##simulation specs
     t_sim = .2 * second
     dt = .1 * ms
-    
+
     ##config brian2
     brian2.defaultclock.dt = dt
 
@@ -138,7 +138,7 @@ def run_brian2():
     ##init network
     brian2.start_scope()
     net1 = Network()
-    
+
     ##setup neurons
     def get_lif():
         eqs = dict(
@@ -209,7 +209,7 @@ def load_data(fname:str, pb_ref:float) -> Tuple:
 
     survey = fname.replace(".csv", "").split("_")[-1]
     sntype = fname.replace(".csv", "").split("_")[-2]
-    
+
     df_raw = df.filter(pl.col("processing")=="raw")
     df_pro = df.filter(pl.col("processing")=="gp")
 
@@ -241,7 +241,7 @@ def load_des(fname:str, df_pb:pl.DataFrame, pb_ref:float) -> Tuple:
     survey = fname.replace(".parquet", "").split("_")[-1]
     sntype = fname.replace(".parquet", "").split("_")[-2]
 
-    #add pb info    
+    #add pb info
     df_raw = (df
         .join(df_pb.filter(pl.col("mission")=="lsst").select("band", "wavelength"), left_on="band", right_on="band", how="left")
     )
@@ -270,7 +270,7 @@ def load_rubin(df_pb:pl.DataFrame) -> Tuple:
     # obj, sntype, t_peak  = "170107660764446767", "snii", 61141
 
     cols = {
-        "r:midpointMjdTai":"time [d]", 
+        "r:midpointMjdTai":"time [d]",
         "r:scienceFlux":"flux_science", "r:scienceFluxErr":"flux_science_e",
         "r:templateFlux":"flux_template", "r:templateFluxErr":"flux_template_e",
         "r:band":"band",
@@ -323,7 +323,7 @@ def plot_onepanel(
             y=1.02,
             xanchor="center",
             x=0.5
-        )        
+        )
     )
 
     fig.add_traces([
@@ -407,7 +407,7 @@ def plot_onepanel_offset(
             y=1.02,
             xanchor="center",
             x=0.5
-        )        
+        )
     )
 
     fig.add_traces([
@@ -493,7 +493,7 @@ def plot_multipanel(
             y=1.02,
             xanchor="center",
             x=0.5
-        )        
+        )
     )
 
     fig.add_traces([
@@ -604,7 +604,7 @@ def plot_3d(
             )
         )
     for pb in np.unique(pb_pro)])
-    
+
     fig.update_layout(
         margin=dict(
             l=70,
@@ -641,7 +641,7 @@ def plot_3d(
     )
 
     pio.write_json(fig, f"../gfx/Scatter3d{survey.capitalize()}{sntype.capitalize()}.json", pretty=True)
-    
+
     #for printing to pdf/browsers without webgl support
     fig.update_layout(
         width=500*1.3,
@@ -676,7 +676,7 @@ def plot_lstein(
         thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
     )
     for idx, pb in enumerate(np.unique(pb_raw)):
-        
+
         LSP = LSC.add_panel(pb,
             yticklabelkwargs=dict(c="#ffffff"),
             yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
@@ -701,6 +701,7 @@ def plot_lstein(
         ),
     )
     pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}{y_projection_method.capitalize()}.json", pretty=True)
+    pio.write_image(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}{y_projection_method.capitalize()}.svg")
     fig.show()
     return
 
@@ -728,7 +729,7 @@ def plot_lstein_des(
         thetalabel="Wavelength [nm]", thetalabelkwargs=dict(c="w", xanchor="right", xshift=30),
     )
     for idx, pb in enumerate(np.unique(pb_raw)):
-        
+
         LSP = LSC.add_panel(pb,
             yticklabelkwargs=dict(c="#ffffff"),
             yticks=(yticks if idx==0 else (yticks, [""]*len(yticks))),
@@ -782,7 +783,7 @@ def plot_onepanel_rubin(
             y=1.02,
             xanchor="center",
             x=0.5
-        )        
+        )
     )
 
     fig.add_traces([
@@ -805,7 +806,7 @@ def plot_onepanel_rubin(
 
     pio.write_json(fig, f"../gfx/ScatterOnepanelRubin{sntype.capitalize()}.json", pretty=True)
 
-    fig.show()    
+    fig.show()
 
     return
 
@@ -833,7 +834,7 @@ def plot_lstein_rubin(
     for idx, pb in enumerate(np.unique(pb_rubin)):
         y_pb = y_rubin[(pb_rubin==pb)]
         x_pb = x_rubin[(pb_rubin==pb)]
-        
+
         if sharey:  #shared y-axis
             yticks = (yticks if idx==0 else (yticks, [""]*len(yticks)))
         else:       #each y-axis scales individually
@@ -853,7 +854,7 @@ def plot_lstein_rubin(
     fig.update_layout(
         autosize=True,
         width=None,
-        height=None,        
+        height=None,
         margin=dict(
             t=0,
             b=0,
@@ -865,7 +866,7 @@ def plot_lstein_rubin(
         ),
     )
     pio.write_json(fig, f"../gfx/LsteinRubin{sntype.capitalize()}.json", pretty=True)
-    fig.show()        
+    fig.show()
 
     return
 
@@ -1041,7 +1042,7 @@ def plot_lstein_pulsar():
         font=dict(
             size=10,
         ),
-    )    
+    )
     pio.write_json(fig, "../gfx/LsteinPulsar.json", pretty=True)
     fig.show()
 
@@ -1061,7 +1062,7 @@ def plot_lstein_spectra():
     df_obs = df_obs[[0,5,8,11,15,17],:] #wiserep
 
     # df_obs = df_obs.filter((pl.col("Phase (days)").abs() < 1)) #wiserep
-    dfs_spec = [] 
+    dfs_spec = []
     for idx in range(df_obs.height):
         df_spec = (
             pl.read_csv(f"{datadir}{df_obs['Ascii file'][idx]}", comment_prefix="#", separator=" ")
@@ -1080,7 +1081,7 @@ def plot_lstein_spectra():
     XY_cont = [binning(xi, yi, 500, np.nanmedian) for xi, yi in zip(X, Y)]
     X_cont = [np.linspace(X[i].min(), X[i].max(), X[i].shape[0]) for i in range(len(X))]
     Y_cont = [np.interp(np.linspace(X[i].min(), X[i].max(), X[i].shape[0]), XY_cont[i][0], XY_cont[i][1]) for i in range(len(X))]
-    
+
     Y = [Y[i] - Y_cont[i] for i in range(len(Y))]
     # for i in range(len(X)):
     #     plt.plot(X[i], Y[i])
@@ -1164,10 +1165,10 @@ def plot_lstein_spectra():
         font=dict(
             size=10,
         ),
-    )        
+    )
     pio.write_json(fig, f"../gfx/LsteinSpectra.json", pretty=True)
     fig.show()
-    
+
     return
 
 #%%main
@@ -1196,19 +1197,19 @@ def main():
     #     df_pb,
     #     survey, sntype,
     # )
-    plot_3d(
-        pb_raw, x_raw, y_raw, y_raw_e,
-        pb_pro, x_pro, y_pro, y_pro_e,
-        df_pb,
-        survey, sntype,
-    )
-    # plot_lstein(
+    # plot_3d(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,
     #     df_pb,
     #     survey, sntype,
-    #     y_projection_method="theta",
     # )
+    plot_lstein(
+        pb_raw, x_raw, y_raw, y_raw_e,
+        pb_pro, x_pro, y_pro, y_pro_e,
+        df_pb,
+        survey, sntype,
+        y_projection_method="theta",
+    )
     # plot_lstein(
     #     pb_raw, x_raw, y_raw, y_raw_e,
     #     pb_pro, x_pro, y_pro, y_pro_e,
@@ -1239,7 +1240,7 @@ def main():
         df_pb,
         survey, sntype
     )
-    
+
     ##bad lc
     (pb_raw, x_raw, y_raw, y_raw_e), \
             (survey, sntype) = load_des(f"../data/lcs_des/1876655_snii_des.parquet", df_pb=df_pb, pb_ref=622.3)
