@@ -699,9 +699,14 @@ def plot_lstein(
         font=dict(
             size=10,
         ),
+        # width=300,
+        # height=500,
+        # autosize=False,
+        # paper_bgcolor="rgba(0,0,0,0)",
+        # plot_bgcolor="rgba(0,0,0,0)",
     )
     pio.write_json(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}{y_projection_method.capitalize()}.json", pretty=True)
-    pio.write_image(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}{y_projection_method.capitalize()}.svg")
+    # pio.write_image(fig, f"../gfx/Lstein{survey.capitalize()}{sntype.capitalize()}{y_projection_method.capitalize()}.svg")
     fig.show()
     return
 
