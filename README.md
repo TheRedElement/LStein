@@ -13,7 +13,8 @@
 <!-- block -->
 > [!NOTE]
 > This page summarizes the most common characteristics, pitfalls etc.
-> Please refer to the paper (in prep) for a more detailed list and [Tutorials](docs/pages/tutorals.rst) for solutions to some known issues/missing features.
+> Please refer to the paper for a more detailed list and [Tutorials](docs/pages/tutorals.rst) for solutions to some known issues/missing features.
+> The full documentation can be found on [Read the Docs](https://lstein.readthedocs.io/en/latest/).
 <!-- block -->
 
 ## Reference
